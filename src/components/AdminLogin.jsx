@@ -10,6 +10,8 @@ export default function AdminLogin() {
   const handleLogin = (e) => {
     e.preventDefault();
 
+    console.log("Entered:", username, password); // debug log
+
     if (username.trim() === "admin" && password.trim() === "1234") {
       localStorage.setItem("isAdminLoggedIn", "true");
       navigate("/admin");
@@ -28,7 +30,6 @@ export default function AdminLogin() {
             type="text"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
-            placeholder="Enter admin"
             required
           />
         </div>
@@ -38,7 +39,6 @@ export default function AdminLogin() {
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder="Enter 1234"
             required
           />
         </div>

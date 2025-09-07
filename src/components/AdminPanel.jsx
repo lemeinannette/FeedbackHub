@@ -28,9 +28,11 @@ export default function AdminPanel() {
   return (
     <div style={{ padding: "20px" }}>
       <h1>Admin Dashboard</h1>
-      <button onClick={handleLogout}>Logout</button>
+      <button onClick={handleLogout} style={{ marginBottom: "20px" }}>
+        Logout
+      </button>
 
-      {/* Summary */}
+      {/* Summary Section */}
       <h2>Summary</h2>
       {feedbacks.length === 0 ? (
         <p>No feedback available yet.</p>
@@ -42,23 +44,48 @@ export default function AdminPanel() {
         </ul>
       )}
 
-      {/* Detailed feedbacks */}
+      {/* Feedback Table */}
       <h2>All Feedbacks</h2>
       {feedbacks.length === 0 ? (
         <p>No feedback available yet.</p>
       ) : (
-        <ul>
-          {feedbacks.map((fb, index) => (
-            <li key={index}>
-              <strong>{fb.name}</strong> ({fb.event})  
-              <br />
-              {fb.comments}  
-              <br />
-              {fb.email && <span>Email: {fb.email} | </span>}
-              <span>Date: {fb.date}</span>
-            </li>
-          ))}
-        </ul>
+        <table
+          border="1"
+          cellPadding="8"
+          cellSpacing="0"
+          style={{ borderCollapse: "collapse", width: "100%" }}
+        >
+          <thead>
+            <tr style={{ background: "#f2f2f2" }}>
+              <th>Type</th>
+              <th>Name / Group</th>
+              <th>Email</th>
+              <th>Contact</th>
+              <th>Event</th>
+              <th>Food Rating</th>
+              <th>Service Rating</th>
+              <th>Ambience Rating</th>
+              <th>Comments</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            {feedbacks.map((fb, index) => (
+              <tr key={index}>
+                <td>{fb.type || "Individual"}</td>
+                <td>{fb.name}</td>
+                <td>{fb.email || "-"}</td>
+                <td>{fb.contact || "-"}</td>
+                <td>{fb.event}</td>
+                <td>{fb.foodRating}</td>
+                <td>{fb.serviceRating}</td>
+                <td>{fb.ambienceRating}</td>
+                <td>{fb.comments}</td>
+                <td>{fb.date}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       )}
     </div>
   );

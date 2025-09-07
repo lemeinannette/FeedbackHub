@@ -5,21 +5,21 @@ import Toggle from "./Toggle";
 import EventDropdown from "./EventDropDown";
 
 export default function FeedbackForm() {
-  const navigate = useNavigate();
-
   const [formData, setFormData] = useState({
-    guestName: "",
+    name: "",
+    email: "",
     contact: "",
+    group: "",
+    comments: "",
+    foodRating: 0,
+    serviceRating: 0,
+    ambienceRating: 0,
     event: "",
     otherEvent: "",
-    overall: 0,
-    food: 0,
-    service: 0,
-    ambience: 0,
-    entertainment: 0,
-    recommend: "",
-    comment: "",
+    anonymous: false,
   });
+
+  const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -30,17 +30,20 @@ export default function FeedbackForm() {
         formData.event === "Other"
           ? `Other: ${formData.otherEvent}`
           : formData.event,
+      name: formData.anonymous ? "Anonymous" : formData.name,
+      email: formData.anonymous ? "" : formData.email,
+      contact: formData.anonymous ? "" : formData.contact,
+      group: formData.anonymous ? "" : formData.group,
       date: new Date().toLocaleString(),
     };
 
-    // Save feedback to localStorage
+    // Save to localStorage
     const existing = JSON.parse(localStorage.getItem("feedbacks")) || [];
     existing.push(finalData);
     localStorage.setItem("feedbacks", JSON.stringify(existing));
 
     console.log("Form submitted:", finalData);
 
-    // ✅ Redirect to Thank You page
     navigate("/thank-you");
   };
 
@@ -48,30 +51,63 @@ export default function FeedbackForm() {
     <div style={{ padding: "20px" }}>
       <h1>Feedback Form</h1>
       <form onSubmit={handleSubmit}>
-        <div>
-          <label>Name: </label>
-          <input
-            type="text"
-            value={formData.guestName}
-            onChange={(e) =>
-              setFormData({ ...formData, guestName: e.target.value })
-            }
-            required
-          />
-        </div>
+        {/* Anonymous Toggle */}
+        <Toggle
+          checked={formData.anonymous}
+          onChange={(val) => setFormData({ ...formData, anonymous: val })}
+        />
 
-        <div>
-          <label>Contact: </label>
-          <input
-            type="text"
-            value={formData.contact}
-            onChange={(e) =>
-              setFormData({ ...formData, contact: e.target.value })
-            }
-          />
-        </div>
+        {/* Show details only if not anonymous */}
+        {!formData.anonymous && (
+          <>
+            <div>
+              <label>Name: </label>
+              <input
+                type="text"
+                value={formData.name}
+                onChange={(e) =>
+                  setFormData({ ...formData, name: e.target.value })
+                }
+                required
+              />
+            </div>
+            <div>
+              <label>Email: </label>
+              <input
+                type="email"
+                value={formData.email}
+                onChange={(e) =>
+                  setFormData({ ...formData, email: e.target.value })
+                }
+                required
+              />
+            </div>
+            <div>
+              <label>Contact: </label>
+              <input
+                type="tel"
+                value={formData.contact}
+                onChange={(e) =>
+                  setFormData({ ...formData, contact: e.target.value })
+                }
+                required
+              />
+            </div>
+            <div>
+              <label>Group/Organization: </label>
+              <input
+                type="text"
+                value={formData.group}
+                onChange={(e) =>
+                  setFormData({ ...formData, group: e.target.value })
+                }
+                required
+              />
+            </div>
+          </>
+        )}
 
-        {/* ✅ Event Dropdown with Other option */}
+        {/* Event Dropdown */}
         <EventDropdown
           value={formData.event}
           otherEvent={formData.otherEvent}
@@ -80,51 +116,33 @@ export default function FeedbackForm() {
 
         {/* Ratings */}
         <StarRating
-          label="Overall"
-          value={formData.overall}
-          onChange={(val) => setFormData({ ...formData, overall: val })}
-        />
-        <StarRating
           label="Food"
-          value={formData.food}
-          onChange={(val) => setFormData({ ...formData, food: val })}
+          value={formData.foodRating}
+          onChange={(val) => setFormData({ ...formData, foodRating: val })}
         />
         <StarRating
           label="Service"
-          value={formData.service}
-          onChange={(val) => setFormData({ ...formData, service: val })}
+          value={formData.serviceRating}
+          onChange={(val) => setFormData({ ...formData, serviceRating: val })}
         />
         <StarRating
           label="Ambience"
-          value={formData.ambience}
-          onChange={(val) => setFormData({ ...formData, ambience: val })}
-        />
-        <StarRating
-          label="Entertainment"
-          value={formData.entertainment}
-          onChange={(val) =>
-            setFormData({ ...formData, entertainment: val })
-          }
+          value={formData.ambienceRating}
+          onChange={(val) => setFormData({ ...formData, ambienceRating: val })}
         />
 
-        {/* Recommend Toggle */}
-        <Toggle
-          label="Would you recommend us?"
-          value={formData.recommend}
-          onChange={(val) => setFormData({ ...formData, recommend: val })}
-        />
-
-        {/* Comment */}
+        {/* Comments */}
         <div>
           <label>Comments: </label>
           <textarea
-            value={formData.comment}
+            value={formData.comments}
             onChange={(e) =>
-              setFormData({ ...formData, comment: e.target.value })
+              setFormData({ ...formData, comments: e.target.value })
             }
           />
         </div>
 
+        {/* Submit */}
         <button type="submit" style={{ marginTop: "10px" }}>
           Submit Feedback
         </button>
