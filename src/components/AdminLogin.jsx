@@ -10,10 +10,15 @@ export default function AdminLogin() {
   const handleLogin = (e) => {
     e.preventDefault();
 
-    if (username === "admin" && password === "1234") {
+    console.log("👉 Entered username:", username);
+    console.log("👉 Entered password:", password);
+
+    if (username.trim() === "admin" && password.trim() === "1234") {
       localStorage.setItem("isAdminLoggedIn", "true");
-      navigate("/admin"); // ✅ straight to dashboard
+      console.log("✅ Login successful, redirecting to /admin...");
+      navigate("/admin");
     } else {
+      console.log("❌ Login failed. Expected admin / 1234");
       setError("Invalid username or password");
     }
   };
@@ -28,6 +33,7 @@ export default function AdminLogin() {
             type="text"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
+            placeholder="Enter admin"
             required
           />
         </div>
@@ -37,6 +43,7 @@ export default function AdminLogin() {
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            placeholder="Enter 1234"
             required
           />
         </div>
