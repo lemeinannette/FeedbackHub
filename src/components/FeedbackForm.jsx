@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import StarRating from "./StarRating";
 import Toggle from "./Toggle";
 import EventDropdown from "./EventDropDown";
@@ -17,6 +18,8 @@ export default function FeedbackForm() {
     comment: "",
     recommend: "",
   });
+
+  const navigate = useNavigate();
 
   const handleChange = (key, value) => {
     setFormData({ ...formData, [key]: value });
@@ -39,59 +42,36 @@ export default function FeedbackForm() {
     existing.push(finalData);
     localStorage.setItem("feedbacks", JSON.stringify(existing));
 
-    console.log("Form submitted:", finalData);
-    alert("Feedback submitted ✅ (check console for details)");
-
-    // Reset form
-    setFormData({
-      guestName: "",
-      contact: "",
-      event: "",
-      otherEvent: "",
-      overall: 0,
-      food: 0,
-      service: 0,
-      ambience: 0,
-      entertainment: 0,
-      comment: "",
-      recommend: "",
-    });
+    // Redirect to thank you page
+    navigate("/thankyou");
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h1>Feedback Form</h1>
+    <form onSubmit={handleSubmit} className="feedback-form">
+      <h1>Event Feedback Form</h1>
 
-      {/* Guest Name */}
-      <div>
-        <label>Name: </label>
-        <input
-          type="text"
-          value={formData.guestName}
-          onChange={(e) => handleChange("guestName", e.target.value)}
-          required
-        />
-      </div>
+      <label>Name</label>
+      <input
+        type="text"
+        value={formData.guestName}
+        onChange={(e) => handleChange("guestName", e.target.value)}
+        required
+      />
 
-      {/* Contact */}
-      <div>
-        <label>Contact: </label>
-        <input
-          type="text"
-          value={formData.contact}
-          onChange={(e) => handleChange("contact", e.target.value)}
-          required
-        />
-      </div>
+      <label>Contact</label>
+      <input
+        type="text"
+        value={formData.contact}
+        onChange={(e) => handleChange("contact", e.target.value)}
+        required
+      />
 
-      {/* Event Dropdown */}
       <EventDropdown
         value={formData.event}
         otherEvent={formData.otherEvent}
         onChange={handleChange}
       />
 
-      {/* Ratings */}
       <StarRating
         label="Overall Experience"
         value={formData.overall}
@@ -118,24 +98,19 @@ export default function FeedbackForm() {
         onChange={(v) => handleChange("entertainment", v)}
       />
 
-      {/* Recommend Toggle */}
       <Toggle
         label="Would you recommend us?"
         value={formData.recommend}
         onChange={(v) => handleChange("recommend", v)}
       />
 
-      {/* Comments */}
-      <div>
-        <label>Comments: </label>
-        <textarea
-          value={formData.comment}
-          onChange={(e) => handleChange("comment", e.target.value)}
-          rows="4"
-        />
-      </div>
+      <label>Comments</label>
+      <textarea
+        value={formData.comment}
+        onChange={(e) => handleChange("comment", e.target.value)}
+        rows="4"
+      />
 
-      {/* Submit */}
       <button type="submit">Submit Feedback</button>
     </form>
   );

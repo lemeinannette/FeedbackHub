@@ -1,20 +1,24 @@
 import { useState, useEffect } from "react";
+import jsPDF from "jspdf";
+import "jspdf-autotable";
 
 export default function AdminPanel() {
   const [feedbacks, setFeedbacks] = useState([]);
 
+  // Load feedbacks from localStorage
   useEffect(() => {
     const stored = JSON.parse(localStorage.getItem("feedbacks")) || [];
     setFeedbacks(stored);
   }, []);
 
-  // Calculate report stats
+  // Function to calculate average rating
   const calcAverage = (key) => {
     if (feedbacks.length === 0) return 0;
-    const total = feedbacks.reduce((sum, fb) => sum + (fb[key] || 0), 0);
+    const total = feedbacks.reduce((sum, fb) => sum + (Number(fb[key]) || 0), 0);
     return (total / feedbacks.length).toFixed(1);
   };
 
+  // Count recommendations
   const recommendCount = feedbacks.reduce(
     (acc, fb) => {
       if (fb.recommend === "yes") acc.yes++;
@@ -24,71 +28,109 @@ export default function AdminPanel() {
     { yes: 0, no: 0 }
   );
 
-  // Export to CSV
-  const exportToCSV = () => {
+  // ✅ Export to PDF
+  const exportToPDF = () => {
+    console.log("Exporting PDF..."); // debug log
+
     if (feedbacks.length === 0) {
       alert("No feedback to export!");
       return;
     }
 
-    const headers = Object.keys(feedbacks[0]).join(",");
-    const rows = feedbacks.map((fb) =>
-      Object.values(fb)
-        .map((val) => `"${val}"`)
-        .join(",")
-    );
-    const csvContent = [headers, ...rows].join("\n");
+    const doc = new jsPDF();
 
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.setAttribute("download", "feedback_report.csv");
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    // Title
+    doc.setFontSize(18);
+    doc.text("Feedback Report", 14, 20);
+
+    // Summary
+    doc.setFontSize(12);
+    doc.text("Summary:", 14, 30);
+    doc.text(`Average Overall: ${calcAverage("overall")}`, 14, 38);
+    doc.text(`Average Food: ${calcAverage("food")}`, 14, 44);
+    doc.text(`Average Service: ${calcAverage("service")}`, 14, 50);
+    doc.text(`Average Ambience: ${calcAverage("ambience")}`, 14, 56);
+    doc.text(`Average Entertainment: ${calcAverage("entertainment")}`, 14, 62);
+    doc.text(
+      `Recommendations → Yes: ${recommendCount.yes}, No: ${recommendCount.no}`,
+      14,
+      70
+    );
+
+    // Table with feedback data
+    const tableData = feedbacks.map((fb) => [
+      fb.guestName,
+      fb.contact,
+      fb.event,
+      fb.overall,
+      fb.food,
+      fb.service,
+      fb.ambience,
+      fb.entertainment,
+      fb.recommend,
+      fb.comment,
+      fb.date,
+    ]);
+
+    doc.autoTable({
+      head: [
+        [
+          "Name",
+          "Contact",
+          "Event",
+          "Overall",
+          "Food",
+          "Service",
+          "Ambience",
+          "Entertainment",
+          "Recommend",
+          "Comment",
+          "Date",
+        ],
+      ],
+      body: tableData,
+      startY: 80,
+      styles: { fontSize: 8 },
+    });
+
+    // Save PDF
+    doc.save("feedback_report.pdf");
   };
 
   return (
-    <div>
+    <div style={{ padding: "20px" }}>
       <h1>Admin Dashboard</h1>
 
-      {/* Report Section */}
       <h2>Reports Summary</h2>
-      <p>Average Overall: {calcAverage("overall")}</p>
-      <p>Average Food: {calcAverage("food")}</p>
-      <p>Average Service: {calcAverage("service")}</p>
-      <p>Average Ambience: {calcAverage("ambience")}</p>
-      <p>Average Entertainment: {calcAverage("entertainment")}</p>
-      <p>
-        Recommendations → Yes: {recommendCount.yes}, No: {recommendCount.no}
-      </p>
-
-      <button onClick={exportToCSV}>📥 Export to CSV</button>
-
-      <hr />
-
-      {/* Feedback List */}
-      <h2>All Feedbacks</h2>
       {feedbacks.length === 0 ? (
         <p>No feedback submitted yet.</p>
       ) : (
-        <ul>
-          {feedbacks.map((fb, index) => (
-            <li key={index}>
-              <strong>{fb.guestName}</strong> ({fb.contact}) – {fb.event}
-              <br />
-              Overall: {fb.overall}, Food: {fb.food}, Service: {fb.service},
-              Ambience: {fb.ambience}, Entertainment: {fb.entertainment}
-              <br />
-              Recommend: {fb.recommend}
-              <br />
-              Comment: {fb.comment}
-              <br />
-              Date: {fb.date}
-              <hr />
-            </li>
-          ))}
-        </ul>
+        <div>
+          <p>Average Overall: {calcAverage("overall")}</p>
+          <p>Average Food: {calcAverage("food")}</p>
+          <p>Average Service: {calcAverage("service")}</p>
+          <p>Average Ambience: {calcAverage("ambience")}</p>
+          <p>Average Entertainment: {calcAverage("entertainment")}</p>
+          <p>
+            Recommendations → Yes: {recommendCount.yes}, No: {recommendCount.no}
+          </p>
+
+          {/* ✅ Working PDF Button */}
+          <button
+            onClick={exportToPDF}
+            style={{
+              marginTop: "10px",
+              padding: "10px 15px",
+              backgroundColor: "blue",
+              color: "white",
+              border: "none",
+              borderRadius: "5px",
+              cursor: "pointer",
+            }}
+          >
+            📄 Export to PDF
+          </button>
+        </div>
       )}
     </div>
   );

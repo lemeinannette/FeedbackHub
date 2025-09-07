@@ -1,8 +1,13 @@
+import { Link } from "react-router-dom";
+
 export default function ThankYouScreen() {
   return (
-    <div>
-      <h1>Thank You!</h1>
-      <p>Your feedback has been submitted.</p>
+    <div className="thank-you">
+      <h1> Thank You for Your Feedback!</h1>
+      <p>Your response has been recorded successfully.</p>
+      <Link to="/" className="back-button">
+        Submit Another Feedback
+      </Link>
     </div>
   );
 }
