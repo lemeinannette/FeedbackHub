@@ -10,14 +10,10 @@ export default function AdminLogin() {
   const handleLogin = (e) => {
     e.preventDefault();
 
-    console.log("Entered:", username, password); // debug
-
     if (username === "admin" && password === "1234") {
-      console.log("✅ Login success");
       localStorage.setItem("isAdminLoggedIn", "true");
-      navigate("/admin");
+      navigate("/admin"); // ✅ straight to dashboard
     } else {
-      console.log("❌ Login failed");
       setError("Invalid username or password");
     }
   };

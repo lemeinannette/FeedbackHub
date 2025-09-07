@@ -17,21 +17,25 @@ export default function App() {
       </nav>
 
       <Routes>
-        {/* Guest routes */}
+        {/* Public routes */}
         <Route path="/" element={<FeedbackForm />} />
         <Route path="/thank-you" element={<ThankYouScreen />} />
 
         {/* Admin routes */}
         <Route
           path="/admin-login"
-          element={isAdminLoggedIn ? <Navigate to="/admin" /> : <AdminLogin />}
+          element={
+            isAdminLoggedIn ? <Navigate to="/admin" /> : <AdminLogin />
+          }
         />
         <Route
           path="/admin"
-          element={isAdminLoggedIn ? <AdminPanel /> : <Navigate to="/admin-login" />}
+          element={
+            isAdminLoggedIn ? <AdminPanel /> : <Navigate to="/admin-login" />
+          }
         />
 
-        {/* Fallback */}
+        {/* Catch all */}
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </Router>

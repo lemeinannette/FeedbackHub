@@ -1,7 +1,5 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
 
 export default function AdminPanel() {
   const [feedbacks, setFeedbacks] = useState([]);
@@ -13,8 +11,8 @@ export default function AdminPanel() {
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem("isAdminLoggedIn");
-    navigate("/admin-login"); // ✅ back to login page
+    localStorage.removeItem("isAdminLoggedIn"); // remove access
+    navigate("/admin-login"); // kick out to login page
   };
 
   return (
@@ -31,10 +29,14 @@ export default function AdminPanel() {
           borderRadius: "4px",
         }}
       >
-        🚪 Logout
+         Logout
       </button>
 
-      {/* rest of your summary + export */}
+      {feedbacks.length === 0 ? (
+        <p>No feedback yet.</p>
+      ) : (
+        <p>{feedbacks.length} feedback entries loaded </p>
+      )}
     </div>
   );
 }
