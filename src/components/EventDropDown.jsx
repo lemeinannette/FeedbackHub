@@ -1,28 +1,30 @@
 export default function EventDropdown({ value, otherEvent, onChange }) {
+  const handleSelect = (e) => {
+    onChange({ event: e.target.value, otherEvent: "" });
+  };
+
+  const handleOtherChange = (e) => {
+    onChange({ event: "Other", otherEvent: e.target.value });
+  };
+
   return (
     <div>
       <label>Event: </label>
-      <select
-        value={value}
-        onChange={(e) => onChange("event", e.target.value)}
-        required
-      >
-        <option value="">Select an event</option>
+      <select value={value} onChange={handleSelect} required>
+        <option value="">-- Select Event --</option>
         <option value="Wedding">Wedding</option>
         <option value="Conference">Conference</option>
         <option value="Gala">Gala</option>
         <option value="Other">Other</option>
       </select>
 
-      {/* If "Other" → show text input */}
       {value === "Other" && (
-        <div>
-          <label>Specify Event: </label>
-          <input
-            type="text"
+        <div style={{ marginTop: "5px" }}>
+          <label>Specify Other Event: </label>
+          <textarea
             value={otherEvent}
-            onChange={(e) => onChange("otherEvent", e.target.value)}
-            placeholder="Enter event name"
+            onChange={handleOtherChange}
+            placeholder="Enter event details"
             required
           />
         </div>
