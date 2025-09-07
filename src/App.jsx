@@ -9,7 +9,6 @@ export default function App() {
 
   return (
     <Router>
-      {/* Simple NavBar for testing */}
       <nav style={{ padding: "10px", background: "#eee" }}>
         <Link to="/" style={{ marginRight: "10px" }}>Feedback</Link>
         <Link to="/thank-you" style={{ marginRight: "10px" }}>Thank You</Link>
@@ -18,16 +17,21 @@ export default function App() {
       </nav>
 
       <Routes>
+        {/* Guest routes */}
         <Route path="/" element={<FeedbackForm />} />
         <Route path="/thank-you" element={<ThankYouScreen />} />
-        <Route path="/admin-login" element={<AdminLogin />} />
 
-        {/* ✅ Protected route */}
+        {/* Admin routes */}
+        <Route
+          path="/admin-login"
+          element={isAdminLoggedIn ? <Navigate to="/admin" /> : <AdminLogin />}
+        />
         <Route
           path="/admin"
           element={isAdminLoggedIn ? <AdminPanel /> : <Navigate to="/admin-login" />}
         />
 
+        {/* Fallback */}
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </Router>
