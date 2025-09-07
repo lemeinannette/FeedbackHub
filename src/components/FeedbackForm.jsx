@@ -71,10 +71,11 @@ export default function FeedbackForm() {
           />
         </div>
 
-        {/* Event Dropdown */}
+        {/* ✅ Event Dropdown with Other option */}
         <EventDropdown
           value={formData.event}
-          onChange={(event) => setFormData({ ...formData, ...event })}
+          otherEvent={formData.otherEvent}
+          onChange={(data) => setFormData({ ...formData, ...data })}
         />
 
         {/* Ratings */}
@@ -101,7 +102,9 @@ export default function FeedbackForm() {
         <StarRating
           label="Entertainment"
           value={formData.entertainment}
-          onChange={(val) => setFormData({ ...formData, entertainment: val })}
+          onChange={(val) =>
+            setFormData({ ...formData, entertainment: val })
+          }
         />
 
         {/* Recommend Toggle */}
