@@ -9,8 +9,8 @@ export default function App() {
 
   return (
     <Router>
-      {/* Navbar (guests only see guest links) */}
       <nav style={{ padding: "10px", background: "#eee" }}>
+        {/* Guests see only Feedback + Thank You */}
         <Link to="/" style={{ marginRight: "10px" }}>Feedback</Link>
         <Link to="/thank-you">Thank You</Link>
       </nav>
@@ -20,7 +20,7 @@ export default function App() {
         <Route path="/" element={<FeedbackForm />} />
         <Route path="/thank-you" element={<ThankYouScreen />} />
 
-        {/* Admin routes (not visible in navbar) */}
+        {/* Admin routes */}
         <Route
           path="/admin-login"
           element={isAdminLoggedIn ? <Navigate to="/admin" /> : <AdminLogin />}
@@ -30,7 +30,7 @@ export default function App() {
           element={isAdminLoggedIn ? <AdminPanel /> : <Navigate to="/admin-login" />}
         />
 
-        {/* Catch all */}
+        {/* Catch-all */}
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </Router>
