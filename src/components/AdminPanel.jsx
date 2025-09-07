@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import jsPDF from "jspdf";
-import "jspdf-autotable";
+import autoTable from "jspdf-autotable";
 
 export default function AdminPanel() {
   const [feedbacks, setFeedbacks] = useState([]);
@@ -8,6 +8,7 @@ export default function AdminPanel() {
   // Load feedbacks from localStorage
   useEffect(() => {
     const stored = JSON.parse(localStorage.getItem("feedbacks")) || [];
+    console.log("Loaded feedbacks:", stored); // debug
     setFeedbacks(stored);
   }, []);
 
@@ -30,7 +31,7 @@ export default function AdminPanel() {
 
   // ✅ Export to PDF
   const exportToPDF = () => {
-    console.log("Exporting PDF..."); // debug log
+    console.log("Exporting PDF...");
 
     if (feedbacks.length === 0) {
       alert("No feedback to export!");
@@ -57,7 +58,7 @@ export default function AdminPanel() {
       70
     );
 
-    // Table with feedback data
+    // Table with feedbacks
     const tableData = feedbacks.map((fb) => [
       fb.guestName,
       fb.contact,
@@ -72,7 +73,7 @@ export default function AdminPanel() {
       fb.date,
     ]);
 
-    doc.autoTable({
+    autoTable(doc, {
       head: [
         [
           "Name",
@@ -115,7 +116,7 @@ export default function AdminPanel() {
             Recommendations → Yes: {recommendCount.yes}, No: {recommendCount.no}
           </p>
 
-          {/* ✅ Working PDF Button */}
+          {/* ✅ Export button */}
           <button
             onClick={exportToPDF}
             style={{

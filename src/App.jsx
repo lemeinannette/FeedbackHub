@@ -1,22 +1,29 @@
-import { Routes, Route, Link } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import FeedbackForm from "./components/FeedbackForm";
 import ThankYouScreen from "./components/ThankYouScreen";
 import AdminPanel from "./components/AdminPanel";
+import AdminLogin from "./components/AdminLogin";
 
 export default function App() {
-  return (
-    <div>
-      <nav>
-        <Link to="/">Feedback</Link> |{" "}
-        <Link to="/thankyou">Thank You</Link> |{" "}
-        <Link to="/admin">Admin</Link>
-      </nav>
+  const isAdminLoggedIn = localStorage.getItem("isAdminLoggedIn") === "true";
 
+  return (
+    <Router>
       <Routes>
+        {/* Guest feedback routes */}
         <Route path="/" element={<FeedbackForm />} />
-        <Route path="/thankyou" element={<ThankYouScreen />} />
-        <Route path="/admin" element={<AdminPanel />} />
+        <Route path="/thank-you" element={<ThankYouScreen />} />
+
+        {/* Admin routes */}
+        <Route path="/admin-login" element={<AdminLogin />} />
+        <Route
+          path="/admin"
+          element={isAdminLoggedIn ? <AdminPanel /> : <Navigate to="/admin-login" />}
+        />
+
+        {/* Fallback (if no route matches) */}
+        <Route path="*" element={<Navigate to="/" />} />
       </Routes>
-    </div>
+    </Router>
   );
 }
