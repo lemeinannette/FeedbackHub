@@ -1,87 +1,101 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
-export default function AdminPanel() {
+export default function AdminPanel({ setIsAdminLoggedIn }) {
   const [feedbacks, setFeedbacks] = useState([]);
-  const [summary, setSummary] = useState({});
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const data = JSON.parse(localStorage.getItem("feedbacks")) || [];
-    setFeedbacks(data);
-
-    if (data.length > 0) {
-      const avg = (arr) =>
-        (arr.reduce((a, b) => a + (Number(b) || 0), 0) / arr.length).toFixed(1);
-
-      setSummary({
-        food: avg(data.map((f) => f.foodRating)),
-        service: avg(data.map((f) => f.serviceRating)),
-        ambience: avg(data.map((f) => f.ambienceRating)),
-      });
-    }
+    const saved = JSON.parse(localStorage.getItem("feedbacks")) || [];
+    setFeedbacks(saved);
   }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("isAdminLoggedIn");
-    window.location.href = "/admin-login";
+    setIsAdminLoggedIn(false);
+    navigate("/admin-login");
+  };
+
+  const exportToPDF = () => {
+    const doc = new jsPDF();
+    doc.text("Feedback Report", 14, 16);
+
+    const tableColumn = [
+      "Date",
+      "Name/Group",
+      "Email",
+      "Contact",
+      "Event",
+      "Food",
+      "Ambience",
+      "Service",
+      "Overall",
+      "Comments",
+    ];
+
+    const tableRows = feedbacks.map((f) => [
+      f.date,
+      f.guestType === "group" ? f.groupName : f.name,
+      f.guestType === "group" ? f.groupEmail : f.email,
+      f.guestType === "group" ? f.groupContact : f.contact,
+      f.event,
+      f.foodRating,
+      f.ambienceRating,
+      f.serviceRating,
+      f.overallRating,
+      f.comments,
+    ]);
+
+    autoTable(doc, {
+      head: [tableColumn],
+      body: tableRows,
+      startY: 20,
+    });
+
+    doc.save("feedback_report.pdf");
   };
 
   return (
     <div style={{ padding: "20px" }}>
-      <h1>Admin Dashboard</h1>
-      <button onClick={handleLogout} style={{ marginBottom: "20px" }}>
-        Logout
+      <h2>Admin Dashboard</h2>
+      <button onClick={handleLogout}> Logout</button>
+      <button onClick={exportToPDF} style={{ marginLeft: "10px" }}>
+        Export to PDF
       </button>
 
-      {/* Summary Section */}
-      <h2>Summary</h2>
       {feedbacks.length === 0 ? (
         <p>No feedback available yet.</p>
       ) : (
-        <ul>
-          <li>Average Food Rating: {summary.food}</li>
-          <li>Average Service Rating: {summary.service}</li>
-          <li>Average Ambience Rating: {summary.ambience}</li>
-        </ul>
-      )}
-
-      {/* Feedback Table */}
-      <h2>All Feedbacks</h2>
-      {feedbacks.length === 0 ? (
-        <p>No feedback available yet.</p>
-      ) : (
-        <table
-          border="1"
-          cellPadding="8"
-          cellSpacing="0"
-          style={{ borderCollapse: "collapse", width: "100%" }}
-        >
+        <table border="1" cellPadding="8" style={{ marginTop: "20px", width: "100%" }}>
           <thead>
-            <tr style={{ background: "#f2f2f2" }}>
-              <th>Type</th>
-              <th>Name / Group</th>
+            <tr>
+              <th>Date</th>
+              <th>Name/Group</th>
               <th>Email</th>
               <th>Contact</th>
               <th>Event</th>
-              <th>Food Rating</th>
-              <th>Service Rating</th>
-              <th>Ambience Rating</th>
+              <th>Food</th>
+              <th>Ambience</th>
+              <th>Service</th>
+              <th>Overall</th>
               <th>Comments</th>
-              <th>Date</th>
             </tr>
           </thead>
           <tbody>
-            {feedbacks.map((fb, index) => (
-              <tr key={index}>
-                <td>{fb.type || "Individual"}</td>
-                <td>{fb.name}</td>
-                <td>{fb.email || "-"}</td>
-                <td>{fb.contact || "-"}</td>
-                <td>{fb.event}</td>
-                <td>{fb.foodRating}</td>
-                <td>{fb.serviceRating}</td>
-                <td>{fb.ambienceRating}</td>
-                <td>{fb.comments}</td>
-                <td>{fb.date}</td>
+            {feedbacks.map((f, idx) => (
+              <tr key={idx}>
+                <td>{f.date}</td>
+                <td>{f.guestType === "group" ? f.groupName : f.name}</td>
+                <td>{f.guestType === "group" ? f.groupEmail : f.email}</td>
+                <td>{f.guestType === "group" ? f.groupContact : f.contact}</td>
+                <td>{f.event}</td>
+                <td>{f.foodRating}</td>
+                <td>{f.ambienceRating}</td>
+                <td>{f.serviceRating}</td>
+                <td>{f.overallRating}</td>
+                <td>{f.comments}</td>
               </tr>
             ))}
           </tbody>

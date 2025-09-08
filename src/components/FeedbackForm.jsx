@@ -1,22 +1,24 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import StarRating from "./StarRating";
-import Toggle from "./Toggle";
 import EventDropdown from "./EventDropDown";
 
 export default function FeedbackForm() {
+  const [feedbackType, setFeedbackType] = useState(""); // "individual" or "group"
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     contact: "",
     group: "",
+    groupEmail: "",
+    groupContact: "",
     comments: "",
     foodRating: 0,
     serviceRating: 0,
     ambienceRating: 0,
     event: "",
     otherEvent: "",
-    anonymous: false,
   });
 
   const navigate = useNavigate();
@@ -24,41 +26,60 @@ export default function FeedbackForm() {
   const handleSubmit = (e) => {
     e.preventDefault();
 
+    if (!feedbackType) {
+      alert("Please select whether you are an Individual or a Group.");
+      return;
+    }
+
     const finalData = {
       ...formData,
       event:
         formData.event === "Other"
           ? `Other: ${formData.otherEvent}`
           : formData.event,
-      name: formData.anonymous ? "Anonymous" : formData.name,
-      email: formData.anonymous ? "" : formData.email,
-      contact: formData.anonymous ? "" : formData.contact,
-      group: formData.anonymous ? "" : formData.group,
+      // Save either individual or group details
+      name: feedbackType === "group" ? formData.group : formData.name,
+      email: feedbackType === "group" ? formData.groupEmail : formData.email,
+      contact:
+        feedbackType === "group" ? formData.groupContact : formData.contact,
+      type: feedbackType === "group" ? "Group" : "Individual",
       date: new Date().toLocaleString(),
     };
 
-    // Save to localStorage
+    // Save feedbacks in localStorage
     const existing = JSON.parse(localStorage.getItem("feedbacks")) || [];
     existing.push(finalData);
     localStorage.setItem("feedbacks", JSON.stringify(existing));
 
     console.log("Form submitted:", finalData);
 
+    // Redirect to Thank You page
     navigate("/thank-you");
   };
 
   return (
     <div style={{ padding: "20px" }}>
       <h1>Feedback Form</h1>
-      <form onSubmit={handleSubmit}>
-        {/* Anonymous Toggle */}
-        <Toggle
-          checked={formData.anonymous}
-          onChange={(val) => setFormData({ ...formData, anonymous: val })}
-        />
 
-        {/* Show details only if not anonymous */}
-        {!formData.anonymous && (
+      {/* Select feedback type */}
+      <div style={{ marginBottom: "10px" }}>
+        <label>
+          <strong>Are you giving feedback as: </strong>
+        </label>
+        <select
+          value={feedbackType}
+          onChange={(e) => setFeedbackType(e.target.value)}
+          required
+        >
+          <option value="">-- Select --</option>
+          <option value="individual">Individual</option>
+          <option value="group">Group / Organization / Association</option>
+        </select>
+      </div>
+
+      <form onSubmit={handleSubmit}>
+        {/* Show fields based on selection */}
+        {feedbackType === "individual" && (
           <>
             <div>
               <label>Name: </label>
@@ -93,13 +114,40 @@ export default function FeedbackForm() {
                 required
               />
             </div>
+          </>
+        )}
+
+        {feedbackType === "group" && (
+          <>
             <div>
-              <label>Group/Organization: </label>
+              <label>Group / Organization Name: </label>
               <input
                 type="text"
                 value={formData.group}
                 onChange={(e) =>
                   setFormData({ ...formData, group: e.target.value })
+                }
+                required
+              />
+            </div>
+            <div>
+              <label>Group Email: </label>
+              <input
+                type="email"
+                value={formData.groupEmail}
+                onChange={(e) =>
+                  setFormData({ ...formData, groupEmail: e.target.value })
+                }
+                required
+              />
+            </div>
+            <div>
+              <label>Group Contact: </label>
+              <input
+                type="tel"
+                value={formData.groupContact}
+                onChange={(e) =>
+                  setFormData({ ...formData, groupContact: e.target.value })
                 }
                 required
               />
@@ -114,22 +162,31 @@ export default function FeedbackForm() {
           onChange={(data) => setFormData({ ...formData, ...data })}
         />
 
-        {/* Ratings */}
-        <StarRating
-          label="Food"
-          value={formData.foodRating}
-          onChange={(val) => setFormData({ ...formData, foodRating: val })}
-        />
-        <StarRating
-          label="Service"
-          value={formData.serviceRating}
-          onChange={(val) => setFormData({ ...formData, serviceRating: val })}
-        />
-        <StarRating
-          label="Ambience"
-          value={formData.ambienceRating}
-          onChange={(val) => setFormData({ ...formData, ambienceRating: val })}
-        />
+       {/* Ratings */}
+<StarRating
+  label="Food"
+  value={formData.foodRating}
+  onChange={(val) => setFormData({ ...formData, foodRating: val })}
+/>
+<StarRating
+  label="Ambience"
+  value={formData.ambienceRating}
+  onChange={(val) =>
+    setFormData({ ...formData, ambienceRating: val })
+  }
+/>
+<StarRating
+  label="Service"
+  value={formData.serviceRating}
+  onChange={(val) => setFormData({ ...formData, serviceRating: val })}
+/>
+<StarRating
+  label="Overall Experience"
+  value={formData.overallRating}
+  onChange={(val) =>
+    setFormData({ ...formData, overallRating: val })
+  }
+/>
 
         {/* Comments */}
         <div>
