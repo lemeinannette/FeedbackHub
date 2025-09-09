@@ -5,6 +5,7 @@ import autoTable from "jspdf-autotable";
 
 export default function AdminPanel({ setIsAdminLoggedIn }) {
   const [feedbacks, setFeedbacks] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -80,6 +81,16 @@ export default function AdminPanel({ setIsAdminLoggedIn }) {
     doc.save("feedback_report.pdf");
   };
 
+  // Filtering by search
+  const filteredFeedbacks = feedbacks.filter(
+    (f) =>
+      f.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      f.groupName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      f.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      f.groupEmail?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      f.event?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <div style={{ padding: "20px" }}>
       <h2>Admin Dashboard</h2>
@@ -99,9 +110,18 @@ export default function AdminPanel({ setIsAdminLoggedIn }) {
         </div>
       )}
 
+      {/* Search */}
+      <input
+        type="text"
+        placeholder="Search by name, email or event..."
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        style={{ marginTop: "15px", padding: "5px", width: "300px" }}
+      />
+
       {/* Table */}
-      {feedbacks.length === 0 ? (
-        <p>No feedback available yet.</p>
+      {filteredFeedbacks.length === 0 ? (
+        <p style={{ marginTop: "20px" }}>No feedback available.</p>
       ) : (
         <table border="1" cellPadding="8" style={{ marginTop: "20px", width: "100%" }}>
           <thead>
@@ -120,7 +140,7 @@ export default function AdminPanel({ setIsAdminLoggedIn }) {
             </tr>
           </thead>
           <tbody>
-            {feedbacks.map((f, idx) => (
+            {filteredFeedbacks.map((f, idx) => (
               <tr key={idx}>
                 <td>{f.date}</td>
                 <td>{f.guestType === "group" ? f.groupName : f.name}</td>
