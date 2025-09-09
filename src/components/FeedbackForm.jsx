@@ -17,8 +17,10 @@ export default function FeedbackForm() {
     foodRating: 0,
     serviceRating: 0,
     ambienceRating: 0,
+    overallRating: 0,
     event: "",
     otherEvent: "",
+    recommend: "", // added
   });
 
   const navigate = useNavigate();
@@ -162,31 +164,64 @@ export default function FeedbackForm() {
           onChange={(data) => setFormData({ ...formData, ...data })}
         />
 
-       {/* Ratings */}
-<StarRating
-  label="Food"
-  value={formData.foodRating}
-  onChange={(val) => setFormData({ ...formData, foodRating: val })}
-/>
-<StarRating
-  label="Ambience"
-  value={formData.ambienceRating}
-  onChange={(val) =>
-    setFormData({ ...formData, ambienceRating: val })
-  }
-/>
-<StarRating
-  label="Service"
-  value={formData.serviceRating}
-  onChange={(val) => setFormData({ ...formData, serviceRating: val })}
-/>
-<StarRating
-  label="Overall Experience"
-  value={formData.overallRating}
-  onChange={(val) =>
-    setFormData({ ...formData, overallRating: val })
-  }
-/>
+        {/* Ratings */}
+        <StarRating
+          label="Food"
+          value={formData.foodRating}
+          onChange={(val) => setFormData({ ...formData, foodRating: val })}
+        />
+        <StarRating
+          label="Ambience"
+          value={formData.ambienceRating}
+          onChange={(val) =>
+            setFormData({ ...formData, ambienceRating: val })
+          }
+        />
+        <StarRating
+          label="Service"
+          value={formData.serviceRating}
+          onChange={(val) => setFormData({ ...formData, serviceRating: val })}
+        />
+        <StarRating
+          label="Overall Experience"
+          value={formData.overallRating}
+          onChange={(val) =>
+            setFormData({ ...formData, overallRating: val })
+          }
+        />
+
+        {/* Would you recommend us? */}
+        <div style={{ marginTop: "10px" }}>
+          <label>
+            <strong>Would you recommend us?</strong>
+          </label>
+          <div>
+            <label>
+              <input
+                type="radio"
+                name="recommend"
+                value="Yes"
+                checked={formData.recommend === "Yes"}
+                onChange={(e) =>
+                  setFormData({ ...formData, recommend: e.target.value })
+                }
+              />
+              Yes
+            </label>
+            <label style={{ marginLeft: "15px" }}>
+              <input
+                type="radio"
+                name="recommend"
+                value="No"
+                checked={formData.recommend === "No"}
+                onChange={(e) =>
+                  setFormData({ ...formData, recommend: e.target.value })
+                }
+              />
+              No
+            </label>
+          </div>
+        </div>
 
         {/* Comments */}
         <div>

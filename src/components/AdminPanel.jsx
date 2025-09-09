@@ -18,9 +18,30 @@ export default function AdminPanel({ setIsAdminLoggedIn }) {
     navigate("/admin-login");
   };
 
+  // Calculate summary
+  const yesCount = feedbacks.filter((f) => f.recommend === "Yes").length;
+  const noCount = feedbacks.filter((f) => f.recommend === "No").length;
+
+  const avg = (arr) =>
+    arr.length ? (arr.reduce((a, b) => a + Number(b || 0), 0) / arr.length).toFixed(1) : "N/A";
+
+  const avgFood = avg(feedbacks.map((f) => f.foodRating));
+  const avgAmbience = avg(feedbacks.map((f) => f.ambienceRating));
+  const avgService = avg(feedbacks.map((f) => f.serviceRating));
+  const avgOverall = avg(feedbacks.map((f) => f.overallRating));
+
   const exportToPDF = () => {
     const doc = new jsPDF();
     doc.text("Feedback Report", 14, 16);
+
+    // Summary
+    doc.text(`Summary:`, 14, 26);
+    doc.text(`Recommend: ${yesCount}`, 14, 34);
+    doc.text(` Not Recommend: ${noCount}`, 14, 42);
+    doc.text(`⭐ Avg Food: ${avgFood}`, 80, 34);
+    doc.text(`⭐ Avg Ambience: ${avgAmbience}`, 80, 42);
+    doc.text(`⭐ Avg Service: ${avgService}`, 140, 34);
+    doc.text(`⭐ Avg Overall: ${avgOverall}`, 140, 42);
 
     const tableColumn = [
       "Date",
@@ -32,6 +53,7 @@ export default function AdminPanel({ setIsAdminLoggedIn }) {
       "Ambience",
       "Service",
       "Overall",
+      "Recommend",
       "Comments",
     ];
 
@@ -45,13 +67,14 @@ export default function AdminPanel({ setIsAdminLoggedIn }) {
       f.ambienceRating,
       f.serviceRating,
       f.overallRating,
+      f.recommend,
       f.comments,
     ]);
 
     autoTable(doc, {
       head: [tableColumn],
       body: tableRows,
-      startY: 20,
+      startY: 50,
     });
 
     doc.save("feedback_report.pdf");
@@ -65,6 +88,18 @@ export default function AdminPanel({ setIsAdminLoggedIn }) {
         Export to PDF
       </button>
 
+      {/* Summary */}
+      {feedbacks.length > 0 && (
+        <div style={{ marginTop: "20px" }}>
+          <h3>Summary</h3>
+          <p>Recommend: {yesCount} |  Not Recommend: {noCount}</p>
+          <p>
+            ⭐ Food: {avgFood} | ⭐ Ambience: {avgAmbience} | ⭐ Service: {avgService} | ⭐ Overall: {avgOverall}
+          </p>
+        </div>
+      )}
+
+      {/* Table */}
       {feedbacks.length === 0 ? (
         <p>No feedback available yet.</p>
       ) : (
@@ -80,6 +115,7 @@ export default function AdminPanel({ setIsAdminLoggedIn }) {
               <th>Ambience</th>
               <th>Service</th>
               <th>Overall</th>
+              <th>Recommend</th>
               <th>Comments</th>
             </tr>
           </thead>
@@ -95,6 +131,7 @@ export default function AdminPanel({ setIsAdminLoggedIn }) {
                 <td>{f.ambienceRating}</td>
                 <td>{f.serviceRating}</td>
                 <td>{f.overallRating}</td>
+                <td>{f.recommend}</td>
                 <td>{f.comments}</td>
               </tr>
             ))}
