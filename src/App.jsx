@@ -18,17 +18,18 @@ export default function App() {
       <nav style={{ padding: "10px", background: "#f8f9fa", borderBottom: "1px solid #ddd" }}>
         <Link to="/" style={{ marginRight: "10px" }}>Feedback</Link>
         <Link to="/thank-you">Thank You</Link>
+        {/* Only show Admin link if logged in */}
         {isAdminLoggedIn && (
           <Link to="/admin" style={{ marginLeft: "10px" }}>Admin</Link>
         )}
       </nav>
 
       <Routes>
-        {/* Guest pages */}
+        {/* Public Routes */}
         <Route path="/" element={<FeedbackForm />} />
         <Route path="/thank-you" element={<ThankYouScreen />} />
 
-        {/* Admin login */}
+        {/* Admin Routes */}
         <Route
           path="/admin-login"
           element={
@@ -39,8 +40,6 @@ export default function App() {
             )
           }
         />
-
-        {/* Protected admin dashboard */}
         <Route
           path="/admin"
           element={
@@ -52,7 +51,7 @@ export default function App() {
           }
         />
 
-        {/* Catch-all redirect */}
+        {/* Catch-all → send back to Feedback */}
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </Router>

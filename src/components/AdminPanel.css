@@ -12,71 +12,70 @@
   margin-bottom: 20px;
 }
 
-.btn {
-  padding: 8px 14px;
-  margin-left: 10px;
+.admin-header h2 {
+  color: #333;
+}
+
+.btn-logout {
+  background: #dc3545;
+  color: white;
   border: none;
-  cursor: pointer;
+  padding: 8px 14px;
   border-radius: 6px;
-  font-weight: bold;
+  cursor: pointer;
+  margin-right: 8px;
 }
 
-.logout {
-  background-color: #dc3545;
+.btn-logout:hover {
+  background: #b02a37;
+}
+
+.btn-export {
+  background: #007bff;
   color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
 }
 
-.logout:hover {
-  background-color: #b52b37;
-}
-
-.export {
-  background-color: #28a745;
-  color: white;
-}
-
-.export:hover {
-  background-color: #1f7c33;
-}
-
-.summary {
-  background: #f8f9fa;
-  padding: 15px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  margin-bottom: 20px;
+.btn-export:hover {
+  background: #0056b3;
 }
 
 .search-box {
-  padding: 8px;
-  margin-bottom: 20px;
-  width: 300px;
-  border: 1px solid #ccc;
+  width: 100%;
+  padding: 10px;
   border-radius: 6px;
+  border: 1px solid #ccc;
+  margin-bottom: 20px;
 }
 
-.admin-table {
+.feedback-table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 10px;
   background: white;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
-.admin-table th,
-.admin-table td {
-  border: 1px solid #ddd;
+.feedback-table th,
+.feedback-table td {
   padding: 10px;
+  border: 1px solid #ddd;
   text-align: left;
 }
 
-.admin-table th {
-  background-color: #f1f1f1;
+.feedback-table th {
+  background: #f8f9fa;
+  font-weight: bold;
 }
 
-.admin-table tr:nth-child(even) {
-  background-color: #fafafa;
+.feedback-table tr:nth-child(even) {
+  background: #f2f2f2;
 }
 
-.admin-table tr:hover {
-  background-color: #f0f8ff;
+.no-data {
+  text-align: center;
+  margin-top: 20px;
+  color: #666;
 }
