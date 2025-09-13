@@ -1,3 +1,5 @@
+import React from "react";
+
 export default function StarRating({ label, value, onChange }) {
   return (
     <div>
@@ -6,6 +8,7 @@ export default function StarRating({ label, value, onChange }) {
         <span
           key={star}
           onClick={() => onChange(star)}
+          style={{ cursor: "pointer", color: star <= value ? "gold" : "gray" }}
         >
           ★
         </span>

@@ -1,10 +1,8 @@
-
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import "./AdminPanel.css";
-
+import "./AdminPanel.css"; // ✅ normal CSS
 
 export default function AdminPanel({ setIsAdminLoggedIn }) {
   const [feedbacks, setFeedbacks] = useState([]);
@@ -22,15 +20,12 @@ export default function AdminPanel({ setIsAdminLoggedIn }) {
     navigate("/admin-login");
   };
 
-  // Calculate summary
   const yesCount = feedbacks.filter((f) => f.recommend === "Yes").length;
   const noCount = feedbacks.filter((f) => f.recommend === "No").length;
 
   const avg = (arr) =>
     arr.length
-      ? (
-          arr.reduce((a, b) => a + Number(b || 0), 0) / arr.length
-        ).toFixed(1)
+      ? (arr.reduce((a, b) => a + Number(b || 0), 0) / arr.length).toFixed(1)
       : "N/A";
 
   const avgFood = avg(feedbacks.map((f) => f.foodRating));
@@ -42,7 +37,6 @@ export default function AdminPanel({ setIsAdminLoggedIn }) {
     const doc = new jsPDF();
     doc.text("Feedback Report", 14, 16);
 
-    // Summary
     doc.text(`Summary:`, 14, 26);
     doc.text(`Recommend: ${yesCount}`, 14, 34);
     doc.text(`Not Recommend: ${noCount}`, 14, 42);
@@ -88,7 +82,6 @@ export default function AdminPanel({ setIsAdminLoggedIn }) {
     doc.save("feedback_report.pdf");
   };
 
-  // Filtering by search
   const filteredFeedbacks = feedbacks.filter(
     (f) =>
       f.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -99,47 +92,43 @@ export default function AdminPanel({ setIsAdminLoggedIn }) {
   );
 
   return (
-    <div className={styles.container}>
-      <div className={styles.header}>
+    <div className="admin-container">
+      <div className="admin-header">
         <h2>Admin Dashboard</h2>
-        <div className={styles.buttons}>
-          <button onClick={handleLogout} className={styles.logout}>
+        <div>
+          <button className="btn logout" onClick={handleLogout}>
             Logout
           </button>
-          <button onClick={exportToPDF} className={styles.export}>
+          <button className="btn export" onClick={exportToPDF}>
             Export to PDF
           </button>
         </div>
       </div>
 
-      {/* Summary */}
       {feedbacks.length > 0 && (
-        <div className={styles.summary}>
+        <div className="summary">
           <h3>Summary</h3>
           <p>
             Recommend: {yesCount} | Not Recommend: {noCount}
           </p>
           <p>
-            ⭐ Food: {avgFood} | ⭐ Ambience: {avgAmbience} | ⭐ Service:{" "}
-            {avgService} | ⭐ Overall: {avgOverall}
+            ⭐ Food: {avgFood} | ⭐ Ambience: {avgAmbience} | ⭐ Service: {avgService} | ⭐ Overall: {avgOverall}
           </p>
         </div>
       )}
 
-      {/* Search */}
       <input
         type="text"
         placeholder="Search by name, email or event..."
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
-        className={styles.search}
+        className="search-box"
       />
 
-      {/* Table */}
       {filteredFeedbacks.length === 0 ? (
         <p>No feedback available.</p>
       ) : (
-        <table className={styles.table}>
+        <table className="admin-table">
           <thead>
             <tr>
               <th>Date</th>
