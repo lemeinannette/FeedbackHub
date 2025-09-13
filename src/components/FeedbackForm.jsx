@@ -1,11 +1,9 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import StarRating from "./StarRating";
 import EventDropdown from "./EventDropDown";
 
 export default function FeedbackForm() {
-  const [feedbackType, setFeedbackType] = useState(""); // "individual" or "group"
-
+  const [feedbackType, setFeedbackType] = useState("");
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -20,18 +18,13 @@ export default function FeedbackForm() {
     overallRating: 0,
     event: "",
     otherEvent: "",
-    recommend: "", // added
+    recommend: "",
   });
 
-  const navigate = useNavigate();
+  const [submitted, setSubmitted] = useState(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    if (!feedbackType) {
-      alert("Please select whether you are an Individual or a Group.");
-      return;
-    }
 
     const finalData = {
       ...formData,
@@ -39,7 +32,6 @@ export default function FeedbackForm() {
         formData.event === "Other"
           ? `Other: ${formData.otherEvent}`
           : formData.event,
-      // Save either individual or group details
       name: feedbackType === "group" ? formData.group : formData.name,
       email: feedbackType === "group" ? formData.groupEmail : formData.email,
       contact:
@@ -48,22 +40,44 @@ export default function FeedbackForm() {
       date: new Date().toLocaleString(),
     };
 
-    // Save feedbacks in localStorage
     const existing = JSON.parse(localStorage.getItem("feedbacks")) || [];
     existing.push(finalData);
     localStorage.setItem("feedbacks", JSON.stringify(existing));
 
     console.log("Form submitted:", finalData);
 
-    // Redirect to Thank You page
-    navigate("/thank-you");
+    setSubmitted(true);
+    setFormData({
+      name: "",
+      email: "",
+      contact: "",
+      group: "",
+      groupEmail: "",
+      groupContact: "",
+      comments: "",
+      foodRating: 0,
+      serviceRating: 0,
+      ambienceRating: 0,
+      overallRating: 0,
+      event: "",
+      otherEvent: "",
+      recommend: "",
+    });
+    setFeedbackType("");
   };
+
+  if (submitted) {
+    return (
+      <div className="p-6 text-center bg-green-100 text-green-700 rounded-lg">
+        Thank you! Your feedback has been submitted.
+      </div>
+    );
+  }
 
   return (
     <div style={{ padding: "20px" }}>
       <h1>Feedback Form</h1>
 
-      {/* Select feedback type */}
       <div style={{ marginBottom: "10px" }}>
         <label>
           <strong>Are you giving feedback as: </strong>
@@ -71,7 +85,6 @@ export default function FeedbackForm() {
         <select
           value={feedbackType}
           onChange={(e) => setFeedbackType(e.target.value)}
-          required
         >
           <option value="">-- Select --</option>
           <option value="individual">Individual</option>
@@ -80,7 +93,7 @@ export default function FeedbackForm() {
       </div>
 
       <form onSubmit={handleSubmit}>
-        {/* Show fields based on selection */}
+        {/* Individual */}
         {feedbackType === "individual" && (
           <>
             <div>
@@ -91,7 +104,6 @@ export default function FeedbackForm() {
                 onChange={(e) =>
                   setFormData({ ...formData, name: e.target.value })
                 }
-                required
               />
             </div>
             <div>
@@ -102,7 +114,6 @@ export default function FeedbackForm() {
                 onChange={(e) =>
                   setFormData({ ...formData, email: e.target.value })
                 }
-                required
               />
             </div>
             <div>
@@ -113,12 +124,12 @@ export default function FeedbackForm() {
                 onChange={(e) =>
                   setFormData({ ...formData, contact: e.target.value })
                 }
-                required
               />
             </div>
           </>
         )}
 
+        {/* Group */}
         {feedbackType === "group" && (
           <>
             <div>
@@ -129,7 +140,6 @@ export default function FeedbackForm() {
                 onChange={(e) =>
                   setFormData({ ...formData, group: e.target.value })
                 }
-                required
               />
             </div>
             <div>
@@ -140,7 +150,6 @@ export default function FeedbackForm() {
                 onChange={(e) =>
                   setFormData({ ...formData, groupEmail: e.target.value })
                 }
-                required
               />
             </div>
             <div>
@@ -151,7 +160,6 @@ export default function FeedbackForm() {
                 onChange={(e) =>
                   setFormData({ ...formData, groupContact: e.target.value })
                 }
-                required
               />
             </div>
           </>
@@ -190,7 +198,7 @@ export default function FeedbackForm() {
           }
         />
 
-        {/* Would you recommend us? */}
+        {/* Recommend */}
         <div style={{ marginTop: "10px" }}>
           <label>
             <strong>Would you recommend us?</strong>

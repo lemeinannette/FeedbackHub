@@ -1,7 +1,10 @@
-import { useEffect, useState } from "react";
+
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import "./AdminPanel.css";
+
 
 export default function AdminPanel({ setIsAdminLoggedIn }) {
   const [feedbacks, setFeedbacks] = useState([]);
@@ -24,7 +27,11 @@ export default function AdminPanel({ setIsAdminLoggedIn }) {
   const noCount = feedbacks.filter((f) => f.recommend === "No").length;
 
   const avg = (arr) =>
-    arr.length ? (arr.reduce((a, b) => a + Number(b || 0), 0) / arr.length).toFixed(1) : "N/A";
+    arr.length
+      ? (
+          arr.reduce((a, b) => a + Number(b || 0), 0) / arr.length
+        ).toFixed(1)
+      : "N/A";
 
   const avgFood = avg(feedbacks.map((f) => f.foodRating));
   const avgAmbience = avg(feedbacks.map((f) => f.ambienceRating));
@@ -38,7 +45,7 @@ export default function AdminPanel({ setIsAdminLoggedIn }) {
     // Summary
     doc.text(`Summary:`, 14, 26);
     doc.text(`Recommend: ${yesCount}`, 14, 34);
-    doc.text(` Not Recommend: ${noCount}`, 14, 42);
+    doc.text(`Not Recommend: ${noCount}`, 14, 42);
     doc.text(`⭐ Avg Food: ${avgFood}`, 80, 34);
     doc.text(`⭐ Avg Ambience: ${avgAmbience}`, 80, 42);
     doc.text(`⭐ Avg Service: ${avgService}`, 140, 34);
@@ -92,20 +99,29 @@ export default function AdminPanel({ setIsAdminLoggedIn }) {
   );
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h2>Admin Dashboard</h2>
-      <button onClick={handleLogout}> Logout</button>
-      <button onClick={exportToPDF} style={{ marginLeft: "10px" }}>
-        Export to PDF
-      </button>
+    <div className={styles.container}>
+      <div className={styles.header}>
+        <h2>Admin Dashboard</h2>
+        <div className={styles.buttons}>
+          <button onClick={handleLogout} className={styles.logout}>
+            Logout
+          </button>
+          <button onClick={exportToPDF} className={styles.export}>
+            Export to PDF
+          </button>
+        </div>
+      </div>
 
       {/* Summary */}
       {feedbacks.length > 0 && (
-        <div style={{ marginTop: "20px" }}>
+        <div className={styles.summary}>
           <h3>Summary</h3>
-          <p>Recommend: {yesCount} |  Not Recommend: {noCount}</p>
           <p>
-            ⭐ Food: {avgFood} | ⭐ Ambience: {avgAmbience} | ⭐ Service: {avgService} | ⭐ Overall: {avgOverall}
+            Recommend: {yesCount} | Not Recommend: {noCount}
+          </p>
+          <p>
+            ⭐ Food: {avgFood} | ⭐ Ambience: {avgAmbience} | ⭐ Service:{" "}
+            {avgService} | ⭐ Overall: {avgOverall}
           </p>
         </div>
       )}
@@ -116,14 +132,14 @@ export default function AdminPanel({ setIsAdminLoggedIn }) {
         placeholder="Search by name, email or event..."
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
-        style={{ marginTop: "15px", padding: "5px", width: "300px" }}
+        className={styles.search}
       />
 
       {/* Table */}
       {filteredFeedbacks.length === 0 ? (
-        <p style={{ marginTop: "20px" }}>No feedback available.</p>
+        <p>No feedback available.</p>
       ) : (
-        <table border="1" cellPadding="8" style={{ marginTop: "20px", width: "100%" }}>
+        <table className={styles.table}>
           <thead>
             <tr>
               <th>Date</th>

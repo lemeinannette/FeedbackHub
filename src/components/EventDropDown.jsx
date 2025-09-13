@@ -1,3 +1,5 @@
+import React from "react";
+
 export default function EventDropdown({ value, otherEvent, onChange }) {
   const handleSelect = (e) => {
     onChange({ event: e.target.value, otherEvent: "" });
@@ -8,8 +10,11 @@ export default function EventDropdown({ value, otherEvent, onChange }) {
   };
 
   return (
-    <div>
-      <label>Event: </label>
+    <div style={{ marginBottom: "15px" }}>
+      <label style={{ display: "block", marginBottom: "5px" }}>
+        Event:
+      </label>
+
       <select value={value} onChange={handleSelect} required>
         <option value="">-- Select Event --</option>
         <option value="Wedding">Wedding</option>
@@ -19,13 +24,17 @@ export default function EventDropdown({ value, otherEvent, onChange }) {
       </select>
 
       {value === "Other" && (
-        <div style={{ marginTop: "5px" }}>
-          <label>Specify Other Event: </label>
+        <div style={{ marginTop: "10px" }}>
+          <label style={{ display: "block", marginBottom: "5px" }}>
+            Specify Other Event:
+          </label>
           <textarea
             value={otherEvent}
             onChange={handleOtherChange}
             placeholder="Enter event details"
             required
+            rows={3}
+            style={{ width: "100%" }}
           />
         </div>
       )}
