@@ -15,7 +15,7 @@ export default function AdminLogin({ setIsAdminLoggedIn }) {
       setIsAdminLoggedIn(true);
       navigate("/admin"); // redirect to admin dashboard
     } else {
-      alert("Invalid login details ❌");
+      alert("Invalid login details ");
     }
   };
 
