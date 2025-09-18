@@ -1,0 +1,105 @@
+.event-dropdown {
+  font-family: Arial, sans-serif;
+  color: #333;
+  background: #fff;
+  padding: 24px;
+  border: 1px solid #e0f7f5;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(60, 216, 201, 0.15);
+  width: 100%;
+  max-width: 600px;
+  margin: 20px auto;
+  transition: all 0.3s ease-in-out;
+}
+
+.label {
+  font-weight: 600;
+  display: block;
+  margin-bottom: 6px;
+  font-size: 15px;
+  color: #3cd8c9;
+}
+
+select,
+textarea {
+  width: 100%;
+  padding: 10px 12px;
+  margin-top: 6px;
+  margin-bottom: 18px;
+  border: 1px solid #b2ece7;
+  border-radius: 8px;
+  font-size: 14px;
+  background: #f9fdfd;
+  outline: none;
+  transition: border 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
+}
+
+select:focus,
+textarea:focus {
+  border: 1px solid #3cd8c9;
+  background: #fff;
+  box-shadow: 0 0 6px rgba(71, 248, 231, 0.4);
+}
+
+textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+/* 🔹 Special styling only for the "Other" textarea */
+.other-textarea {
+  border: 1px solid #3cd8c9;
+  background: #f0fffe;
+  font-style: italic;
+  border-radius: 10px;
+  animation: fadeSlideIn 0.4s ease;
+}
+
+.other-textarea:focus {
+  border-color: #2bb7a9;
+  box-shadow: 0 0 8px rgba(60, 216, 201, 0.5);
+  background: #fff;
+}
+
+/* Smooth animation when it appears */
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+h3 {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: #2bb7a9;
+  border-left: 4px solid #47f8e7;
+  padding-left: 10px;
+}
+
+button.back-btn {
+  display: inline-block;
+  padding: 8px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  background: linear-gradient(135deg, #3cd8c9, #47f8e7);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s ease-in-out, transform 0.2s ease-in-out;
+}
+
+button.back-btn:hover {
+  background: linear-gradient(135deg, #2bb7a9, #3cd8c9);
+  transform: translateY(-2px);
+}
+
+button.back-btn:active {
+  transform: translateY(0);
+}

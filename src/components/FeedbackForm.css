@@ -1,0 +1,165 @@
+.feedback-form-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+  padding: 40px 20px;
+  background: #f9f9f9;
+}
+
+.feedback-form {
+  width: 100%;
+  max-width: 600px;
+  padding: 25px 30px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  background: #fff;
+  font-family: Arial, sans-serif;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  box-sizing: border-box;
+}
+
+.feedback-form h1 {
+  text-align: center;
+  margin-bottom: 25px;
+  font-size: 26px;
+  font-weight: bold;
+  color: #333;
+}
+
+.form-group {
+  margin-bottom: 18px;
+}
+
+/* labels */
+.feedback-form label {
+  font-weight: 600;
+  display: block;
+  margin-bottom: 6px;
+  color: #444;
+}
+
+/* inputs, selects, textareas - unified look */
+.feedback-form input[type="text"],
+.feedback-form input[type="email"],
+.feedback-form input[type="tel"],
+.feedback-form select,
+.feedback-form textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  background: #fff;
+  outline: none;
+  transition: border-color 0.3s ease, box-shadow 0.2s ease;
+  box-sizing: border-box;
+}
+
+/* focus effect */
+.feedback-form input:focus,
+.feedback-form select:focus,
+.feedback-form textarea:focus {
+  border-color: #3cd8c9;
+  box-shadow: 0 0 4px rgba(60, 216, 201, 0.3);
+}
+
+/* textarea */
+.feedback-form textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+/* submit button */
+.feedback-form button {
+  display: block;
+  margin: 20px auto 0;
+  padding: 10px 20px;
+  font-size: 15px;
+  font-weight: bold;
+  color: #fff;
+  background: #3cd8c9;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.feedback-form button:hover {
+  background: #2bb7a9;
+}
+
+.feedback-form button:active {
+  transform: scale(0.97);
+}
+
+/* messages */
+.thank-you-message {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  font-size: 20px;
+  color: green;
+  font-weight: bold;
+  text-align: center;
+}
+
+.feedback-form .error {
+  color: red;
+  font-size: 12px;
+  margin-top: 5px;
+}
+
+.feedback-form .success {
+  color: green;
+  font-size: 14px;
+  margin-top: 10px;
+}
+
+.feedback-form .success-message {
+  text-align: center;
+  font-size: 18px;
+  color: green;
+  margin-top: 20px;
+}
+
+/* back button */
+.feedback-form .back-btn {
+  display: inline-block;
+  margin-top: 15px;
+  padding: 8px 14px;
+  font-size: 14px;
+  font-weight: bold;
+  color: #3cd8c9;
+  background: #fff;
+  border: 1px solid #3cd8c9;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.feedback-form .back-btn:hover {
+  background: #3cd8c9;
+  color: #fff;
+}
+
+.feedback-form .back-btn:active {
+  transform: scale(0.97);
+}
+
+.feedback-form .back-btn:disabled {
+  background: #f0f0f0;
+  color: #ccc;
+  border-color: #ddd;
+  cursor: not-allowed;
+}
+
+/* 🔥 remove unwanted borders/padding around dropdown wrapper */
+.event-dropdown-wrapper {
+  border: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}

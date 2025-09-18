@@ -1,8 +1,17 @@
-import React from "react";
+import React, { useState } from "react";
+import "./EventDropDown.css"; // optional, but we'll tone it down
 
 export default function EventDropdown({ value, otherEvent, onChange }) {
+  const [step, setStep] = useState("select"); // "select" or "other"
+
   const handleSelect = (e) => {
-    onChange({ event: e.target.value, otherEvent: "" });
+    if (e.target.value === "Other") {
+      setStep("other");
+      onChange({ event: "Other", otherEvent: "" });
+    } else {
+      setStep("select");
+      onChange({ event: e.target.value, otherEvent: "" });
+    }
   };
 
   const handleOtherChange = (e) => {
@@ -10,33 +19,39 @@ export default function EventDropdown({ value, otherEvent, onChange }) {
   };
 
   return (
-    <div style={{ marginBottom: "15px" }}>
-      <label style={{ display: "block", marginBottom: "5px" }}>
-        Event:
-      </label>
-
-      <select value={value} onChange={handleSelect} required>
-        <option value="">-- Select Event --</option>
-        <option value="Wedding">Wedding</option>
-        <option value="Conference">Conference</option>
-        <option value="Gala">Gala</option>
-        <option value="Other">Other</option>
-      </select>
-
-      {value === "Other" && (
-        <div style={{ marginTop: "10px" }}>
-          <label style={{ display: "block", marginBottom: "5px" }}>
-            Specify Other Event:
-          </label>
-          <textarea
-            value={otherEvent}
-            onChange={handleOtherChange}
-            placeholder="Enter event details"
-            required
-            rows={3}
-            style={{ width: "100%" }}
-          />
+    <div>
+      {step === "select" && (
+        <div className="form-group">
+          <label>Select Event:</label>
+          <select value={value} onChange={handleSelect} required>
+            <option value="">-- Select Event --</option>
+            <option value="Wedding">Wedding</option>
+            <option value="Conference">Conference</option>
+            <option value="Gala">Gala</option>
+            <option value="Other">Other</option>
+          </select>
         </div>
+      )}
+
+      {step === "other" && (
+        <>
+          <div className="form-group">
+            <label>Specify Other Event:</label>
+            <textarea
+              value={otherEvent}
+              onChange={handleOtherChange}
+              placeholder="Enter event details..."
+              required
+            />
+          </div>
+          <button
+            type="button"
+            className="back-btn"
+            onClick={() => setStep("select")}
+          >
+            ← Back
+          </button>
+        </>
       )}
     </div>
   );

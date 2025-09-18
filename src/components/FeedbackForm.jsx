@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import StarRating from "./StarRating";
 import EventDropdown from "./EventDropDown";
 import Toggle from "./Toggle";
+import "./FeedbackForm.css";
 
 export default function FeedbackForm() {
   const [feedbackType, setFeedbackType] = useState("");
@@ -70,62 +71,67 @@ export default function FeedbackForm() {
 
   if (submitted) {
     return (
-      <div className="p-6 text-center bg-green-100 text-green-700 rounded-lg">
+      <div className="thank-you-message">
         Thank you! Your feedback has been submitted.
       </div>
     );
   }
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h1>Feedback Form</h1>
+    <div className="feedback-form-container">
+      <form className="feedback-form" onSubmit={handleSubmit}>
+        <h1>Feedback Form</h1>
 
-      <div style={{ marginBottom: "10px" }}>
-        <label>
-          <strong>Are you giving feedback as: </strong>
-        </label>
-        <select
-          value={feedbackType}
-          onChange={(e) => setFeedbackType(e.target.value)}
-        >
-          <option value="">-- Select --</option>
-          <option value="individual">Individual</option>
-          <option value="group">Group / Organization / Association</option>
-        </select>
-      </div>
+        {/* Feedback Type */}
+        <div className="form-group">
+          <label>
+            <strong>Are you giving feedback as:</strong>
+          </label>
+          <select
+            value={feedbackType}
+            onChange={(e) => setFeedbackType(e.target.value)}
+            required
+          >
+            <option value="">-- Select --</option>
+            <option value="individual">Individual</option>
+            <option value="group">Group / Organization / Association</option>
+          </select>
+        </div>
 
-      <form onSubmit={handleSubmit}>
         {/* Individual */}
         {feedbackType === "individual" && (
           <>
-            <div>
-              <label>Name: </label>
+            <div className="form-group">
+              <label>Name:</label>
               <input
                 type="text"
                 value={formData.name}
                 onChange={(e) =>
                   setFormData({ ...formData, name: e.target.value })
                 }
+                required
               />
             </div>
-            <div>
-              <label>Email: </label>
+            <div className="form-group">
+              <label>Email:</label>
               <input
                 type="email"
                 value={formData.email}
                 onChange={(e) =>
                   setFormData({ ...formData, email: e.target.value })
                 }
+                required
               />
             </div>
-            <div>
-              <label>Contact: </label>
+            <div className="form-group">
+              <label>Contact:</label>
               <input
                 type="tel"
                 value={formData.contact}
                 onChange={(e) =>
                   setFormData({ ...formData, contact: e.target.value })
                 }
+                required
               />
             </div>
           </>
@@ -134,34 +140,37 @@ export default function FeedbackForm() {
         {/* Group */}
         {feedbackType === "group" && (
           <>
-            <div>
-              <label>Group / Organization Name: </label>
+            <div className="form-group">
+              <label>Group / Organization Name:</label>
               <input
                 type="text"
                 value={formData.group}
                 onChange={(e) =>
                   setFormData({ ...formData, group: e.target.value })
                 }
+                required
               />
             </div>
-            <div>
-              <label>Group Email: </label>
+            <div className="form-group">
+              <label>Group Email:</label>
               <input
                 type="email"
                 value={formData.groupEmail}
                 onChange={(e) =>
                   setFormData({ ...formData, groupEmail: e.target.value })
                 }
+                required
               />
             </div>
-            <div>
-              <label>Group Contact: </label>
+            <div className="form-group">
+              <label>Group Contact:</label>
               <input
                 type="tel"
                 value={formData.groupContact}
                 onChange={(e) =>
                   setFormData({ ...formData, groupContact: e.target.value })
                 }
+                required
               />
             </div>
           </>
@@ -201,7 +210,7 @@ export default function FeedbackForm() {
         />
 
         {/* Recommend */}
-        <div style={{ marginTop: "10px" }}>
+        <div className="form-group">
           <label>
             <strong>Would you recommend us?</strong>
           </label>
@@ -234,8 +243,8 @@ export default function FeedbackForm() {
         </div>
 
         {/* Comments */}
-        <div>
-          <label>Comments: </label>
+        <div className="form-group">
+          <label>Comments:</label>
           <textarea
             value={formData.comments}
             onChange={(e) =>
@@ -245,9 +254,7 @@ export default function FeedbackForm() {
         </div>
 
         {/* Submit */}
-        <button type="submit" style={{ marginTop: "10px" }}>
-          Submit Feedback
-        </button>
+        <button type="submit">Submit Feedback</button>
       </form>
     </div>
   );
