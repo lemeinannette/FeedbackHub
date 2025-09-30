@@ -21,7 +21,7 @@ export default function FeedbackForm() {
     overallRating: 0,
     event: "",
     otherEvent: "",
-    recommend: "",
+    recommend: "", // stores "Yes" or "No"
   });
 
   const [submitted, setSubmitted] = useState(false);
@@ -29,23 +29,29 @@ export default function FeedbackForm() {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // ✅ Map rating fields to simple keys (food, ambience, etc.)
     const finalData = {
       ...formData,
+      // ✅ Add short keys for easy access in AdminPanel
       food: formData.foodRating,
-      ambience: formData.ambienceRating,
       service: formData.serviceRating,
+      ambience: formData.ambienceRating,
       overall: formData.overallRating,
+
+      // ✅ Event fallback if "Other" is chosen
       event:
         formData.event === "Other"
           ? `Other: ${formData.otherEvent}`
           : formData.event,
+
+      // ✅ Correct name/email/contact depending on type
       name: feedbackType === "group" ? formData.group : formData.name,
       email: feedbackType === "group" ? formData.groupEmail : formData.email,
       contact:
         feedbackType === "group" ? formData.groupContact : formData.contact,
+
       type: feedbackType === "group" ? "Group" : "Individual",
       date: new Date().toLocaleString(),
+      // recommend is already a string "Yes" or "No"
     };
 
     const existing = JSON.parse(localStorage.getItem("feedbacks")) || [];
@@ -55,6 +61,7 @@ export default function FeedbackForm() {
     console.log("Form submitted:", finalData);
 
     setSubmitted(true);
+    // reset form
     setFormData({
       name: "",
       email: "",

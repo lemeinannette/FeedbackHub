@@ -16,14 +16,20 @@ export default function AdminPanel({ setIsAdminLoggedIn }) {
 
   // --- Calculations ---
   const totalSubmissions = feedbacks.length;
-  const recommendCount = feedbacks.filter(f => f.recommend).length;
+
+  // ✅ Count only explicit "Yes"
+  const recommendCount = feedbacks.filter(f => f.recommend === "Yes").length;
+
   const recommendRate = totalSubmissions
     ? ((recommendCount / totalSubmissions) * 100).toFixed(1)
     : 0;
 
   const average = (key) =>
     totalSubmissions
-      ? (feedbacks.reduce((sum, f) => sum + Number(f[key] || 0), 0) / totalSubmissions).toFixed(1)
+      ? (
+          feedbacks.reduce((sum, f) => sum + Number(f[key] || 0), 0) /
+          totalSubmissions
+        ).toFixed(1)
       : 0;
 
   const averages = {
@@ -42,12 +48,24 @@ export default function AdminPanel({ setIsAdminLoggedIn }) {
   const handleExportPDF = () => {
     const doc = new jsPDF();
     autoTable(doc, {
-      head: [["Date", "Name/Group", "Email", "Contact", "Event",
-              "Food", "Ambience", "Service", "Overall", "Recommend", "Comments"]],
+      head: [[
+        "Date", "Name/Group", "Email", "Contact", "Event",
+        "Food", "Ambience", "Service", "Overall",
+        "Recommend", "Comments"
+      ]],
       body: feedbacks.map(f => [
-        f.date, f.name, f.email, f.contact, f.event,
-        f.food, f.ambience, f.service, f.overall,
-        f.recommend ? "Yes" : "No", f.comments
+        f.date,
+        f.name,
+        f.email,
+        f.contact,
+        f.event,
+        f.food,
+        f.ambience,
+        f.service,
+        f.overall,
+        // ✅ Show exactly what's stored ("Yes" or "No")
+        f.recommend || "No",
+        f.comments
       ]),
     });
     doc.save("feedbacks.pdf");
@@ -79,7 +97,7 @@ export default function AdminPanel({ setIsAdminLoggedIn }) {
         <div className="card summary">
           <h2>Summary</h2>
           <p><strong>Total Feedback:</strong> {totalSubmissions}</p>
-          <p><strong>Recommend:</strong> {recommendCount}</p>
+          <p><strong>Recommend (Yes):</strong> {recommendCount}</p>
           <p><strong>Recommendation Rate:</strong> {recommendRate}%</p>
         </div>
         <div className="card averages">
@@ -105,10 +123,12 @@ export default function AdminPanel({ setIsAdminLoggedIn }) {
         <table className="table">
           <thead>
             <tr>
-              {["Date", "Name/Group", "Email", "Contact", "Event",
+              {[
+                "Date", "Name/Group", "Email", "Contact", "Event",
                 "Food", "Ambience", "Service", "Overall",
-                "Recommend", "Comments", "Actions"].map(h => (
-                  <th key={h}>{h}</th>
+                "Recommend", "Comments", "Actions"
+              ].map(h => (
+                <th key={h}>{h}</th>
               ))}
             </tr>
           </thead>
@@ -129,7 +149,8 @@ export default function AdminPanel({ setIsAdminLoggedIn }) {
                   <td>{f.ambience}</td>
                   <td>{f.service}</td>
                   <td>{f.overall}</td>
-                  <td>{f.recommend ? "Yes" : "No"}</td>
+                  {/* ✅ Display stored value exactly */}
+                  <td>{f.recommend || "No"}</td>
                   <td>{f.comments}</td>
                   <td>
                     <button
