@@ -22,6 +22,7 @@ export default function FeedbackForm() {
     event: "",
     otherEvent: "",
     recommend: "", // stores "Yes" or "No"
+    isAnonymous: false, // ✅ NEW
   });
 
   const [submitted, setSubmitted] = useState(false);
@@ -43,13 +44,28 @@ export default function FeedbackForm() {
           ? `Other: ${formData.otherEvent}`
           : formData.event,
 
-      // ✅ Correct name/email/contact depending on type
-      name: feedbackType === "group" ? formData.group : formData.name,
-      email: feedbackType === "group" ? formData.groupEmail : formData.email,
-      contact:
-        feedbackType === "group" ? formData.groupContact : formData.contact,
+      // ✅ Correct name/email/contact depending on type or Anonymous
+      name: formData.isAnonymous
+        ? "Anonymous"
+        : feedbackType === "group"
+        ? formData.group
+        : formData.name,
+      email: formData.isAnonymous
+        ? ""
+        : feedbackType === "group"
+        ? formData.groupEmail
+        : formData.email,
+      contact: formData.isAnonymous
+        ? ""
+        : feedbackType === "group"
+        ? formData.groupContact
+        : formData.contact,
 
-      type: feedbackType === "group" ? "Group" : "Individual",
+      type: formData.isAnonymous
+        ? "Anonymous"
+        : feedbackType === "group"
+        ? "Group"
+        : "Individual",
       date: new Date().toLocaleString(),
       // recommend is already a string "Yes" or "No"
     };
@@ -77,6 +93,7 @@ export default function FeedbackForm() {
       event: "",
       otherEvent: "",
       recommend: "",
+      isAnonymous: false,
     });
     setFeedbackType("");
   };
@@ -94,24 +111,40 @@ export default function FeedbackForm() {
       <form className="feedback-form" onSubmit={handleSubmit}>
         <h1>Feedback Form</h1>
 
-        {/* Feedback Type */}
+        {/* Anonymous Option */}
         <div className="form-group">
-          <label>
-            <strong>Are you giving feedback as:</strong>
+          <label className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              checked={formData.isAnonymous}
+              onChange={(e) =>
+                setFormData({ ...formData, isAnonymous: e.target.checked })
+              }
+            />
+            Submit as Anonymous
           </label>
-          <select
-            value={feedbackType}
-            onChange={(e) => setFeedbackType(e.target.value)}
-            required
-          >
-            <option value="">-- Select --</option>
-            <option value="individual">Individual</option>
-            <option value="group">Group / Organization / Association</option>
-          </select>
         </div>
 
+        {/* Feedback Type */}
+        {!formData.isAnonymous && (
+          <div className="form-group">
+            <label>
+              <strong>Are you giving feedback as:</strong>
+            </label>
+            <select
+              value={feedbackType}
+              onChange={(e) => setFeedbackType(e.target.value)}
+              required
+            >
+              <option value="">-- Select --</option>
+              <option value="individual">Individual</option>
+              <option value="group">Group / Organization / Association</option>
+            </select>
+          </div>
+        )}
+
         {/* Individual */}
-        {feedbackType === "individual" && (
+        {!formData.isAnonymous && feedbackType === "individual" && (
           <>
             <div className="form-group">
               <label>Name:</label>
@@ -150,7 +183,7 @@ export default function FeedbackForm() {
         )}
 
         {/* Group */}
-        {feedbackType === "group" && (
+        {!formData.isAnonymous && feedbackType === "group" && (
           <>
             <div className="form-group">
               <label>Group / Organization Name:</label>
@@ -236,6 +269,7 @@ export default function FeedbackForm() {
                 onChange={(e) =>
                   setFormData({ ...formData, recommend: e.target.value })
                 }
+                required
               />
               Yes
             </label>
@@ -248,6 +282,7 @@ export default function FeedbackForm() {
                 onChange={(e) =>
                   setFormData({ ...formData, recommend: e.target.value })
                 }
+                required
               />
               No
             </label>
