@@ -9,6 +9,19 @@ export default function AdminPanel({ setIsAdminLoggedIn }) {
   const [feedbacks, setFeedbacks] = useState([]);
   const navigate = useNavigate();
 
+  // ✅ Check admin session expiry on mount
+  useEffect(() => {
+    const expiresAt = parseInt(localStorage.getItem("adminExpires"), 10);
+    if (!expiresAt || Date.now() > expiresAt) {
+      // session expired
+      localStorage.removeItem("isAdminLoggedIn");
+      localStorage.removeItem("adminExpires");
+      setIsAdminLoggedIn(false);
+      navigate("/admin-login");
+    }
+  }, [navigate, setIsAdminLoggedIn]);
+
+  // ✅ Load feedbacks from storage
   useEffect(() => {
     const saved = JSON.parse(localStorage.getItem("feedbacks")) || [];
     setFeedbacks(saved);
@@ -16,10 +29,7 @@ export default function AdminPanel({ setIsAdminLoggedIn }) {
 
   // --- Calculations ---
   const totalSubmissions = feedbacks.length;
-
-  // ✅ Count only explicit "Yes"
-  const recommendCount = feedbacks.filter(f => f.recommend === "Yes").length;
-
+  const recommendCount = feedbacks.filter((f) => f.recommend === "Yes").length;
   const recommendRate = totalSubmissions
     ? ((recommendCount / totalSubmissions) * 100).toFixed(1)
     : 0;
@@ -41,6 +51,8 @@ export default function AdminPanel({ setIsAdminLoggedIn }) {
 
   // --- Actions ---
   const handleLogout = () => {
+    localStorage.removeItem("isAdminLoggedIn");
+    localStorage.removeItem("adminExpires");
     setIsAdminLoggedIn(false);
     navigate("/");
   };
@@ -63,8 +75,7 @@ export default function AdminPanel({ setIsAdminLoggedIn }) {
         f.ambience,
         f.service,
         f.overall,
-        // ✅ Show exactly what's stored ("Yes" or "No")
-        f.recommend || "No",
+        f.recommend || "No", // ✅ Show stored value exactly
         f.comments
       ]),
     });
@@ -149,7 +160,6 @@ export default function AdminPanel({ setIsAdminLoggedIn }) {
                   <td>{f.ambience}</td>
                   <td>{f.service}</td>
                   <td>{f.overall}</td>
-                  {/* ✅ Display stored value exactly */}
                   <td>{f.recommend || "No"}</td>
                   <td>{f.comments}</td>
                   <td>
