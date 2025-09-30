@@ -29,8 +29,13 @@ export default function FeedbackForm() {
   const handleSubmit = (e) => {
     e.preventDefault();
 
+    // ✅ Map rating fields to simple keys (food, ambience, etc.)
     const finalData = {
       ...formData,
+      food: formData.foodRating,
+      ambience: formData.ambienceRating,
+      service: formData.serviceRating,
+      overall: formData.overallRating,
       event:
         formData.event === "Other"
           ? `Other: ${formData.otherEvent}`
