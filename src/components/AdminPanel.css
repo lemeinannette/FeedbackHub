@@ -147,3 +147,22 @@
 }
 .pagination span {
   font-size: 14px;}
+  .archive-btn {
+  background-color: #ffa500;
+  color: white;
+  border: none;
+  padding: 4px 8px;
+  margin-left: 6px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.archive-btn:hover {
+  background-color: #e69500;
+}
+.archive-toggle {
+  background-color: #555;
+  color: white;
+  margin-left: 8px;
+  padding: 8px 12px;
+  border-radius: 6px;
+}

@@ -2,34 +2,42 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import { LogOut, FileDown, Trash2 } from "lucide-react";
+import { LogOut, FileDown, Trash2, Archive } from "lucide-react";
 import "./AdminPanel.css";
 
 export default function AdminPanel({ setIsAdminLoggedIn }) {
   const [feedbacks, setFeedbacks] = useState([]);
+  const [showArchived, setShowArchived] = useState(false);
   const navigate = useNavigate();
 
-  // ✅ Check admin session expiry on mount
   useEffect(() => {
+    // ✅ Session Expiration
     const expiresAt = parseInt(localStorage.getItem("adminExpires"), 10);
     if (!expiresAt || Date.now() > expiresAt) {
-      // session expired
       localStorage.removeItem("isAdminLoggedIn");
       localStorage.removeItem("adminExpires");
       setIsAdminLoggedIn(false);
       navigate("/admin-login");
+      return;
     }
-  }, [navigate, setIsAdminLoggedIn]);
 
-  // ✅ Load feedbacks from storage
-  useEffect(() => {
     const saved = JSON.parse(localStorage.getItem("feedbacks")) || [];
     setFeedbacks(saved);
-  }, []);
+  }, [navigate, setIsAdminLoggedIn]);
+
+  const updateStorage = (newData) => {
+    setFeedbacks(newData);
+    localStorage.setItem("feedbacks", JSON.stringify(newData));
+  };
 
   // --- Calculations ---
-  const totalSubmissions = feedbacks.length;
-  const recommendCount = feedbacks.filter((f) => f.recommend === "Yes").length;
+  const visibleFeedbacks = showArchived
+    ? feedbacks
+    : feedbacks.filter((f) => !f.archived);
+
+  const totalSubmissions = visibleFeedbacks.length;
+  const recommendCount = visibleFeedbacks.filter(f => f.recommend === "Yes").length;
+
   const recommendRate = totalSubmissions
     ? ((recommendCount / totalSubmissions) * 100).toFixed(1)
     : 0;
@@ -37,7 +45,7 @@ export default function AdminPanel({ setIsAdminLoggedIn }) {
   const average = (key) =>
     totalSubmissions
       ? (
-          feedbacks.reduce((sum, f) => sum + Number(f[key] || 0), 0) /
+          visibleFeedbacks.reduce((sum, f) => sum + Number(f[key] || 0), 0) /
           totalSubmissions
         ).toFixed(1)
       : 0;
@@ -51,8 +59,6 @@ export default function AdminPanel({ setIsAdminLoggedIn }) {
 
   // --- Actions ---
   const handleLogout = () => {
-    localStorage.removeItem("isAdminLoggedIn");
-    localStorage.removeItem("adminExpires");
     setIsAdminLoggedIn(false);
     navigate("/");
   };
@@ -63,7 +69,7 @@ export default function AdminPanel({ setIsAdminLoggedIn }) {
       head: [[
         "Date", "Name/Group", "Email", "Contact", "Event",
         "Food", "Ambience", "Service", "Overall",
-        "Recommend", "Comments"
+        "Recommend", "Comments", "Archived"
       ]],
       body: feedbacks.map(f => [
         f.date,
@@ -75,8 +81,9 @@ export default function AdminPanel({ setIsAdminLoggedIn }) {
         f.ambience,
         f.service,
         f.overall,
-        f.recommend || "No", // ✅ Show stored value exactly
-        f.comments
+        f.recommend || "No",
+        f.comments,
+        f.archived ? "Yes" : "No"
       ]),
     });
     doc.save("feedbacks.pdf");
@@ -84,8 +91,13 @@ export default function AdminPanel({ setIsAdminLoggedIn }) {
 
   const handleDelete = (index) => {
     const updated = feedbacks.filter((_, i) => i !== index);
-    setFeedbacks(updated);
-    localStorage.setItem("feedbacks", JSON.stringify(updated));
+    updateStorage(updated);
+  };
+
+  const handleArchive = (index) => {
+    const updated = [...feedbacks];
+    updated[index].archived = !updated[index].archived; // toggle archive
+    updateStorage(updated);
   };
 
   return (
@@ -99,6 +111,12 @@ export default function AdminPanel({ setIsAdminLoggedIn }) {
           </button>
           <button onClick={handleExportPDF} className="button export-btn">
             <FileDown size={16} /> Export PDF
+          </button>
+          <button
+            onClick={() => setShowArchived(!showArchived)}
+            className="button archive-toggle"
+          >
+            {showArchived ? "Hide Archived" : "Show Archived"}
           </button>
         </div>
       </div>
@@ -120,7 +138,7 @@ export default function AdminPanel({ setIsAdminLoggedIn }) {
         </div>
         <div className="card activity">
           <h2>Recent Activity</h2>
-          {feedbacks.slice(-3).reverse().map((f, i) => (
+          {visibleFeedbacks.slice(-3).reverse().map((f, i) => (
             <p key={i}>
               <strong>{f.name}</strong> left a {f.overall}-star review
               ({new Date(f.date).toLocaleTimeString()})
@@ -144,12 +162,12 @@ export default function AdminPanel({ setIsAdminLoggedIn }) {
             </tr>
           </thead>
           <tbody>
-            {feedbacks.length === 0 ? (
+            {visibleFeedbacks.length === 0 ? (
               <tr>
                 <td colSpan="12" className="empty">No feedback available</td>
               </tr>
             ) : (
-              feedbacks.map((f, index) => (
+              visibleFeedbacks.map((f, index) => (
                 <tr key={index} className={index % 2 === 0 ? "even" : "odd"}>
                   <td>{f.date}</td>
                   <td>{f.name}</td>
@@ -169,6 +187,13 @@ export default function AdminPanel({ setIsAdminLoggedIn }) {
                       title="Delete feedback"
                     >
                       <Trash2 size={16} />
+                    </button>
+                    <button
+                      className="archive-btn"
+                      onClick={() => handleArchive(feedbacks.indexOf(f))}
+                      title={f.archived ? "Unarchive" : "Archive feedback"}
+                    >
+                      <Archive size={16} />
                     </button>
                   </td>
                 </tr>
