@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import { LogOut, FileDown, Trash2, Archive } from "lucide-react";
+import DarkModeToggle from "./DarkModeToggle";
 import "./AdminPanel.css";
 
 export default function AdminPanel({ setIsAdminLoggedIn }) {
@@ -36,7 +36,9 @@ export default function AdminPanel({ setIsAdminLoggedIn }) {
     : feedbacks.filter((f) => !f.archived);
 
   const totalSubmissions = visibleFeedbacks.length;
-  const recommendCount = visibleFeedbacks.filter(f => f.recommend === "Yes").length;
+  const recommendCount = visibleFeedbacks.filter(
+    (f) => f.recommend === "Yes"
+  ).length;
 
   const recommendRate = totalSubmissions
     ? ((recommendCount / totalSubmissions) * 100).toFixed(1)
@@ -71,7 +73,7 @@ export default function AdminPanel({ setIsAdminLoggedIn }) {
         "Food", "Ambience", "Service", "Overall",
         "Recommend", "Comments", "Archived"
       ]],
-      body: feedbacks.map(f => [
+      body: feedbacks.map((f) => [
         f.date,
         f.name,
         f.email,
@@ -83,7 +85,7 @@ export default function AdminPanel({ setIsAdminLoggedIn }) {
         f.overall,
         f.recommend || "No",
         f.comments,
-        f.archived ? "Yes" : "No"
+        f.archived ? "Yes" : "No",
       ]),
     });
     doc.save("feedbacks.pdf");
@@ -106,17 +108,18 @@ export default function AdminPanel({ setIsAdminLoggedIn }) {
       <div className="header">
         <h1>Admin Dashboard</h1>
         <div className="header-buttons">
+          <DarkModeToggle />
           <button onClick={handleLogout} className="button logout-btn">
-            <LogOut size={16} /> Logout
+            <i className="bx bx-log-out"></i> Logout
           </button>
           <button onClick={handleExportPDF} className="button export-btn">
-            <FileDown size={16} /> Export PDF
+            <i className="bx bx-download"></i> Export PDF
           </button>
           <button
             onClick={() => setShowArchived(!showArchived)}
             className="button archive-toggle"
           >
-            {showArchived ? "Hide Archived" : "Show Archived"}
+            <i className="bx bx-archive"></i> {showArchived ? "Hide Archived" : "Show Archived"}
           </button>
         </div>
       </div>
@@ -156,7 +159,7 @@ export default function AdminPanel({ setIsAdminLoggedIn }) {
                 "Date", "Name/Group", "Email", "Contact", "Event",
                 "Food", "Ambience", "Service", "Overall",
                 "Recommend", "Comments", "Actions"
-              ].map(h => (
+              ].map((h) => (
                 <th key={h}>{h}</th>
               ))}
             </tr>
@@ -186,14 +189,14 @@ export default function AdminPanel({ setIsAdminLoggedIn }) {
                       onClick={() => handleDelete(index)}
                       title="Delete feedback"
                     >
-                      <Trash2 size={16} />
+                      <i className="bx bx-trash-alt"></i>
                     </button>
                     <button
                       className="archive-btn"
                       onClick={() => handleArchive(feedbacks.indexOf(f))}
                       title={f.archived ? "Unarchive" : "Archive feedback"}
                     >
-                      <Archive size={16} />
+                      <i className="bx bx-archive-in"></i>
                     </button>
                   </td>
                 </tr>

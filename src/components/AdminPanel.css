@@ -1,4 +1,6 @@
-/* General container */
+/* ==============================
+   Light Mode (default)
+   ============================== */
 .admin-container {
   min-height: 100vh;
   background: #f9fafb;
@@ -37,7 +39,7 @@
   cursor: pointer;
   font-size: 14px;
   font-weight: 500;
-  transition: background 0.2s ease;
+  transition: background 0.2s ease, color 0.2s ease;
   color: #fff;
 }
 
@@ -53,6 +55,27 @@
 }
 .export-btn:hover {
   background: #16a34a;
+}
+
+.archive-btn {
+  background-color: #ffa500;
+  color: white;
+  border: none;
+  padding: 4px 8px;
+  margin-left: 6px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.archive-btn:hover {
+  background-color: #e69500;
+}
+
+.archive-toggle {
+  background-color: #555;
+  color: white;
+  margin-left: 8px;
+  padding: 8px 12px;
+  border-radius: 6px;
 }
 
 /* Top section */
@@ -81,6 +104,8 @@
   border-radius: 8px;
   border: 1px solid #d1d5db;
   font-size: 14px;
+  background: #fff;
+  color: #333;
 }
 
 /* Table */
@@ -122,6 +147,8 @@
   padding: 20px;
   color: #6b7280;
 }
+
+/* Pagination */
 .pagination {
   display: flex;
   justify-content: center;
@@ -146,23 +173,53 @@
   background: #2563eb;
 }
 .pagination span {
-  font-size: 14px;}
-  .archive-btn {
-  background-color: #ffa500;
-  color: white;
-  border: none;
-  padding: 4px 8px;
-  margin-left: 6px;
-  border-radius: 4px;
-  cursor: pointer;
+  font-size: 14px;
 }
-.archive-btn:hover {
-  background-color: #e69500;
+
+/* ==============================
+   Dark Mode
+   ============================== */
+body.dark .admin-container {
+  background: #121212;
+  color: #e5e7eb;
 }
-.archive-toggle {
-  background-color: #555;
-  color: white;
-  margin-left: 8px;
-  padding: 8px 12px;
-  border-radius: 6px;
+
+body.dark .header h1 {
+  color: #f9fafb;
+}
+
+body.dark .card,
+body.dark .table-container {
+  background: #1e1e1e;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+body.dark .search input {
+  background: #2a2a2a;
+  border: 1px solid #444;
+  color: #f1f1f1;
+}
+
+body.dark .table thead {
+  background: #2a2a2a;
+  color: #e5e7eb;
+}
+
+body.dark .table tr.even {
+  background: #1e1e1e;
+}
+
+body.dark .table tr.odd {
+  background: #2a2a2a;
+}
+
+body.dark .empty {
+  color: #9ca3af;
+}
+
+body.dark .pagination button {
+  background: #2563eb;
+}
+body.dark .pagination button:hover:not(:disabled) {
+  background: #1e40af;
 }
