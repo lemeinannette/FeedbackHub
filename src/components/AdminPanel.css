@@ -1,6 +1,7 @@
-/* ==============================
-   Light Mode (default)
-   ============================== */
+
+/* 
+   Light Mode (default) */
+  
 .admin-container {
   min-height: 100vh;
   background: #f9fafb;
@@ -26,6 +27,7 @@
 .header-buttons {
   display: flex;
   gap: 12px;
+  flex-wrap: wrap;
 }
 
 /* Buttons */
@@ -76,6 +78,14 @@
   margin-left: 8px;
   padding: 8px 12px;
   border-radius: 6px;
+}
+
+/* Theme Toggle */
+.theme-toggle {
+  background: #3b82f6;
+}
+.theme-toggle:hover {
+  background: #2563eb;
 }
 
 /* Top section */
@@ -223,3 +233,11 @@ body.dark .pagination button {
 body.dark .pagination button:hover:not(:disabled) {
   background: #1e40af;
 }
+
+body.dark .theme-toggle {
+  background: #2563eb;
+}
+body.dark .theme-toggle:hover {
+  background: #1e40af;
+}
+
