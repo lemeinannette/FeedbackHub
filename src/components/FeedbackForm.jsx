@@ -26,10 +26,72 @@ export default function FeedbackForm() {
   });
 
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formErrors, setFormErrors] = useState({});
 
-  const handleSubmit = (e) => {
+  const validateForm = () => {
+    const errors = {};
+    
+    if (!formData.isAnonymous && !feedbackType) {
+      errors.feedbackType = "Please select a feedback type";
+    }
+    
+    if (!formData.isAnonymous && feedbackType === "individual" && !formData.name) {
+      errors.name = "Name is required";
+    }
+    
+    if (!formData.isAnonymous && feedbackType === "individual" && !formData.email) {
+      errors.email = "Email is required";
+    }
+    
+    if (!formData.isAnonymous && feedbackType === "group" && !formData.group) {
+      errors.group = "Group name is required";
+    }
+    
+    if (!formData.event) {
+      errors.event = "Please select an event";
+    }
+    
+    if (formData.event === "Other" && !formData.otherEvent) {
+      errors.otherEvent = "Please specify the event";
+    }
+    
+    if (formData.foodRating === 0) {
+      errors.foodRating = "Please rate the food";
+    }
+    
+    if (formData.serviceRating === 0) {
+      errors.serviceRating = "Please rate the service";
+    }
+    
+    if (formData.ambienceRating === 0) {
+      errors.ambienceRating = "Please rate the ambience";
+    }
+    
+    if (formData.overallRating === 0) {
+      errors.overallRating = "Please rate the overall experience";
+    }
+    
+    if (!formData.recommend) {
+      errors.recommend = "Please indicate if you would recommend us";
+    }
+    
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
+    
+    if (!validateForm()) {
+      return;
+    }
+    
+    setIsSubmitting(true);
+    
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
     const finalData = {
       ...formData,
       // ✅ Add short keys for easy access in AdminPanel
@@ -76,6 +138,7 @@ export default function FeedbackForm() {
 
     console.log("Form submitted:", finalData);
 
+    setIsSubmitting(false);
     setSubmitted(true);
     // reset form
     setFormData({
@@ -100,8 +163,20 @@ export default function FeedbackForm() {
 
   if (submitted) {
     return (
-      <div className="thank-you-message">
-        Thank you! Your feedback has been submitted.
+      <div className="thank-you-container">
+        <div className="thank-you-message">
+          <div className="success-icon">
+            <i className="bx bx-check-circle"></i>
+          </div>
+          <h2>Thank You!</h2>
+          <p>Your feedback has been submitted successfully.</p>
+          <button 
+            className="submit-another-btn"
+            onClick={() => setSubmitted(false)}
+          >
+            Submit Another Feedback
+          </button>
+        </div>
       </div>
     );
   }
@@ -110,10 +185,13 @@ export default function FeedbackForm() {
     <div className="feedback-form-container">
       <form className="feedback-form" onSubmit={handleSubmit}>
         <h1>Feedback Form</h1>
+        <p className="form-description">
+          We value your feedback! Please share your experience with us.
+        </p>
 
         {/* Anonymous Option */}
-        <div className="form-group">
-          <label className="flex items-center gap-2">
+        <div className="form-group anonymous-option">
+          <label className="checkbox-label">
             <input
               type="checkbox"
               checked={formData.isAnonymous}
@@ -121,6 +199,7 @@ export default function FeedbackForm() {
                 setFormData({ ...formData, isAnonymous: e.target.checked })
               }
             />
+            <span className="checkmark"></span>
             Submit as Anonymous
           </label>
         </div>
@@ -131,21 +210,40 @@ export default function FeedbackForm() {
             <label>
               <strong>Are you giving feedback as:</strong>
             </label>
-            <select
-              value={feedbackType}
-              onChange={(e) => setFeedbackType(e.target.value)}
-              required
-            >
-              <option value="">-- Select --</option>
-              <option value="individual">Individual</option>
-              <option value="group">Group / Organization / Association</option>
-            </select>
+            <div className="radio-group">
+              <label className="radio-label">
+                <input
+                  type="radio"
+                  name="feedbackType"
+                  value="individual"
+                  checked={feedbackType === "individual"}
+                  onChange={(e) => setFeedbackType(e.target.value)}
+                />
+                <span className="radio-custom"></span>
+                Individual
+              </label>
+              <label className="radio-label">
+                <input
+                  type="radio"
+                  name="feedbackType"
+                  value="group"
+                  checked={feedbackType === "group"}
+                  onChange={(e) => setFeedbackType(e.target.value)}
+                />
+                <span className="radio-custom"></span>
+                Group / Organization / Association
+              </label>
+            </div>
+            {formErrors.feedbackType && (
+              <span className="error-message">{formErrors.feedbackType}</span>
+            )}
           </div>
         )}
 
         {/* Individual */}
         {!formData.isAnonymous && feedbackType === "individual" && (
-          <>
+          <div className="form-section">
+            <h3>Individual Information</h3>
             <div className="form-group">
               <label>Name:</label>
               <input
@@ -154,8 +252,11 @@ export default function FeedbackForm() {
                 onChange={(e) =>
                   setFormData({ ...formData, name: e.target.value })
                 }
-                required
+                className={formErrors.name ? "error" : ""}
               />
+              {formErrors.name && (
+                <span className="error-message">{formErrors.name}</span>
+              )}
             </div>
             <div className="form-group">
               <label>Email:</label>
@@ -165,8 +266,11 @@ export default function FeedbackForm() {
                 onChange={(e) =>
                   setFormData({ ...formData, email: e.target.value })
                 }
-                required
+                className={formErrors.email ? "error" : ""}
               />
+              {formErrors.email && (
+                <span className="error-message">{formErrors.email}</span>
+              )}
             </div>
             <div className="form-group">
               <label>Contact:</label>
@@ -176,15 +280,15 @@ export default function FeedbackForm() {
                 onChange={(e) =>
                   setFormData({ ...formData, contact: e.target.value })
                 }
-                required
               />
             </div>
-          </>
+          </div>
         )}
 
         {/* Group */}
         {!formData.isAnonymous && feedbackType === "group" && (
-          <>
+          <div className="form-section">
+            <h3>Group / Organization Information</h3>
             <div className="form-group">
               <label>Group / Organization Name:</label>
               <input
@@ -193,8 +297,11 @@ export default function FeedbackForm() {
                 onChange={(e) =>
                   setFormData({ ...formData, group: e.target.value })
                 }
-                required
+                className={formErrors.group ? "error" : ""}
               />
+              {formErrors.group && (
+                <span className="error-message">{formErrors.group}</span>
+              )}
             </div>
             <div className="form-group">
               <label>Group Email:</label>
@@ -204,7 +311,6 @@ export default function FeedbackForm() {
                 onChange={(e) =>
                   setFormData({ ...formData, groupEmail: e.target.value })
                 }
-                required
               />
             </div>
             <div className="form-group">
@@ -215,93 +321,142 @@ export default function FeedbackForm() {
                 onChange={(e) =>
                   setFormData({ ...formData, groupContact: e.target.value })
                 }
-                required
               />
             </div>
-          </>
+          </div>
         )}
 
         {/* Event Dropdown */}
-        <EventDropdown
-          value={formData.event}
-          otherEvent={formData.otherEvent}
-          onChange={(data) => setFormData({ ...formData, ...data })}
-        />
+        <div className="form-section">
+          <h3>Event Information</h3>
+          <EventDropdown
+            value={formData.event}
+            otherEvent={formData.otherEvent}
+            onChange={(data) => setFormData({ ...formData, ...data })}
+          />
+          {formErrors.event && (
+            <span className="error-message">{formErrors.event}</span>
+          )}
+          {formErrors.otherEvent && (
+            <span className="error-message">{formErrors.otherEvent}</span>
+          )}
+        </div>
 
         {/* Ratings */}
-        <StarRating
-          label="Food"
-          value={formData.foodRating}
-          onChange={(val) => setFormData({ ...formData, foodRating: val })}
-        />
-        <StarRating
-          label="Ambience"
-          value={formData.ambienceRating}
-          onChange={(val) =>
-            setFormData({ ...formData, ambienceRating: val })
-          }
-        />
-        <StarRating
-          label="Service"
-          value={formData.serviceRating}
-          onChange={(val) => setFormData({ ...formData, serviceRating: val })}
-        />
-        <StarRating
-          label="Overall Experience"
-          value={formData.overallRating}
-          onChange={(val) =>
-            setFormData({ ...formData, overallRating: val })
-          }
-        />
+        <div className="form-section">
+          <h3>Your Ratings</h3>
+          <div className="ratings-container">
+            <StarRating
+              label="Food"
+              value={formData.foodRating}
+              onChange={(val) => setFormData({ ...formData, foodRating: val })}
+              error={formErrors.foodRating}
+            />
+            <StarRating
+              label="Ambience"
+              value={formData.ambienceRating}
+              onChange={(val) =>
+                setFormData({ ...formData, ambienceRating: val })
+              }
+              error={formErrors.ambienceRating}
+            />
+            <StarRating
+              label="Service"
+              value={formData.serviceRating}
+              onChange={(val) => setFormData({ ...formData, serviceRating: val })}
+              error={formErrors.serviceRating}
+            />
+            <StarRating
+              label="Overall Experience"
+              value={formData.overallRating}
+              onChange={(val) =>
+                setFormData({ ...formData, overallRating: val })
+              }
+              error={formErrors.overallRating}
+            />
+          </div>
+        </div>
 
         {/* Recommend */}
-        <div className="form-group">
-          <label>
-            <strong>Would you recommend us?</strong>
-          </label>
-          <div>
+        <div className="form-section">
+          <h3>Recommendation</h3>
+          <div className="form-group">
             <label>
-              <input
-                type="radio"
-                name="recommend"
-                value="Yes"
-                checked={formData.recommend === "Yes"}
-                onChange={(e) =>
-                  setFormData({ ...formData, recommend: e.target.value })
-                }
-                required
-              />
-              Yes
+              <strong>Would you recommend us?</strong>
             </label>
-            <label style={{ marginLeft: "15px" }}>
-              <input
-                type="radio"
-                name="recommend"
-                value="No"
-                checked={formData.recommend === "No"}
-                onChange={(e) =>
-                  setFormData({ ...formData, recommend: e.target.value })
-                }
-                required
-              />
-              No
-            </label>
+            <div className="recommendation-options">
+              <label className="recommendation-label">
+                <input
+                  type="radio"
+                  name="recommend"
+                  value="Yes"
+                  checked={formData.recommend === "Yes"}
+                  onChange={(e) =>
+                    setFormData({ ...formData, recommend: e.target.value })
+                  }
+                />
+                <span className="recommendation-custom yes">
+                  <i className="bx bx-smile"></i>
+                  Yes
+                </span>
+              </label>
+              <label className="recommendation-label">
+                <input
+                  type="radio"
+                  name="recommend"
+                  value="No"
+                  checked={formData.recommend === "No"}
+                  onChange={(e) =>
+                    setFormData({ ...formData, recommend: e.target.value })
+                  }
+                />
+                <span className="recommendation-custom no">
+                  <i className="bx bx-sad"></i>
+                  No
+                </span>
+              </label>
+            </div>
+            {formErrors.recommend && (
+              <span className="error-message">{formErrors.recommend}</span>
+            )}
           </div>
         </div>
 
         {/* Comments */}
-        <div className="form-group">
-          <label>Comments:</label>
-          <textarea
-            value={formData.comments}
-            onChange={(e) =>
-              setFormData({ ...formData, comments: e.target.value })
-            }
-          />
+        <div className="form-section">
+          <h3>Additional Comments</h3>
+          <div className="form-group">
+            <label>Comments:</label>
+            <textarea
+              value={formData.comments}
+              onChange={(e) =>
+                setFormData({ ...formData, comments: e.target.value })
+              }
+              placeholder="Please share any additional feedback or suggestions..."
+            />
+          </div>
         </div>
 
         {/* Submit */}
-        <button type="submit">Submit Feedback</button>
+        <div className="form-actions">
+          <button 
+            type="submit" 
+            className="submit-btn"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? (
+              <>
+                <i className="bx bx-loader-alt bx-spin"></i>
+                Submitting...
+              </>
+            ) : (
+              <>
+                <i className="bx bx-send"></i>
+                Submit Feedback
+              </>
+            )}
+          </button>
+        </div>
       </form>
     </div>
   );
