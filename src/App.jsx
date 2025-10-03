@@ -4,7 +4,7 @@ import FeedbackForm from "./components/FeedbackForm";
 import ThankYouScreen from "./components/ThankYouScreen";
 import AdminPanel from "./components/AdminPanel";
 import AdminLogin from "./components/AdminLogin";
-
+import "./App.css";
 
 export default function App() {
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
@@ -16,13 +16,30 @@ export default function App() {
 
   return (
     <Router>
-      <nav style={{ padding: "10px", background: "#f8f9fa", borderBottom: "1px solid #ddd" }}>
-        <Link to="/" style={{ marginRight: "10px" }}>Feedback</Link>
-        <Link to="/thank-you">Thank You</Link>
-        {/* Only show Admin link if logged in */}
-        {isAdminLoggedIn && (
-          <Link to="/admin" style={{ marginLeft: "10px" }}>Admin</Link>
-        )}
+      <nav className="app-nav">
+        <div className="nav-container">
+          <div className="nav-brand">
+            <i className="bx bx-comment-detail"></i>
+            <span>Feedback Hub</span>
+          </div>
+          <div className="nav-links">
+            <Link to="/" className="nav-link">
+              <i className="bx bx-message-square-edit"></i>
+              <span>Feedback</span>
+            </Link>
+            <Link to="/thank-you" className="nav-link">
+              <i className="bx bx-heart"></i>
+              <span>Thank You</span>
+            </Link>
+            {/* Only show Admin link if logged in */}
+            {isAdminLoggedIn && (
+              <Link to="/admin" className="nav-link admin-link">
+                <i className="bx bx-shield"></i>
+                <span>Admin</span>
+              </Link>
+            )}
+          </div>
+        </div>
       </nav>
 
       <Routes>
