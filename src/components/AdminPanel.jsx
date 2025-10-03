@@ -63,24 +63,6 @@ export default function AdminPanel({ setIsAdminLoggedIn }) {
 
   const visibleFeedbacks = getFilteredFeedbacks();
   const totalSubmissions = visibleFeedbacks.length;
-  
-  // --- Quick Stats Calculations ---
-  const today = new Date().toDateString();
-  const newToday = visibleFeedbacks.filter(f => 
-    new Date(f.date).toDateString() === today
-  ).length;
-  
-  const pendingReviews = visibleFeedbacks.filter(f => 
-    !f.responded
-  ).length;
-  
-  const respondedCount = visibleFeedbacks.filter(f => 
-    f.responded
-  ).length;
-  
-  const responseRate = totalSubmissions
-    ? ((respondedCount / totalSubmissions) * 100).toFixed(1)
-    : 0;
 
   // --- Calculations ---
   const recommendCount = visibleFeedbacks.filter(
@@ -319,37 +301,6 @@ export default function AdminPanel({ setIsAdminLoggedIn }) {
                 )}
               </div>
             )}
-          </div>
-        </div>
-      </div>
-
-      {/* Quick Stats Cards */}
-      <div className="quick-stats">
-        <div className="stat-card">
-          <div className="stat-icon">
-            <i className="bx bx-trending-up"></i>
-          </div>
-          <div className="stat-content">
-            <h3>New Today</h3>
-            <div className="stat-value">{newToday}</div>
-          </div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-icon">
-            <i className="bx bx-time-five"></i>
-          </div>
-          <div className="stat-content">
-            <h3>Pending Reviews</h3>
-            <div className="stat-value">{pendingReviews}</div>
-          </div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-icon">
-            <i className="bx bx-check-circle"></i>
-          </div>
-          <div className="stat-content">
-            <h3>Response Rate</h3>
-            <div className="stat-value">{responseRate}%</div>
           </div>
         </div>
       </div>
