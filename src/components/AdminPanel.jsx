@@ -4,13 +4,15 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import DarkModeToggle from "./DarkModeToggle";
 import "./AdminPanel.css";
+import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 export default function AdminPanel({ setIsAdminLoggedIn }) {
   const [feedbacks, setFeedbacks] = useState([]);
   const [showArchived, setShowArchived] = useState(false);
-  const [timeFilter, setTimeFilter] = useState('all'); // 'all', '7days', '30days', 'custom'
+  const [timeFilter, setTimeFilter] = useState('all');
   const [customStartDate, setCustomStartDate] = useState('');
   const [customEndDate, setCustomEndDate] = useState('');
+  const [showDatePicker, setShowDatePicker] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -63,6 +65,11 @@ export default function AdminPanel({ setIsAdminLoggedIn }) {
   const totalSubmissions = visibleFeedbacks.length;
   
   // --- Quick Stats Calculations ---
+  const today = new Date().toDateString();
+  const newToday = visibleFeedbacks.filter(f => 
+    new Date(f.date).toDateString() === today
+  ).length;
+  
   const pendingReviews = visibleFeedbacks.filter(f => 
     !f.responded
   ).length;
@@ -212,8 +219,19 @@ export default function AdminPanel({ setIsAdminLoggedIn }) {
 
   const handleArchive = (index) => {
     const updated = [...feedbacks];
-    updated[index].archived = !updated[index].archived; // toggle archive
+    updated[index].archived = !updated[index].archived;
     updateStorage(updated);
+  };
+
+  const getTimeFilterLabel = () => {
+    switch(timeFilter) {
+      case '7days': return 'Last 7 Days';
+      case '30days': return 'Last 30 Days';
+      case 'custom': return customStartDate && customEndDate 
+        ? `${customStartDate} to ${customEndDate}` 
+        : 'Custom Range';
+      default: return 'All Time';
+    }
   };
 
   return (
@@ -238,184 +256,194 @@ export default function AdminPanel({ setIsAdminLoggedIn }) {
         </div>
       </div>
 
-      {/* Time Period Filters */}
-      <div className="time-filters">
-        <h3>Time Period:</h3>
-        <div className="filter-buttons">
-          <button 
-            className={timeFilter === 'all' ? 'active' : ''} 
-            onClick={() => setTimeFilter('all')}
-          >
-            All Time
-          </button>
-          <button 
-            className={timeFilter === '7days' ? 'active' : ''} 
-            onClick={() => setTimeFilter('7days')}
-          >
-            Last 7 Days
-          </button>
-          <button 
-            className={timeFilter === '30days' ? 'active' : ''} 
-            onClick={() => setTimeFilter('30days')}
-          >
-            Last 30 Days
-          </button>
-          <button 
-            className={timeFilter === 'custom' ? 'active' : ''} 
-            onClick={() => setTimeFilter('custom')}
-          >
-            Custom Range
-          </button>
-        </div>
-        {timeFilter === 'custom' && (
-          <div className="custom-date-range">
+      {/* Search Bar with Time Filter */}
+      <div className="search-section">
+        <div className="search-bar">
+          <div className="search-input-wrapper">
+            <i className="bx bx-search search-icon"></i>
             <input 
-              type="date" 
-              value={customStartDate} 
-              onChange={(e) => setCustomStartDate(e.target.value)}
-            />
-            <span>to</span>
-            <input 
-              type="date" 
-              value={customEndDate} 
-              onChange={(e) => setCustomEndDate(e.target.value)}
+              type="text" 
+              placeholder="Search feedback..."
+              className="search-input"
             />
           </div>
-        )}
+          <div className="time-filter-dropdown">
+            <button 
+              className="time-filter-button"
+              onClick={() => setShowDatePicker(!showDatePicker)}
+            >
+              <i className="bx bx-calendar"></i>
+              <span>{getTimeFilterLabel()}</span>
+              <i className={`bx bx-chevron-${showDatePicker ? 'up' : 'down'}`}></i>
+            </button>
+            {showDatePicker && (
+              <div className="date-picker-dropdown">
+                <button 
+                  className={timeFilter === 'all' ? 'active' : ''} 
+                  onClick={() => { setTimeFilter('all'); setShowDatePicker(false); }}
+                >
+                  All Time
+                </button>
+                <button 
+                  className={timeFilter === '7days' ? 'active' : ''} 
+                  onClick={() => { setTimeFilter('7days'); setShowDatePicker(false); }}
+                >
+                  Last 7 Days
+                </button>
+                <button 
+                  className={timeFilter === '30days' ? 'active' : ''} 
+                  onClick={() => { setTimeFilter('30days'); setShowDatePicker(false); }}
+                >
+                  Last 30 Days
+                </button>
+                <button 
+                  className={timeFilter === 'custom' ? 'active' : ''} 
+                  onClick={() => setTimeFilter('custom')}
+                >
+                  Custom Range
+                </button>
+                {timeFilter === 'custom' && (
+                  <div className="custom-date-inputs">
+                    <input 
+                      type="date" 
+                      value={customStartDate} 
+                      onChange={(e) => setCustomStartDate(e.target.value)}
+                    />
+                    <span>to</span>
+                    <input 
+                      type="date" 
+                      value={customEndDate} 
+                      onChange={(e) => setCustomEndDate(e.target.value)}
+                    />
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* Quick Stats Cards */}
       <div className="quick-stats">
         <div className="stat-card">
-          <h3>Pending Reviews</h3>
-          <div className="stat-value">{pendingReviews}</div>
+          <div className="stat-icon">
+            <i className="bx bx-trending-up"></i>
+          </div>
+          <div className="stat-content">
+            <h3>New Today</h3>
+            <div className="stat-value">{newToday}</div>
+          </div>
         </div>
         <div className="stat-card">
-          <h3>Response Rate</h3>
-          <div className="stat-value">{responseRate}%</div>
+          <div className="stat-icon">
+            <i className="bx bx-time-five"></i>
+          </div>
+          <div className="stat-content">
+            <h3>Pending Reviews</h3>
+            <div className="stat-value">{pendingReviews}</div>
+          </div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-icon">
+            <i className="bx bx-check-circle"></i>
+          </div>
+          <div className="stat-content">
+            <h3>Response Rate</h3>
+            <div className="stat-value">{responseRate}%</div>
+          </div>
         </div>
       </div>
 
-      {/* Summary Section */}
+      {/* Charts Section */}
+      <div className="charts-section">
+        <div className="chart-container">
+          <h2>Recommendation Rate</h2>
+          <ResponsiveContainer width="100%" height={300}>
+            <PieChart>
+              <Pie
+                data={recommendData}
+                cx="50%"
+                cy="50%"
+                labelLine={false}
+                label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                outerRadius={80}
+                fill="#8884d8"
+                dataKey="value"
+              >
+                {recommendData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.color} />
+                ))}
+              </Pie>
+              <Tooltip />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
+        <div className="chart-container">
+          <h2>Rating Comparison</h2>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={ratingsData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="name" />
+              <YAxis domain={[0, 5]} />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey="rating" fill="#8884d8" />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
+      {/* Summary Section with Trends */}
       <div className="top-section">
         <div className="card summary">
           <h2>Summary</h2>
           <p><strong>Total Feedback:</strong> {totalSubmissions}</p>
           <p><strong>Recommend (Yes):</strong> {recommendCount}</p>
           <p><strong>Recommendation Rate:</strong> {recommendRate}%</p>
-          <div className="pie-chart-container">
-            <div className="pie-chart">
-              <div 
-                className="pie-chart-fill" 
-                style={{
-                  background: `conic-gradient(#4CAF50 0% ${recommendRate}%, #F44336 ${recommendRate}% 100%)`
-                }}
-              ></div>
-              <div className="pie-chart-center">
-                <span>{recommendRate}%</span>
-              </div>
-            </div>
-            <div className="pie-chart-legend">
-              <div className="legend-item">
-                <div className="legend-color" style={{backgroundColor: '#4CAF50'}}></div>
-                <span>Would Recommend ({recommendCount})</span>
-              </div>
-              <div className="legend-item">
-                <div className="legend-color" style={{backgroundColor: '#F44336'}}></div>
-                <span>Would Not ({totalSubmissions - recommendCount})</span>
-              </div>
-            </div>
-          </div>
         </div>
         <div className="card averages">
           <h2>Average Ratings</h2>
-          <div className="rating-bars">
-            <div className="rating-bar">
-              <span className="rating-label">Food: {averages.food}</span>
-              <div className="rating-bar-bg">
-                <div 
-                  className="rating-bar-fill" 
-                  style={{ width: `${(averages.food / 5) * 100}%` }}
-                ></div>
-              </div>
-              {trends.food && (
-                <span className={`trend ${trends.food.isPositive ? 'positive' : 'negative'}`}>
-                  {trends.food.isPositive ? '↑' : '↓'} {trends.food.value}%
-                </span>
-              )}
-            </div>
-            <div className="rating-bar">
-              <span className="rating-label">Ambience: {averages.ambience}</span>
-              <div className="rating-bar-bg">
-                <div 
-                  className="rating-bar-fill" 
-                  style={{ width: `${(averages.ambience / 5) * 100}%` }}
-                ></div>
-              </div>
-              {trends.ambience && (
-                <span className={`trend ${trends.ambience.isPositive ? 'positive' : 'negative'}`}>
-                  {trends.ambience.isPositive ? '↑' : '↓'} {trends.ambience.value}%
-                </span>
-              )}
-            </div>
-            <div className="rating-bar">
-              <span className="rating-label">Service: {averages.service}</span>
-              <div className="rating-bar-bg">
-                <div 
-                  className="rating-bar-fill" 
-                  style={{ width: `${(averages.service / 5) * 100}%` }}
-                ></div>
-              </div>
-              {trends.service && (
-                <span className={`trend ${trends.service.isPositive ? 'positive' : 'negative'}`}>
-                  {trends.service.isPositive ? '↑' : '↓'} {trends.service.value}%
-                </span>
-              )}
-            </div>
-            <div className="rating-bar">
-              <span className="rating-label">Overall: {averages.overall}</span>
-              <div className="rating-bar-bg">
-                <div 
-                  className="rating-bar-fill" 
-                  style={{ width: `${(averages.overall / 5) * 100}%` }}
-                ></div>
-              </div>
-              {trends.overall && (
-                <span className={`trend ${trends.overall.isPositive ? 'positive' : 'negative'}`}>
-                  {trends.overall.isPositive ? '↑' : '↓'} {trends.overall.value}%
-                </span>
-              )}
-            </div>
-          </div>
+          <p>
+            Food: {averages.food} 
+            {trends.food && (
+              <span className={`trend ${trends.food.isPositive ? 'positive' : 'negative'}`}>
+                {trends.food.isPositive ? '↑' : '↓'} {trends.food.value}%
+              </span>
+            )}
+          </p>
+          <p>
+            Ambience: {averages.ambience}
+            {trends.ambience && (
+              <span className={`trend ${trends.ambience.isPositive ? 'positive' : 'negative'}`}>
+                {trends.ambience.isPositive ? '↑' : '↓'} {trends.ambience.value}%
+              </span>
+            )}
+          </p>
+          <p>
+            Service: {averages.service}
+            {trends.service && (
+              <span className={`trend ${trends.service.isPositive ? 'positive' : 'negative'}`}>
+                {trends.service.isPositive ? '↑' : '↓'} {trends.service.value}%
+              </span>
+            )}
+          </p>
+          <p>
+            Overall: {averages.overall}
+            {trends.overall && (
+              <span className={`trend ${trends.overall.isPositive ? 'positive' : 'negative'}`}>
+                {trends.overall.isPositive ? '↑' : '↓'} {trends.overall.value}%
+              </span>
+            )}
+          </p>
         </div>
         <div className="card activity">
           <h2>Recent Activity</h2>
-          {visibleFeedbacks.length === 0 ? (
-            <p>No feedback available</p>
-          ) : (
-            visibleFeedbacks.slice(-3).reverse().map((f, i) => (
-              <div key={i} className="activity-item">
-                <div className="activity-header">
-                  <strong>{f.name}</strong>
-                  <span className="activity-rating">
-                    {Array.from({ length: 5 }).map((_, i) => (
-                      <i 
-                        key={i} 
-                        className={`bx ${i < f.overall ? 'bxs-star' : 'bx-star'}`}
-                      ></i>
-                    ))}
-                  </span>
-                </div>
-                <div className="activity-meta">
-                  <span>{new Date(f.date).toLocaleDateString()}</span>
-                  <span>{f.event}</span>
-                </div>
-                {f.comments && (
-                  <div className="activity-comment">{f.comments}</div>
-                )}
-              </div>
-            ))
-          )}
+          {visibleFeedbacks.slice(-3).reverse().map((f, i) => (
+            <p key={i}>
+              <strong>{f.name}</strong> left a {f.overall}-star review
+              ({new Date(f.date).toLocaleTimeString()})
+            </p>
+          ))}
         </div>
       </div>
 
