@@ -19,7 +19,11 @@ export default function App() {
       <nav className="app-nav">
         <div className="nav-container">
           <div className="nav-brand">
-            <img src="/logo.svg" alt="Feedback Hub" className="nav-logo" />
+            <img 
+              src="https://ui-avatars.com/api/?name=Feedback+Hub&background=2bb7a9&color=fff&size=32&font-size=0.6&bold=true&rounded=true" 
+              alt="Feedback Hub" 
+              className="nav-logo" 
+            />
             <span>Feedback Hub</span>
           </div>
           <div className="nav-links">
@@ -31,7 +35,6 @@ export default function App() {
               <i className="bx bx-heart"></i>
               <span>Thank You</span>
             </Link>
-            {/* Only show Admin link if logged in */}
             {isAdminLoggedIn && (
               <Link to="/admin" className="nav-link admin-link">
                 <i className="bx bx-shield"></i>
@@ -43,11 +46,8 @@ export default function App() {
       </nav>
 
       <Routes>
-        {/* Public Routes */}
         <Route path="/" element={<FeedbackForm />} />
         <Route path="/thank-you" element={<ThankYouScreen />} />
-
-        {/* Admin Routes */}
         <Route
           path="/admin-login"
           element={
@@ -68,8 +68,6 @@ export default function App() {
             )
           }
         />
-
-        {/* Catch-all → send back to Feedback */}
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </Router>
