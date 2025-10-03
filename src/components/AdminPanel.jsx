@@ -4,10 +4,14 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import DarkModeToggle from "./DarkModeToggle";
 import "./AdminPanel.css";
+import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 export default function AdminPanel({ setIsAdminLoggedIn }) {
   const [feedbacks, setFeedbacks] = useState([]);
   const [showArchived, setShowArchived] = useState(false);
+  const [timeFilter, setTimeFilter] = useState('all'); // 'all', '7days', '30days', 'custom'
+  const [customStartDate, setCustomStartDate] = useState('');
+  const [customEndDate, setCustomEndDate] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -30,12 +34,54 @@ export default function AdminPanel({ setIsAdminLoggedIn }) {
     localStorage.setItem("feedbacks", JSON.stringify(newData));
   };
 
-  // --- Calculations ---
-  const visibleFeedbacks = showArchived
-    ? feedbacks
-    : feedbacks.filter((f) => !f.archived);
+  // --- Filter feedbacks based on time period ---
+  const getFilteredFeedbacks = () => {
+    let filtered = showArchived
+      ? feedbacks
+      : feedbacks.filter((f) => !f.archived);
+    
+    const now = new Date();
+    
+    if (timeFilter === '7days') {
+      const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+      filtered = filtered.filter(f => new Date(f.date) >= sevenDaysAgo);
+    } else if (timeFilter === '30days') {
+      const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+      filtered = filtered.filter(f => new Date(f.date) >= thirtyDaysAgo);
+    } else if (timeFilter === 'custom' && customStartDate && customEndDate) {
+      const start = new Date(customStartDate);
+      const end = new Date(customEndDate);
+      filtered = filtered.filter(f => {
+        const feedbackDate = new Date(f.date);
+        return feedbackDate >= start && feedbackDate <= end;
+      });
+    }
+    
+    return filtered;
+  };
 
+  const visibleFeedbacks = getFilteredFeedbacks();
   const totalSubmissions = visibleFeedbacks.length;
+  
+  // --- Quick Stats Calculations ---
+  const today = new Date().toDateString();
+  const newToday = visibleFeedbacks.filter(f => 
+    new Date(f.date).toDateString() === today
+  ).length;
+  
+  const pendingReviews = visibleFeedbacks.filter(f => 
+    !f.responded
+  ).length;
+  
+  const respondedCount = visibleFeedbacks.filter(f => 
+    f.responded
+  ).length;
+  
+  const responseRate = totalSubmissions
+    ? ((respondedCount / totalSubmissions) * 100).toFixed(1)
+    : 0;
+
+  // --- Calculations ---
   const recommendCount = visibleFeedbacks.filter(
     (f) => f.recommend === "Yes"
   ).length;
@@ -58,6 +104,80 @@ export default function AdminPanel({ setIsAdminLoggedIn }) {
     service: average("service"),
     overall: average("overall"),
   };
+
+  // --- Trend Calculations ---
+  const calculateTrend = (key) => {
+    if (timeFilter === 'all') return null;
+    
+    const now = new Date();
+    let currentPeriod, previousPeriod;
+    
+    if (timeFilter === '7days') {
+      currentPeriod = visibleFeedbacks.filter(f => {
+        const feedbackDate = new Date(f.date);
+        const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+        return feedbackDate >= sevenDaysAgo;
+      });
+      
+      previousPeriod = feedbacks.filter(f => {
+        const feedbackDate = new Date(f.date);
+        const fourteenDaysAgo = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
+        const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+        return feedbackDate >= fourteenDaysAgo && feedbackDate < sevenDaysAgo;
+      });
+    } else if (timeFilter === '30days') {
+      currentPeriod = visibleFeedbacks.filter(f => {
+        const feedbackDate = new Date(f.date);
+        const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+        return feedbackDate >= thirtyDaysAgo;
+      });
+      
+      previousPeriod = feedbacks.filter(f => {
+        const feedbackDate = new Date(f.date);
+        const sixtyDaysAgo = new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000);
+        const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+        return feedbackDate >= sixtyDaysAgo && feedbackDate < thirtyDaysAgo;
+      });
+    } else {
+      return null;
+    }
+    
+    const currentAvg = currentPeriod.length
+      ? currentPeriod.reduce((sum, f) => sum + Number(f[key] || 0), 0) / currentPeriod.length
+      : 0;
+      
+    const previousAvg = previousPeriod.length
+      ? previousPeriod.reduce((sum, f) => sum + Number(f[key] || 0), 0) / previousPeriod.length
+      : 0;
+      
+    if (previousAvg === 0) return null;
+    
+    const change = ((currentAvg - previousAvg) / previousAvg) * 100;
+    return {
+      value: change.toFixed(1),
+      isPositive: change >= 0
+    };
+  };
+
+  const trends = {
+    food: calculateTrend("food"),
+    ambience: calculateTrend("ambience"),
+    service: calculateTrend("service"),
+    overall: calculateTrend("overall"),
+  };
+
+  // --- Chart Data ---
+  const recommendData = [
+    { name: 'Would Recommend', value: recommendCount, color: '#4CAF50' },
+    { name: 'Would Not Recommend', value: totalSubmissions - recommendCount, color: '#F44336' }
+  ];
+
+  const ratingsData = [
+    { name: 'Food', rating: parseFloat(averages.food) },
+    { name: 'Ambience', rating: parseFloat(averages.ambience) },
+    { name: 'Service', rating: parseFloat(averages.service) },
+    { name: 'Overall', rating: parseFloat(averages.overall) }
+  ];
 
   // --- Actions ---
   const handleLogout = () => {
@@ -124,6 +244,68 @@ export default function AdminPanel({ setIsAdminLoggedIn }) {
         </div>
       </div>
 
+      {/* Time Period Filters */}
+      <div className="time-filters">
+        <h3>Time Period:</h3>
+        <div className="filter-buttons">
+          <button 
+            className={timeFilter === 'all' ? 'active' : ''} 
+            onClick={() => setTimeFilter('all')}
+          >
+            All Time
+          </button>
+          <button 
+            className={timeFilter === '7days' ? 'active' : ''} 
+            onClick={() => setTimeFilter('7days')}
+          >
+            Last 7 Days
+          </button>
+          <button 
+            className={timeFilter === '30days' ? 'active' : ''} 
+            onClick={() => setTimeFilter('30days')}
+          >
+            Last 30 Days
+          </button>
+          <button 
+            className={timeFilter === 'custom' ? 'active' : ''} 
+            onClick={() => setTimeFilter('custom')}
+          >
+            Custom Range
+          </button>
+        </div>
+        {timeFilter === 'custom' && (
+          <div className="custom-date-range">
+            <input 
+              type="date" 
+              value={customStartDate} 
+              onChange={(e) => setCustomStartDate(e.target.value)}
+            />
+            <span>to</span>
+            <input 
+              type="date" 
+              value={customEndDate} 
+              onChange={(e) => setCustomEndDate(e.target.value)}
+            />
+          </div>
+        )}
+      </div>
+
+      {/* Quick Stats Cards */}
+      <div className="quick-stats">
+        <div className="stat-card">
+          <h3>New Today</h3>
+          <div className="stat-value">{newToday}</div>
+        </div>
+        <div className="stat-card">
+          <h3>Pending Reviews</h3>
+          <div className="stat-value">{pendingReviews}</div>
+        </div>
+        <div className="stat-card">
+          <h3>Response Rate</h3>
+          <div className="stat-value">{responseRate}%</div>
+        </div>
+      </div>
+
       {/* Summary Section */}
       <div className="top-section">
         <div className="card summary">
@@ -134,10 +316,38 @@ export default function AdminPanel({ setIsAdminLoggedIn }) {
         </div>
         <div className="card averages">
           <h2>Average Ratings</h2>
-          <p>Food: {averages.food}</p>
-          <p>Ambience: {averages.ambience}</p>
-          <p>Service: {averages.service}</p>
-          <p>Overall: {averages.overall}</p>
+          <p>
+            Food: {averages.food} 
+            {trends.food && (
+              <span className={`trend ${trends.food.isPositive ? 'positive' : 'negative'}`}>
+                {trends.food.isPositive ? '↑' : '↓'} {trends.food.value}%
+              </span>
+            )}
+          </p>
+          <p>
+            Ambience: {averages.ambience}
+            {trends.ambience && (
+              <span className={`trend ${trends.ambience.isPositive ? 'positive' : 'negative'}`}>
+                {trends.ambience.isPositive ? '↑' : '↓'} {trends.ambience.value}%
+              </span>
+            )}
+          </p>
+          <p>
+            Service: {averages.service}
+            {trends.service && (
+              <span className={`trend ${trends.service.isPositive ? 'positive' : 'negative'}`}>
+                {trends.service.isPositive ? '↑' : '↓'} {trends.service.value}%
+              </span>
+            )}
+          </p>
+          <p>
+            Overall: {averages.overall}
+            {trends.overall && (
+              <span className={`trend ${trends.overall.isPositive ? 'positive' : 'negative'}`}>
+                {trends.overall.isPositive ? '↑' : '↓'} {trends.overall.value}%
+              </span>
+            )}
+          </p>
         </div>
         <div className="card activity">
           <h2>Recent Activity</h2>
@@ -147,6 +357,45 @@ export default function AdminPanel({ setIsAdminLoggedIn }) {
               ({new Date(f.date).toLocaleTimeString()})
             </p>
           ))}
+        </div>
+      </div>
+
+      {/* Charts Section */}
+      <div className="charts-section">
+        <div className="chart-container">
+          <h2>Recommendation Rate</h2>
+          <ResponsiveContainer width="100%" height={300}>
+            <PieChart>
+              <Pie
+                data={recommendData}
+                cx="50%"
+                cy="50%"
+                labelLine={false}
+                label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                outerRadius={80}
+                fill="#8884d8"
+                dataKey="value"
+              >
+                {recommendData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.color} />
+                ))}
+              </Pie>
+              <Tooltip />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
+        <div className="chart-container">
+          <h2>Rating Comparison</h2>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={ratingsData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="name" />
+              <YAxis domain={[0, 5]} />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey="rating" fill="#8884d8" />
+            </BarChart>
+          </ResponsiveContainer>
         </div>
       </div>
 
