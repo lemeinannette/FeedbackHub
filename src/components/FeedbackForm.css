@@ -606,4 +606,12 @@ body.dark .thank-you-message p {
   .thank-you-message {
     padding: 32px 24px;
   }
+  .feedback-form h1 {
+  font-family: 'Fredoka', 'Poppins', cursive, sans-serif;
+  font-size: 32px;
+  background: linear-gradient(135deg, #2bb7a9 0%, #229287 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
 }

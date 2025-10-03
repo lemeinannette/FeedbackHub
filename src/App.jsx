@@ -20,7 +20,7 @@ export default function App() {
         <div className="nav-container">
           <div className="nav-brand">
             <img 
-              src="https://ui-avatars.com/api/?name=Feedback+Hub&background=2bb7a9&color=fff&size=32&font-size=0.6&bold=true&rounded=true" 
+              src="https://ui-avatars.com/api/?name=FH&background=2bb7a9&color=fff&size=56&font-size=0.9&bold=true&rounded=true" 
               alt="Feedback Hub" 
               className="nav-logo" 
             />
