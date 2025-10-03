@@ -193,4 +193,44 @@ body.dark .admin-link:hover {
   .nav-link i {
     font-size: 18px;
   }
+  /* Add this to your existing App.css */
+
+.nav-logo {
+  height: 32px;
+  width: auto;
+  margin-right: 10px;
+  transition: transform 0.3s ease;
+}
+
+.nav-brand:hover .nav-logo {
+  transform: scale(1.05);
+}
+
+/* For dark mode, you might want to add a filter if your logo doesn't work well */
+body.dark .nav-logo {
+  filter: brightness(1.2);
+}
+
+/* If you want to keep the icon as a fallback when the logo doesn't load */
+.nav-brand i {
+  font-size: 24px;
+  color: #2bb7a9;
+  display: none; /* Hide by default when using logo */
+}
+
+/* Show icon only if logo fails to load */
+.nav-brand img:not([src]), .nav-brand img[src=""] {
+  display: none;
+}
+
+.nav-brand img:not([src]) + i, .nav-brand img[src=""] + i {
+  display: inline-block;
+}
+
+/* Mobile responsiveness for logo */
+@media (max-width: 768px) {
+  .nav-logo {
+    height: 28px;
+  }
+}
 }

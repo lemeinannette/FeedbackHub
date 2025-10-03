@@ -19,7 +19,7 @@ export default function App() {
       <nav className="app-nav">
         <div className="nav-container">
           <div className="nav-brand">
-            <i className="bx bx-comment-detail"></i>
+            <img src="/logo.svg" alt="Feedback Hub" className="nav-logo" />
             <span>Feedback Hub</span>
           </div>
           <div className="nav-links">
