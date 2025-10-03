@@ -23,16 +23,45 @@
 .nav-brand {
   display: flex;
   align-items: center;
-  gap: 10px;
-  font-size: 20px;
+  gap: 12px;
+  font-size: 24px;
   font-weight: 700;
   color: #1f2937;
   text-decoration: none;
+  font-family: 'Fredoka', 'Poppins', cursive, sans-serif;
+  transition: all 0.3s ease;
+}
+
+.nav-brand:hover {
+  transform: scale(1.02);
 }
 
 .nav-brand i {
-  font-size: 24px;
+  font-size: 28px;
   color: #2bb7a9;
+  display: none;
+}
+
+.nav-logo {
+  height: 56px;
+  width: auto;
+  transition: all 0.3s ease;
+  border-radius: 16px;
+  box-shadow: 0 3px 10px rgba(43, 183, 169, 0.25);
+}
+
+.nav-brand:hover .nav-logo {
+  transform: scale(1.1) rotate(5deg);
+  box-shadow: 0 5px 15px rgba(43, 183, 169, 0.35);
+}
+
+/* Fallback for logo */
+.nav-brand img:not([src]), .nav-brand img[src=""] {
+  display: none;
+}
+
+.nav-brand img:not([src]) + i, .nav-brand img[src=""] + i {
+  display: inline-block;
 }
 
 .nav-links {
@@ -50,6 +79,7 @@
   text-decoration: none;
   color: #4b5563;
   font-weight: 500;
+  font-family: 'Poppins', sans-serif;
   transition: all 0.2s ease;
   position: relative;
 }
@@ -69,6 +99,7 @@
 .nav-link:hover {
   color: #2bb7a9;
   background: rgba(43, 183, 169, 0.05);
+  transform: translateY(-1px);
 }
 
 .nav-link:hover::before {
@@ -92,11 +123,13 @@
   color: #2bb7a9;
   background: rgba(43, 183, 169, 0.1);
   border: 1px solid rgba(43, 183, 169, 0.2);
+  font-weight: 600;
 }
 
 .admin-link:hover {
   background: rgba(43, 183, 169, 0.15);
   border-color: rgba(43, 183, 169, 0.3);
+  transform: translateY(-1px);
 }
 
 /* Dark Mode */
@@ -108,6 +141,10 @@ body.dark .app-nav {
 
 body.dark .nav-brand {
   color: #f1f5f9;
+}
+
+body.dark .nav-logo {
+  filter: brightness(1.2);
 }
 
 body.dark .nav-link {
@@ -145,6 +182,10 @@ body.dark .admin-link:hover {
     padding: 0 16px;
   }
   
+  .nav-brand {
+    font-size: 20px;
+  }
+  
   .nav-brand span {
     display: none;
   }
@@ -159,6 +200,10 @@ body.dark .admin-link:hover {
   
   .nav-link i {
     font-size: 20px;
+  }
+  
+  .nav-logo {
+    height: 48px;
   }
   
   .admin-link {
@@ -186,51 +231,19 @@ body.dark .admin-link:hover {
     height: 56px;
   }
   
+  .nav-brand {
+    font-size: 18px;
+  }
+  
   .nav-brand i {
-    font-size: 22px;
+    font-size: 24px;
   }
   
   .nav-link i {
     font-size: 18px;
   }
-  /* Add this to your existing App.css */
-
-.nav-logo {
-  height: 32px;
-  width: auto;
-  margin-right: 10px;
-  transition: transform 0.3s ease;
-}
-
-.nav-brand:hover .nav-logo {
-  transform: scale(1.05);
-}
-
-/* For dark mode, you might want to add a filter if your logo doesn't work well */
-body.dark .nav-logo {
-  filter: brightness(1.2);
-}
-
-/* If you want to keep the icon as a fallback when the logo doesn't load */
-.nav-brand i {
-  font-size: 24px;
-  color: #2bb7a9;
-  display: none; /* Hide by default when using logo */
-}
-
-/* Show icon only if logo fails to load */
-.nav-brand img:not([src]), .nav-brand img[src=""] {
-  display: none;
-}
-
-.nav-brand img:not([src]) + i, .nav-brand img[src=""] + i {
-  display: inline-block;
-}
-
-/* Mobile responsiveness for logo */
-@media (max-width: 768px) {
+  
   .nav-logo {
-    height: 28px;
+    height: 44px;
   }
-}
 }
