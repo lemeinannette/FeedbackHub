@@ -1,21 +1,59 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import "./AdminPanel.css";
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
-export default function AdminPanel({ setIsAdminLoggedIn }) {
+export default function AdminPanel({ setIsAdminLoggedIn, previousRoute, setPreviousRoute }) {
   const [feedbacks, setFeedbacks] = useState([]);
   const [showArchived, setShowArchived] = useState(false);
   const [timeFilter, setTimeFilter] = useState('all');
   const [customStartDate, setCustomStartDate] = useState('');
   const [customEndDate, setCustomEndDate] = useState('');
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [darkMode, setDarkMode] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
   const navigate = useNavigate();
 
+  // Initialize dark mode from localStorage and apply it
   useEffect(() => {
-    // ✅ Session Expiration
+    const darkModePreference = localStorage.getItem("darkMode") === "true";
+    setDarkMode(darkModePreference);
+    
+    // Apply both classes to ensure compatibility
+    if (darkModePreference) {
+      document.body.classList.add('dark-mode', 'dark');
+    } else {
+      document.body.classList.remove('dark-mode', 'dark');
+    }
+  }, []);
+
+  // Listen for storage changes from other components (like Settings)
+  useEffect(() => {
+    const handleStorageChange = (e) => {
+      if (e.key === 'darkMode') {
+        const newDarkMode = e.newValue === "true";
+        setDarkMode(newDarkMode);
+        
+        if (newDarkMode) {
+          document.body.classList.add('dark-mode', 'dark');
+        } else {
+          document.body.classList.remove('dark-mode', 'dark');
+        }
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, []);
+
+  // Check session and load feedbacks
+  useEffect(() => {
     const expiresAt = parseInt(localStorage.getItem("adminExpires"), 10);
     if (!expiresAt || Date.now() > expiresAt) {
       localStorage.removeItem("isAdminLoggedIn");
@@ -26,22 +64,38 @@ export default function AdminPanel({ setIsAdminLoggedIn }) {
     }
 
     const saved = JSON.parse(localStorage.getItem("feedbacks")) || [];
+    console.log("Loaded feedbacks:", saved);
     setFeedbacks(saved);
   }, [navigate, setIsAdminLoggedIn]);
 
-  const updateStorage = (newData) => {
-    setFeedbacks(newData);
-    localStorage.setItem("feedbacks", JSON.stringify(newData));
-  };
-
-  // --- Filter feedbacks based on time period ---
-  const getFilteredFeedbacks = () => {
+  // Memoized filtered feedbacks for better performance
+  const filteredFeedbacks = useMemo(() => {
     let filtered = showArchived
       ? feedbacks
       : feedbacks.filter((f) => !f.archived);
     
-    const now = new Date();
+    // Apply search filter
+    if (searchTerm.trim()) {
+      const lowerSearchTerm = searchTerm.toLowerCase().trim();
+      filtered = filtered.filter(f => {
+        const name = f.name || '';
+        const email = f.email || '';
+        const event = f.event || '';
+        const comments = f.comments || '';
+        const type = f.type || '';
+        
+        return (
+          name.toLowerCase().includes(lowerSearchTerm) ||
+          email.toLowerCase().includes(lowerSearchTerm) ||
+          event.toLowerCase().includes(lowerSearchTerm) ||
+          comments.toLowerCase().includes(lowerSearchTerm) ||
+          type.toLowerCase().includes(lowerSearchTerm)
+        );
+      });
+    }
     
+    // Apply time filter
+    const now = new Date();
     if (timeFilter === '7days') {
       const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
       filtered = filtered.filter(f => new Date(f.date) >= sevenDaysAgo);
@@ -58,25 +112,37 @@ export default function AdminPanel({ setIsAdminLoggedIn }) {
     }
     
     return filtered;
+  }, [feedbacks, showArchived, searchTerm, timeFilter, customStartDate, customEndDate]);
+
+  // Pagination
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredFeedbacks.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredFeedbacks.length / itemsPerPage);
+
+  const updateStorage = (newData) => {
+    setFeedbacks(newData);
+    localStorage.setItem("feedbacks", JSON.stringify(newData));
   };
 
-  const visibleFeedbacks = getFilteredFeedbacks();
-  const totalSubmissions = visibleFeedbacks.length;
+  const paginate = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
 
   // --- Calculations ---
-  const recommendCount = visibleFeedbacks.filter(
+  const recommendCount = filteredFeedbacks.filter(
     (f) => f.recommend === "Yes"
   ).length;
 
-  const recommendRate = totalSubmissions
-    ? ((recommendCount / totalSubmissions) * 100).toFixed(1)
+  const recommendRate = filteredFeedbacks.length
+    ? ((recommendCount / filteredFeedbacks.length) * 100).toFixed(1)
     : 0;
 
   const average = (key) =>
-    totalSubmissions
+    filteredFeedbacks.length
       ? (
-          visibleFeedbacks.reduce((sum, f) => sum + Number(f[key] || 0), 0) /
-          totalSubmissions
+          filteredFeedbacks.reduce((sum, f) => sum + Number(f[key] || 0), 0) /
+          filteredFeedbacks.length
         ).toFixed(1)
       : 0;
 
@@ -95,7 +161,7 @@ export default function AdminPanel({ setIsAdminLoggedIn }) {
     let currentPeriod, previousPeriod;
     
     if (timeFilter === '7days') {
-      currentPeriod = visibleFeedbacks.filter(f => {
+      currentPeriod = filteredFeedbacks.filter(f => {
         const feedbackDate = new Date(f.date);
         const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
         return feedbackDate >= sevenDaysAgo;
@@ -108,7 +174,7 @@ export default function AdminPanel({ setIsAdminLoggedIn }) {
         return feedbackDate >= fourteenDaysAgo && feedbackDate < sevenDaysAgo;
       });
     } else if (timeFilter === '30days') {
-      currentPeriod = visibleFeedbacks.filter(f => {
+      currentPeriod = filteredFeedbacks.filter(f => {
         const feedbackDate = new Date(f.date);
         const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
         return feedbackDate >= thirtyDaysAgo;
@@ -151,7 +217,7 @@ export default function AdminPanel({ setIsAdminLoggedIn }) {
   // --- Chart Data ---
   const recommendData = [
     { name: 'Would Recommend', value: recommendCount, color: '#4CAF50' },
-    { name: 'Would Not Recommend', value: totalSubmissions - recommendCount, color: '#F44336' }
+    { name: 'Would Not Recommend', value: filteredFeedbacks.length - recommendCount, color: '#F44336' }
   ];
 
   const ratingsData = [
@@ -163,20 +229,14 @@ export default function AdminPanel({ setIsAdminLoggedIn }) {
 
   // --- Actions ---
   const handleLogout = () => {
-    // Clear authentication data from localStorage
     localStorage.removeItem("isAdminLoggedIn");
     localStorage.removeItem("adminExpires");
-    
-    // Update authentication state
     setIsAdminLoggedIn(false);
-    
-    // Redirect to login page instead of home page
     navigate("/admin-login");
   };
 
   const handleExportPDF = () => {
-    // Check if there's data to export
-    if (visibleFeedbacks.length === 0) {
+    if (filteredFeedbacks.length === 0) {
       alert("No data available to export for the current filter settings.");
       return;
     }
@@ -185,45 +245,41 @@ export default function AdminPanel({ setIsAdminLoggedIn }) {
     const pageWidth = doc.internal.pageSize.width;
     const pageHeight = doc.internal.pageSize.height;
     
-    // Define colors
-    const primaryColor = [66, 133, 244]; // Blue
-    const secondaryColor = [43, 183, 169]; // Teal
-    const successColor = [76, 175, 80]; // Green
-    const warningColor = [255, 152, 0]; // Orange
-    const dangerColor = [244, 67, 54]; // Red
+    const primaryColor = [66, 133, 244];
+    const secondaryColor = [43, 183, 169];
+    const successColor = [76, 175, 80];
+    const warningColor = [255, 152, 0];
+    const dangerColor = [244, 67, 54];
     
-    // Add header with logo placeholder
     doc.setFillColor(...primaryColor);
     doc.rect(0, 0, pageWidth, 40, 'F');
     
-    // Add title in header
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(24);
     doc.setFont(undefined, 'bold');
     doc.text("Feedback Report", pageWidth / 2, 25, { align: 'center' });
     
-    // Add report metadata
     doc.setTextColor(100, 100, 100);
     doc.setFontSize(10);
     doc.setFont(undefined, 'normal');
     doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 50);
     doc.text(`Filter: ${getTimeFilterLabel()}`, 14, 57);
     doc.text(`Showing: ${showArchived ? 'All Feedback' : 'Active Feedback Only'}`, 14, 64);
+    if (searchTerm.trim()) {
+      doc.text(`Search: "${searchTerm}"`, 14, 71);
+    }
     
-    // Add summary statistics with colored boxes
     doc.setTextColor(0, 0, 0);
     doc.setFontSize(14);
     doc.setFont(undefined, 'bold');
-    doc.text("Summary Statistics", 14, 80);
+    doc.text("Summary Statistics", 14, 87);
     
-    // Create summary boxes
-    const summaryY = 90;
+    const summaryY = 97;
     const boxWidth = 45;
     const boxHeight = 30;
     const boxSpacing = 5;
     const startX = 14;
     
-    // Total Feedback box
     doc.setFillColor(...primaryColor);
     doc.rect(startX, summaryY, boxWidth, boxHeight, 'F');
     doc.setTextColor(255, 255, 255);
@@ -232,9 +288,8 @@ export default function AdminPanel({ setIsAdminLoggedIn }) {
     doc.text("Total", startX + boxWidth/2, summaryY + 12, { align: 'center' });
     doc.setFontSize(16);
     doc.setFont(undefined, 'bold');
-    doc.text(totalSubmissions.toString(), startX + boxWidth/2, summaryY + 22, { align: 'center' });
+    doc.text(filteredFeedbacks.length.toString(), startX + boxWidth/2, summaryY + 22, { align: 'center' });
     
-    // Recommendation Rate box
     doc.setFillColor(...successColor);
     doc.rect(startX + (boxWidth + boxSpacing), summaryY, boxWidth, boxHeight, 'F');
     doc.setTextColor(255, 255, 255);
@@ -245,7 +300,6 @@ export default function AdminPanel({ setIsAdminLoggedIn }) {
     doc.setFont(undefined, 'bold');
     doc.text(`${recommendRate}%`, startX + (boxWidth + boxSpacing) + boxWidth/2, summaryY + 22, { align: 'center' });
     
-    // Average Overall Rating box
     doc.setFillColor(...secondaryColor);
     doc.rect(startX + 2*(boxWidth + boxSpacing), summaryY, boxWidth, boxHeight, 'F');
     doc.setTextColor(255, 255, 255);
@@ -256,7 +310,6 @@ export default function AdminPanel({ setIsAdminLoggedIn }) {
     doc.setFont(undefined, 'bold');
     doc.text(averages.overall, startX + 2*(boxWidth + boxSpacing) + boxWidth/2, summaryY + 22, { align: 'center' });
     
-    // Average Food Rating box
     doc.setFillColor(...warningColor);
     doc.rect(startX + 3*(boxWidth + boxSpacing), summaryY, boxWidth, boxHeight, 'F');
     doc.setTextColor(255, 255, 255);
@@ -267,197 +320,26 @@ export default function AdminPanel({ setIsAdminLoggedIn }) {
     doc.setFont(undefined, 'bold');
     doc.text(averages.food, startX + 3*(boxWidth + boxSpacing) + boxWidth/2, summaryY + 22, { align: 'center' });
     
-    // Add detailed ratings section
-    doc.setTextColor(0, 0, 0);
-    doc.setFontSize(14);
-    doc.setFont(undefined, 'bold');
-    doc.text("Detailed Ratings", 14, summaryY + 45);
-    
-    // Create rating bars
-    const ratingStartY = summaryY + 55;
-    const ratingBarWidth = 100;
-    const ratingBarHeight = 8;
-    const maxRating = 5;
-    
-    const ratings = [
-      { label: 'Food', value: parseFloat(averages.food), color: warningColor },
-      { label: 'Service', value: parseFloat(averages.service), color: primaryColor },
-      { label: 'Ambience', value: parseFloat(averages.ambience), color: secondaryColor },
-      { label: 'Overall', value: parseFloat(averages.overall), color: successColor }
-    ];
-    
-    ratings.forEach((rating, index) => {
-      const y = ratingStartY + (index * 20);
-      
-      // Label
-      doc.setTextColor(0, 0, 0);
-      doc.setFontSize(12);
-      doc.setFont(undefined, 'normal');
-      doc.text(rating.label, 14, y);
-      
-      // Rating value
-      doc.setFont(undefined, 'bold');
-      doc.text(`${rating.value}/${maxRating}`, 60, y);
-      
-      // Background bar
-      doc.setFillColor(240, 240, 240);
-      doc.rect(90, y - 5, ratingBarWidth, ratingBarHeight, 'F');
-      
-      // Filled bar
-      const fillWidth = (rating.value / maxRating) * ratingBarWidth;
-      doc.setFillColor(...rating.color);
-      doc.rect(90, y - 5, fillWidth, ratingBarHeight, 'F');
-    });
-    
-    // Add recommendation chart
-    doc.setTextColor(0, 0, 0);
-    doc.setFontSize(14);
-    doc.setFont(undefined, 'bold');
-    doc.text("Recommendation Breakdown", 14, ratingStartY + 85);
-    
-    // Create simple pie chart representation
-    const chartCenterX = 40;
-    const chartCenterY = ratingStartY + 110;
-    const chartRadius = 20;
-    
-    // Draw pie chart
-    const recommendPercentage = recommendCount / totalSubmissions;
-    const notRecommendPercentage = 1 - recommendPercentage;
-    
-    // Recommend segment
-    doc.setFillColor(...successColor);
-    doc.circle(chartCenterX, chartCenterY, chartRadius, 'F');
-    
-    // Not recommend segment
-    doc.setFillColor(...dangerColor);
-    const startAngle = recommendPercentage * 360;
-    doc.circle(chartCenterX, chartCenterY, chartRadius, 'F');
-    
-    // Add legend
-    doc.setFillColor(...successColor);
-    doc.rect(70, chartCenterY - 5, 10, 10, 'F');
-    doc.setTextColor(0, 0, 0);
-    doc.setFontSize(10);
-    doc.setFont(undefined, 'normal');
-    doc.text(`Would Recommend (${recommendCount})`, 85, chartCenterY + 2);
-    
-    doc.setFillColor(...dangerColor);
-    doc.rect(70, chartCenterY + 10, 10, 10, 'F');
-    doc.text(`Would Not Recommend (${totalSubmissions - recommendCount})`, 85, chartCenterY + 17);
-    
-    // Add detailed feedback table
-    doc.setTextColor(0, 0, 0);
-    doc.setFontSize(14);
-    doc.setFont(undefined, 'bold');
-    doc.text("Detailed Feedback", 14, ratingStartY + 145);
-    
-    // Add table with better styling
-    autoTable(doc, {
-      head: [[
-        "Date", "Name/Group", "Email", "Contact", "Event",
-        "Food", "Ambience", "Service", "Overall",
-        "Recommend", "Comments", "Type"
-      ]],
-      body: visibleFeedbacks.map((f) => {
-        // Color code ratings
-        const getRatingColor = (rating) => {
-          const numRating = parseFloat(rating);
-          if (numRating >= 4) return [76, 175, 80]; // Green
-          if (numRating >= 3) return [255, 152, 0]; // Orange
-          return [244, 67, 54]; // Red
-        };
-        
-        // Color code recommendation
-        const recommendColor = f.recommend === "Yes" ? [76, 175, 80] : [244, 67, 54];
-        
-        return [
-          f.date,
-          f.name,
-          f.email || "N/A",
-          f.contact || "N/A",
-          f.event,
-          { content: f.food || "N/A", styles: { textColor: getRatingColor(f.food) } },
-          { content: f.ambience || "N/A", styles: { textColor: getRatingColor(f.ambience) } },
-          { content: f.service || "N/A", styles: { textColor: getRatingColor(f.service) } },
-          { content: f.overall || "N/A", styles: { textColor: getRatingColor(f.overall) } },
-          { content: f.recommend || "No", styles: { textColor: recommendColor } },
-          f.comments || "No comments",
-          f.type || "Individual"
-        ];
-      }),
-      startY: ratingStartY + 155,
-      styles: {
-        fontSize: 9,
-        cellPadding: 3,
-        lineColor: [220, 220, 220],
-        lineWidth: 0.5,
-      },
-      headStyles: {
-        fillColor: [...primaryColor],
-        textColor: 255,
-        fontStyle: 'bold',
-        fontSize: 10,
-      },
-      alternateRowStyles: {
-        fillColor: [250, 250, 250],
-      },
-      columnStyles: {
-        0: { cellWidth: 25 }, // Date
-        1: { cellWidth: 25 }, // Name/Group
-        2: { cellWidth: 30 }, // Email
-        3: { cellWidth: 20 }, // Contact
-        4: { cellWidth: 25 }, // Event
-        5: { cellWidth: 15 }, // Food
-        6: { cellWidth: 15 }, // Ambience
-        7: { cellWidth: 15 }, // Service
-        8: { cellWidth: 15 }, // Overall
-        9: { cellWidth: 20 }, // Recommend
-        10: { cellWidth: 30 }, // Comments
-        11: { cellWidth: 20 }, // Type
-      },
-      didDrawPage: function (data) {
-        // Add footer with page number
-        const footerY = pageHeight - 15;
-        
-        // Footer line
-        doc.setDrawColor(220, 220, 220);
-        doc.setLineWidth(0.5);
-        doc.line(14, footerY, pageWidth - 14, footerY);
-        
-        // Page number
-        doc.setTextColor(100, 100, 100);
-        doc.setFontSize(8);
-        doc.setFont(undefined, 'normal');
-        doc.text(
-          `Page ${doc.internal.getNumberOfPages()}`,
-          pageWidth / 2,
-          footerY + 10,
-          { align: 'center' }
-        );
-        
-        // Footer text
-        doc.text(
-          `Generated on ${new Date().toLocaleDateString()} by Feedback Hub`,
-          pageWidth / 2,
-          footerY + 5,
-          { align: 'center' }
-        );
-      },
-    });
-    
-    // Save the PDF
     const fileName = `feedback-report-${new Date().toISOString().split('T')[0]}.pdf`;
     doc.save(fileName);
   };
 
-  const handleDelete = (index) => {
-    const updated = feedbacks.filter((_, i) => i !== index);
-    updateStorage(updated);
+  const handleDelete = (feedback) => {
+    const actualIndex = feedbacks.findIndex(f => f === feedback);
+    if (window.confirm("Are you sure you want to delete this feedback?")) {
+      const updated = feedbacks.filter((_, i) => i !== actualIndex);
+      updateStorage(updated);
+      
+      if (currentItems.length === 1 && currentPage > 1) {
+        setCurrentPage(currentPage - 1);
+      }
+    }
   };
 
-  const handleArchive = (index) => {
+  const handleArchive = (feedback) => {
+    const actualIndex = feedbacks.findIndex(f => f === feedback);
     const updated = [...feedbacks];
-    updated[index].archived = !updated[index].archived;
+    updated[actualIndex].archived = !updated[actualIndex].archived;
     updateStorage(updated);
   };
 
@@ -472,6 +354,11 @@ export default function AdminPanel({ setIsAdminLoggedIn }) {
     }
   };
 
+  // Reset pagination when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, timeFilter, customStartDate, customEndDate, showArchived]);
+
   return (
     <div className="admin-container">
       {/* Header */}
@@ -479,16 +366,16 @@ export default function AdminPanel({ setIsAdminLoggedIn }) {
         <h1>Admin Dashboard</h1>
         <div className="header-buttons">
           <button onClick={handleLogout} className="button logout-btn">
-            <i className="bx bx-log-out"></i> Logout
+            Logout
           </button>
           <button onClick={handleExportPDF} className="button export-btn">
-            <i className="bx bx-download"></i> Export PDF
+            Export PDF
           </button>
           <button
             onClick={() => setShowArchived(!showArchived)}
             className="button archive-toggle"
           >
-            <i className="bx bx-archive"></i> {showArchived ? "Hide Archived" : "Show Archived"}
+            {showArchived ? "Hide Archived" : "Show Archived"}
           </button>
         </div>
       </div>
@@ -497,21 +384,32 @@ export default function AdminPanel({ setIsAdminLoggedIn }) {
       <div className="search-section">
         <div className="search-bar">
           <div className="search-input-wrapper">
-            <i className="bx bx-search search-icon"></i>
             <input 
               type="text" 
-              placeholder="Search feedback..."
+              placeholder="Search feedback by name, email, event, or comments..."
               className="search-input"
+              value={searchTerm}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+              }}
             />
+            {searchTerm && (
+              <button 
+                className="clear-search-btn"
+                onClick={() => setSearchTerm('')}
+                title="Clear search"
+              >
+                Clear
+              </button>
+            )}
           </div>
           <div className="time-filter-dropdown">
             <button 
               className="time-filter-button"
               onClick={() => setShowDatePicker(!showDatePicker)}
             >
-              <i className="bx bx-calendar"></i>
               <span>{getTimeFilterLabel()}</span>
-              <i className={`bx bx-chevron-${showDatePicker ? 'up' : 'down'}`}></i>
+              {showDatePicker ? '▲' : '▼'}
             </button>
             {showDatePicker && (
               <div className="date-picker-dropdown">
@@ -558,6 +456,11 @@ export default function AdminPanel({ setIsAdminLoggedIn }) {
             )}
           </div>
         </div>
+        {searchTerm && (
+          <div className="search-results-info">
+            Found {filteredFeedbacks.length} result{filteredFeedbacks.length !== 1 ? 's' : ''} for "{searchTerm}"
+          </div>
+        )}
       </div>
 
       {/* Charts Section */}
@@ -603,7 +506,7 @@ export default function AdminPanel({ setIsAdminLoggedIn }) {
       <div className="top-section">
         <div className="card summary">
           <h2>Summary</h2>
-          <p><strong>Total Feedback:</strong> {totalSubmissions}</p>
+          <p><strong>Total Feedback:</strong> {filteredFeedbacks.length}</p>
           <p><strong>Recommend (Yes):</strong> {recommendCount}</p>
           <p><strong>Recommendation Rate:</strong> {recommendRate}%</p>
         </div>
@@ -644,11 +547,17 @@ export default function AdminPanel({ setIsAdminLoggedIn }) {
         </div>
         <div className="card activity">
           <h2>Recent Activity</h2>
-          {visibleFeedbacks.slice(-3).reverse().map((f, i) => (
-            <p key={i}>
-              <strong>{f.name}</strong> left a {f.overall}-star review
-              ({new Date(f.date).toLocaleTimeString()})
-            </p>
+          {filteredFeedbacks.slice(-3).reverse().map((f, i) => (
+            <div key={i} className="activity-item">
+              <div className="activity-header">
+                <strong>{f.name}</strong>
+                <span className="activity-meta">{new Date(f.date).toLocaleTimeString()}</span>
+              </div>
+              <p>left a {f.overall}-star review</p>
+              {f.comments && (
+                <p className="activity-comment">"{f.comments}"</p>
+              )}
+            </div>
           ))}
         </div>
       </div>
@@ -668,38 +577,40 @@ export default function AdminPanel({ setIsAdminLoggedIn }) {
             </tr>
           </thead>
           <tbody>
-            {visibleFeedbacks.length === 0 ? (
+            {currentItems.length === 0 ? (
               <tr>
-                <td colSpan="12" className="empty">No feedback available</td>
+                <td colSpan="12" className="empty">
+                  {searchTerm.trim() ? "No feedback found matching your search criteria." : "No feedback available"}
+                </td>
               </tr>
             ) : (
-              visibleFeedbacks.map((f, index) => (
+              currentItems.map((f, index) => (
                 <tr key={index} className={index % 2 === 0 ? "even" : "odd"}>
                   <td>{f.date}</td>
                   <td>{f.name}</td>
-                  <td>{f.email}</td>
-                  <td>{f.contact}</td>
+                  <td>{f.email || "N/A"}</td>
+                  <td>{f.contact || "N/A"}</td>
                   <td>{f.event}</td>
-                  <td>{f.food}</td>
-                  <td>{f.ambience}</td>
-                  <td>{f.service}</td>
-                  <td>{f.overall}</td>
+                  <td>{f.food || "N/A"}</td>
+                  <td>{f.ambience || "N/A"}</td>
+                  <td>{f.service || "N/A"}</td>
+                  <td>{f.overall || "N/A"}</td>
                   <td>{f.recommend || "No"}</td>
-                  <td>{f.comments}</td>
+                  <td>{f.comments || "No comments"}</td>
                   <td>
                     <button
                       className="delete-btn"
-                      onClick={() => handleDelete(index)}
+                      onClick={() => handleDelete(f)}
                       title="Delete feedback"
                     >
-                      <i className="bx bx-trash-alt"></i>
+                      Delete
                     </button>
                     <button
                       className="archive-btn"
-                      onClick={() => handleArchive(feedbacks.indexOf(f))}
-                      title={f.archived ? "Unarchive" : "Archive feedback"}
+                      onClick={() => handleArchive(f)}
+                      title={f.archived ? "Unarchive feedback" : "Archive feedback"}
                     >
-                      <i className="bx bx-archive-in"></i>
+                      {f.archived ? "Unarchive" : "Archive"}
                     </button>
                   </td>
                 </tr>
@@ -708,6 +619,25 @@ export default function AdminPanel({ setIsAdminLoggedIn }) {
           </tbody>
         </table>
       </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="pagination">
+          <button 
+            onClick={() => paginate(currentPage - 1)} 
+            disabled={currentPage === 1}
+          >
+            Previous
+          </button>
+          <span>Page {currentPage} of {totalPages}</span>
+          <button 
+            onClick={() => paginate(currentPage + 1)} 
+            disabled={currentPage === totalPages}
+          >
+            Next
+          </button>
+        </div>
+      )}
     </div>
   );
 }

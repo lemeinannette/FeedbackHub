@@ -41,7 +41,6 @@
 .export-btn,
 .archive-btn,
 .archive-toggle,
-.theme-toggle,
 input[type="submit"],
 button[type="submit"] {
   display: inline-flex;
@@ -62,14 +61,48 @@ button[type="submit"] {
   overflow: hidden;
 }
 
+/* Theme Toggle Button - Special Styling */
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  color: #fff;
+  background: #2bb7a9; /* screenshot teal */
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  position: relative;
+  overflow: hidden;
+}
+
+.theme-toggle.dark {
+  background: #fbbf24; /* amber for dark mode */
+  color: #1f2937;
+}
+
+.theme-toggle i {
+  font-size: 18px;
+  transition: transform 0.3s ease;
+}
+
+.theme-toggle:hover i {
+  transform: scale(1.1);
+}
+
 .button::before,
 .logout-btn::before,
 .export-btn::before,
 .archive-btn::before,
 .archive-toggle::before,
-.theme-toggle::before,
 input[type="submit"]::before,
-button[type="submit"]::before {
+button[type="submit"]::before,
+.theme-toggle::before {
   content: '';
   position: absolute;
   top: 0;
@@ -86,9 +119,9 @@ button[type="submit"]::before {
 .export-btn:hover::before,
 .archive-btn:hover::before,
 .archive-toggle:hover::before,
-.theme-toggle:hover::before,
 input[type="submit"]:hover::before,
-button[type="submit"]:hover::before {
+button[type="submit"]:hover::before,
+.theme-toggle:hover::before {
   transform: translateX(0);
 }
 
@@ -97,12 +130,16 @@ button[type="submit"]:hover::before {
 .export-btn:hover,
 .archive-btn:hover,
 .archive-toggle:hover,
-.theme-toggle:hover,
 input[type="submit"]:hover,
-button[type="submit"]:hover {
+button[type="submit"]:hover,
+.theme-toggle:hover {
   background: #229287; /* darker teal hover */
   transform: translateY(-2px);
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.theme-toggle.dark:hover {
+  background: #f59e0b; /* darker amber hover */
 }
 
 .button:active,
@@ -110,9 +147,9 @@ button[type="submit"]:hover {
 .export-btn:active,
 .archive-btn:active,
 .archive-toggle:active,
-.theme-toggle:active,
 input[type="submit"]:active,
-button[type="submit"]:active {
+button[type="submit"]:active,
+.theme-toggle:active {
   transform: translateY(0);
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
@@ -586,4 +623,92 @@ body.dark .table tr.odd {
 
 body.dark .table tr:hover {
   background: #0f766e;
+}
+
+/* Dark mode theme toggle */
+body.dark .theme-toggle {
+  background: #f59e0b; /* amber for dark mode */
+  color: #1f2937;
+}
+
+body.dark .theme-toggle:hover {
+  background: #d97706; /* darker amber hover */
+}
+/* Clear search button */
+.clear-search-btn {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #6b7280;
+  cursor: pointer;
+  font-size: 18px;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.clear-search-btn:hover {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+/* Search results info */
+.search-results-info {
+  margin-top: 8px;
+  padding: 8px 16px;
+  background: #f0fdfa;
+  border: 1px solid #b2f5ea;
+  border-radius: 8px;
+  color: #0f766e;
+  font-size: 14px;
+  animation: fadeIn 0.3s ease;
+}
+
+/* Dark mode for search results */
+body.dark .search-results-info {
+  background: #0f766e;
+  border-color: #0d9488;
+  color: #a7f3d0;
+}
+
+body.dark .clear-search-btn {
+  color: #9ca3af;
+}
+
+body.dark .clear-search-btn:hover {
+  background: #374151;
+  color: #e5e7eb;
+}
+
+/* Add to existing button styles */
+.clear-btn {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+}
+
+.clear-btn:hover {
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+}
+
+/* Fix for table cells with N/A */
+.table td {
+  color: #6b7280;
+}
+
+.table td:not(:empty) {
+  color: inherit;
+}
+
+/* Animation for search results */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

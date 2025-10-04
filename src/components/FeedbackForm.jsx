@@ -5,7 +5,7 @@ import EventDropdown from "./EventDropDown";
 import Toggle from "./Toggle";
 import "./FeedbackForm.css";
 
-export default function FeedbackForm() {
+export default function FeedbackForm({ previousRoute, setPreviousRoute }) {
   const [feedbackType, setFeedbackType] = useState("");
   const [formData, setFormData] = useState({
     name: "",
@@ -27,7 +27,7 @@ export default function FeedbackForm() {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formErrors, setFormErrors] = useState({});
-  const navigate = useNavigate(); // Added for navigation
+  const navigate = useNavigate();
 
   const validateForm = () => {
     const errors = {};
@@ -117,13 +117,35 @@ export default function FeedbackForm() {
 
     setIsSubmitting(false);
     
+    // Set previous route before navigating
+    setPreviousRoute("/");
+    
     // Redirect to thank you page
     navigate('/thank-you');
+  };
+
+  const handleBack = () => {
+    if (previousRoute === "/admin") {
+      navigate("/admin");
+    } else {
+      // Default to home if no previous route or if previous route is "/"
+      navigate("/");
+    }
   };
 
   return (
     <div className="feedback-form-container">
       <form className="feedback-form" onSubmit={handleSubmit}>
+        {/* Back button - only show if coming from admin */}
+        {previousRoute === "/admin" && (
+          <div className="form-header">
+            <button type="button" className="back-btn" onClick={handleBack}>
+              <i className="bx bx-arrow-back"></i>
+              Back to Admin Dashboard
+            </button>
+          </div>
+        )}
+        
         <h1>Feedback Form</h1>
         <p className="form-description">
           We value your feedback! Please share your experience with us.

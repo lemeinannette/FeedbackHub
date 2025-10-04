@@ -41,19 +41,15 @@
 }
 
 .settings-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  text-align: center;
   margin-bottom: 32px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid #f3f4f6;
 }
 
 .settings-header h1 {
   font-size: 48px;
   font-weight: 700;
   color: #1f2937;
-  margin: 0;
+  margin: 0 0 16px 0;
   background: linear-gradient(135deg, #2bb7a9 0%, #229287 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -61,44 +57,10 @@
   font-family: 'Fredoka', 'Poppins', cursive, sans-serif;
 }
 
-.back-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  padding: 16px 32px;
-  background: linear-gradient(135deg, #2bb7a9 0%, #229287 100%);
-  color: white;
-  border: none;
-  border-radius: 12px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  text-decoration: none;
-  position: relative;
-  overflow: hidden;
-}
-
-.back-button::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.2) 50%, transparent 100%);
-  transition: left 0.5s ease;
-}
-
-.back-button:hover::before {
-  left: 100%;
-}
-
-.back-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+.settings-header p {
+  color: #6b7280;
+  font-size: 20px;
+  line-height: 1.6;
 }
 
 .settings-section {
@@ -184,6 +146,58 @@
   transform: translateX(30px);
 }
 
+.settings-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid #f3f4f6;
+}
+
+.back-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 16px 32px;
+  background: linear-gradient(135deg, #2bb7a9 0%, #229287 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  text-decoration: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.back-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.2) 50%, transparent 100%);
+  transition: left 0.5s ease;
+}
+
+.back-button:hover::before {
+  left: 100%;
+}
+
+.back-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.back-button:active {
+  transform: translateY(0);
+}
+
 /* Dark mode styles */
 body.dark-mode .settings-container {
   background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
@@ -199,6 +213,10 @@ body.dark-mode .settings-header h1 {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+}
+
+body.dark-mode .settings-header p {
+  color: #94a3b8;
 }
 
 body.dark-mode .settings-section {
@@ -219,6 +237,18 @@ body.dark-mode .setting-info p {
   color: #94a3b8;
 }
 
+body.dark-mode .toggle-button {
+  background-color: #475569;
+}
+
+body.dark-mode .toggle-button.active {
+  background-color: #2bb7a9;
+}
+
+body.dark-mode .settings-actions {
+  border-top-color: #334155;
+}
+
 /* Mobile responsiveness */
 @media (max-width: 768px) {
   .settings-container {
@@ -235,9 +265,8 @@ body.dark-mode .setting-info p {
     font-size: 36px;
   }
   
-  .back-button {
-    padding: 12px 24px;
-    font-size: 14px;
+  .settings-header p {
+    font-size: 18px;
   }
   
   .setting-item {
@@ -261,6 +290,10 @@ body.dark-mode .setting-info p {
   
   .settings-header h1 {
     font-size: 28px;
+  }
+  
+  .settings-header p {
+    font-size: 16px;
   }
   
   .settings-section h2 {

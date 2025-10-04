@@ -2,40 +2,48 @@ import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate, Link } from "react-router-dom";
 import FeedbackForm from "./components/FeedbackForm";
 import ThankYouScreen from "./components/ThankYouScreen";
+import Settings from "./components/Settings";
 import AdminPanel from "./components/AdminPanel";
 import AdminLogin from "./components/AdminLogin";
-import Settings from "./components/Settings"; // New import
 import "./App.css";
 
 export default function App() {
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
+  const [previousRoute, setPreviousRoute] = useState("/");
 
-  // Check for saved dark mode preference
   useEffect(() => {
     const stored = localStorage.getItem("isAdminLoggedIn") === "true";
     setIsAdminLoggedIn(stored);
     
-    const darkModePreference = localStorage.getItem("darkMode") === "true";
-    setDarkMode(darkModePreference);
+    // Check for user preference first, then default theme
+    const userPreference = localStorage.getItem("darkMode");
+    const defaultTheme = localStorage.getItem("defaultTheme") || 'light';
     
-    // Apply dark mode class to body
-    if (darkModePreference) {
-      document.body.classList.add('dark-mode');
+    const shouldBeDark = userPreference 
+      ? userPreference === "true" 
+      : defaultTheme === 'dark';
+    
+    setDarkMode(shouldBeDark);
+    
+    // Apply both classes to ensure compatibility
+    if (shouldBeDark) {
+      document.body.classList.add('dark-mode', 'dark');
+    } else {
+      document.body.classList.remove('dark-mode', 'dark');
     }
   }, []);
 
-  // Function to toggle dark mode
   const toggleDarkMode = () => {
     const newDarkMode = !darkMode;
     setDarkMode(newDarkMode);
     localStorage.setItem("darkMode", newDarkMode);
     
-    // Apply or remove dark mode class
+    // Apply both classes to ensure compatibility
     if (newDarkMode) {
-      document.body.classList.add('dark-mode');
+      document.body.classList.add('dark-mode', 'dark');
     } else {
-      document.body.classList.remove('dark-mode');
+      document.body.classList.remove('dark-mode', 'dark');
     }
   };
 
@@ -71,8 +79,8 @@ export default function App() {
       </nav>
 
       <Routes>
-        <Route path="/" element={<FeedbackForm />} />
-        <Route path="/thank-you" element={<ThankYouScreen />} />
+        <Route path="/" element={<FeedbackForm previousRoute={previousRoute} setPreviousRoute={setPreviousRoute} />} />
+        <Route path="/thank-you" element={<ThankYouScreen previousRoute={previousRoute} setPreviousRoute={setPreviousRoute} />} />
         <Route path="/settings" element={<Settings darkMode={darkMode} toggleDarkMode={toggleDarkMode} />} />
         <Route
           path="/admin-login"
@@ -80,7 +88,7 @@ export default function App() {
             isAdminLoggedIn ? (
               <Navigate to="/admin" />
             ) : (
-              <AdminLogin setIsAdminLoggedIn={setIsAdminLoggedIn} />
+              <AdminLogin setIsAdminLoggedIn={setIsAdminLoggedIn} previousRoute={previousRoute} setPreviousRoute={setPreviousRoute} />
             )
           }
         />
@@ -88,7 +96,7 @@ export default function App() {
           path="/admin"
           element={
             isAdminLoggedIn ? (
-              <AdminPanel setIsAdminLoggedIn={setIsAdminLoggedIn} />
+              <AdminPanel setIsAdminLoggedIn={setIsAdminLoggedIn} previousRoute={previousRoute} setPreviousRoute={setPreviousRoute} />
             ) : (
               <Navigate to="/admin-login" />
             )
