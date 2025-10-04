@@ -246,4 +246,42 @@ body.dark .admin-link:hover {
   .nav-logo {
     height: 44px;
   }
+  /* Add these dark mode styles to your App.css */
+
+/* Dark mode base styles */
+body.dark-mode {
+  background-color: #0f172a;
+  color: #e2e8f0;
+}
+
+body.dark-mode .app-nav {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+}
+
+body.dark-mode .nav-link {
+  color: #cbd5e1;
+}
+
+body.dark-mode .nav-link:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  color: #fff;
+}
+
+body.dark-mode .nav-link.active {
+  background: linear-gradient(135deg, #2bb7a9 0%, #229287 100%);
+  color: #fff;
+}
+
+/* Add dark mode styles for your other components as needed */
+body.dark-mode .feedback-form-container {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+}
+
+body.dark-mode .feedback-form {
+  background: #1e293b;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.4);
+}
+
+/* Add more dark mode styles for your other components */
 }

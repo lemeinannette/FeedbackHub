@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import DarkModeToggle from "./DarkModeToggle";
 import "./AdminPanel.css";
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
@@ -479,7 +478,6 @@ export default function AdminPanel({ setIsAdminLoggedIn }) {
       <div className="header">
         <h1>Admin Dashboard</h1>
         <div className="header-buttons">
-          <DarkModeToggle />
           <button onClick={handleLogout} className="button logout-btn">
             <i className="bx bx-log-out"></i> Logout
           </button>
