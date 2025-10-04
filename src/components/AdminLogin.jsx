@@ -121,7 +121,7 @@ export default function AdminLogin({ setIsAdminLoggedIn }) {
         </form>
 
         <div className="login-footer">
-          <p>For demo purposes, use: admin / 1234</p>
+          
         </div>
       </div>
     </div>
