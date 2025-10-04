@@ -31,10 +31,7 @@ export default function App() {
               <i className="bx bx-message-square-edit"></i>
               <span>Feedback</span>
             </Link>
-            <Link to="/thank-you" className="nav-link">
-              <i className="bx bx-heart"></i>
-              <span>Thank You</span>
-            </Link>
+            {/* Thank You link removed from navigation */}
             {isAdminLoggedIn && (
               <Link to="/admin" className="nav-link admin-link">
                 <i className="bx bx-shield"></i>
@@ -47,6 +44,7 @@ export default function App() {
 
       <Routes>
         <Route path="/" element={<FeedbackForm />} />
+        {/* Thank You route kept for redirection */}
         <Route path="/thank-you" element={<ThankYouScreen />} />
         <Route
           path="/admin-login"

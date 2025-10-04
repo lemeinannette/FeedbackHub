@@ -25,9 +25,9 @@ export default function FeedbackForm() {
     isAnonymous: false,
   });
 
-  const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formErrors, setFormErrors] = useState({});
+  const navigate = useNavigate(); // Added for navigation
 
   const validateForm = () => {
     const errors = {};
@@ -116,42 +116,10 @@ export default function FeedbackForm() {
     console.log("Form submitted:", finalData);
 
     setIsSubmitting(false);
-    setSubmitted(true);
-    // reset form
-    setFormData({
-      name: "",
-      email: "",
-      contact: "",
-      group: "",
-      groupEmail: "",
-      groupContact: "",
-      comments: "",
-      foodRating: 0,
-      serviceRating: 0,
-      ambienceRating: 0,
-      overallRating: 0,
-      event: "",
-      otherEvent: "",
-      recommend: "",
-      isAnonymous: false,
-    });
-    setFeedbackType("");
+    
+    // Redirect to thank you page
+    navigate('/thank-you');
   };
-
-  if (submitted) {
-    return (
-      <div className="thank-you">
-        <h1>Thank You!</h1>
-        <p>Your feedback has been successfully submitted. We appreciate your input and will use it to improve our services.</p>
-        <button 
-          className="back-button"
-          onClick={() => setSubmitted(false)}
-        >
-          Submit Another Feedback
-        </button>
-      </div>
-    );
-  }
 
   return (
     <div className="feedback-form-container">
