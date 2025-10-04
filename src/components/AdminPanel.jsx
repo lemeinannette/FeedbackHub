@@ -5,7 +5,7 @@ import autoTable from "jspdf-autotable";
 import "./AdminPanel.css";
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
-export default function AdminPanel({ setIsAdminLoggedIn, previousRoute, setPreviousRoute }) {
+function AdminPanel({ setIsAdminLoggedIn, previousRoute, setPreviousRoute }) {
   const [feedbacks, setFeedbacks] = useState([]);
   const [showArchived, setShowArchived] = useState(false);
   const [timeFilter, setTimeFilter] = useState('all');
@@ -598,20 +598,22 @@ export default function AdminPanel({ setIsAdminLoggedIn, previousRoute, setPrevi
                   <td>{f.recommend || "No"}</td>
                   <td>{f.comments || "No comments"}</td>
                   <td>
-                    <button
-                      className="delete-btn"
-                      onClick={() => handleDelete(f)}
-                      title="Delete feedback"
-                    >
-                      Delete
-                    </button>
-                    <button
-                      className="archive-btn"
-                      onClick={() => handleArchive(f)}
-                      title={f.archived ? "Unarchive feedback" : "Archive feedback"}
-                    >
-                      {f.archived ? "Unarchive" : "Archive"}
-                    </button>
+                    <div className="action-buttons">
+                      <button
+                        className="action-btn delete-btn"
+                        onClick={() => handleDelete(f)}
+                        title="Delete feedback"
+                      >
+                        <i className="bx bx-trash"></i>
+                      </button>
+                      <button
+                        className={`action-btn archive-btn ${f.archived ? 'archived' : ''}`}
+                        onClick={() => handleArchive(f)}
+                        title={f.archived ? "Unarchive feedback" : "Archive feedback"}
+                      >
+                        <i className={`bx ${f.archived ? 'bx-archive-out' : 'bx-archive-in'}`}></i>
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))
@@ -641,3 +643,5 @@ export default function AdminPanel({ setIsAdminLoggedIn, previousRoute, setPrevi
     </div>
   );
 }
+
+export default AdminPanel;
