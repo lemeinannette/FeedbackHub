@@ -21,8 +21,8 @@ export default function FeedbackForm() {
     overallRating: 0,
     event: "",
     otherEvent: "",
-    recommend: "", // stores "Yes" or "No"
-    isAnonymous: false, // ✅ NEW
+    recommend: "",
+    isAnonymous: false,
   });
 
   const [submitted, setSubmitted] = useState(false);
@@ -82,54 +82,31 @@ export default function FeedbackForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log("Submit button clicked");
     
     if (!validateForm()) {
+      console.log("Form validation failed");
       return;
     }
     
     setIsSubmitting(true);
+    console.log("Submitting form...");
     
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 1000));
     
     const finalData = {
       ...formData,
-      // ✅ Add short keys for easy access in AdminPanel
       food: formData.foodRating,
       service: formData.serviceRating,
       ambience: formData.ambienceRating,
       overall: formData.overallRating,
-
-      // ✅ Event fallback if "Other" is chosen
-      event:
-        formData.event === "Other"
-          ? `Other: ${formData.otherEvent}`
-          : formData.event,
-
-      // ✅ Correct name/email/contact depending on type or Anonymous
-      name: formData.isAnonymous
-        ? "Anonymous"
-        : feedbackType === "group"
-        ? formData.group
-        : formData.name,
-      email: formData.isAnonymous
-        ? ""
-        : feedbackType === "group"
-        ? formData.groupEmail
-        : formData.email,
-      contact: formData.isAnonymous
-        ? ""
-        : feedbackType === "group"
-        ? formData.groupContact
-        : formData.contact,
-
-      type: formData.isAnonymous
-        ? "Anonymous"
-        : feedbackType === "group"
-        ? "Group"
-        : "Individual",
+      event: formData.event === "Other" ? `Other: ${formData.otherEvent}` : formData.event,
+      name: formData.isAnonymous ? "Anonymous" : feedbackType === "group" ? formData.group : formData.name,
+      email: formData.isAnonymous ? "" : feedbackType === "group" ? formData.groupEmail : formData.email,
+      contact: formData.isAnonymous ? "" : feedbackType === "group" ? formData.groupContact : formData.contact,
+      type: formData.isAnonymous ? "Anonymous" : feedbackType === "group" ? "Group" : "Individual",
       date: new Date().toLocaleString(),
-      // recommend is already a string "Yes" or "No"
     };
 
     const existing = JSON.parse(localStorage.getItem("feedbacks")) || [];
@@ -163,20 +140,15 @@ export default function FeedbackForm() {
 
   if (submitted) {
     return (
-      <div className="thank-you-container">
-        <div className="thank-you-message">
-          <div className="success-icon">
-            <i className="bx bx-check-circle"></i>
-          </div>
-          <h2>Thank You!</h2>
-          <p>Your feedback has been submitted successfully.</p>
-          <button 
-            className="submit-another-btn"
-            onClick={() => setSubmitted(false)}
-          >
-            Submit Another Feedback
-          </button>
-        </div>
+      <div className="thank-you">
+        <h1>Thank You!</h1>
+        <p>Your feedback has been successfully submitted. We appreciate your input and will use it to improve our services.</p>
+        <button 
+          className="back-button"
+          onClick={() => setSubmitted(false)}
+        >
+          Submit Another Feedback
+        </button>
       </div>
     );
   }
@@ -443,6 +415,7 @@ export default function FeedbackForm() {
             type="submit" 
             className="submit-btn"
             disabled={isSubmitting}
+            style={{ cursor: isSubmitting ? 'not-allowed' : 'pointer' }}
           >
             {isSubmitting ? (
               <>
