@@ -164,8 +164,15 @@ export default function AdminPanel({ setIsAdminLoggedIn }) {
 
   // --- Actions ---
   const handleLogout = () => {
+    // Clear authentication data from localStorage
+    localStorage.removeItem("isAdminLoggedIn");
+    localStorage.removeItem("adminExpires");
+    
+    // Update authentication state
     setIsAdminLoggedIn(false);
-    navigate("/");
+    
+    // Redirect to login page instead of home page
+    navigate("/admin-login");
   };
 
   const handleExportPDF = () => {
