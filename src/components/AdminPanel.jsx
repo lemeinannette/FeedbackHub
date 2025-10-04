@@ -176,29 +176,279 @@ export default function AdminPanel({ setIsAdminLoggedIn }) {
   };
 
   const handleExportPDF = () => {
+    // Check if there's data to export
+    if (visibleFeedbacks.length === 0) {
+      alert("No data available to export for the current filter settings.");
+      return;
+    }
+
     const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.width;
+    const pageHeight = doc.internal.pageSize.height;
+    
+    // Define colors
+    const primaryColor = [66, 133, 244]; // Blue
+    const secondaryColor = [43, 183, 169]; // Teal
+    const successColor = [76, 175, 80]; // Green
+    const warningColor = [255, 152, 0]; // Orange
+    const dangerColor = [244, 67, 54]; // Red
+    
+    // Add header with logo placeholder
+    doc.setFillColor(...primaryColor);
+    doc.rect(0, 0, pageWidth, 40, 'F');
+    
+    // Add title in header
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(24);
+    doc.setFont(undefined, 'bold');
+    doc.text("Feedback Report", pageWidth / 2, 25, { align: 'center' });
+    
+    // Add report metadata
+    doc.setTextColor(100, 100, 100);
+    doc.setFontSize(10);
+    doc.setFont(undefined, 'normal');
+    doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 50);
+    doc.text(`Filter: ${getTimeFilterLabel()}`, 14, 57);
+    doc.text(`Showing: ${showArchived ? 'All Feedback' : 'Active Feedback Only'}`, 14, 64);
+    
+    // Add summary statistics with colored boxes
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(14);
+    doc.setFont(undefined, 'bold');
+    doc.text("Summary Statistics", 14, 80);
+    
+    // Create summary boxes
+    const summaryY = 90;
+    const boxWidth = 45;
+    const boxHeight = 30;
+    const boxSpacing = 5;
+    const startX = 14;
+    
+    // Total Feedback box
+    doc.setFillColor(...primaryColor);
+    doc.rect(startX, summaryY, boxWidth, boxHeight, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(10);
+    doc.setFont(undefined, 'normal');
+    doc.text("Total", startX + boxWidth/2, summaryY + 12, { align: 'center' });
+    doc.setFontSize(16);
+    doc.setFont(undefined, 'bold');
+    doc.text(totalSubmissions.toString(), startX + boxWidth/2, summaryY + 22, { align: 'center' });
+    
+    // Recommendation Rate box
+    doc.setFillColor(...successColor);
+    doc.rect(startX + (boxWidth + boxSpacing), summaryY, boxWidth, boxHeight, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(10);
+    doc.setFont(undefined, 'normal');
+    doc.text("Recommend", startX + (boxWidth + boxSpacing) + boxWidth/2, summaryY + 12, { align: 'center' });
+    doc.setFontSize(16);
+    doc.setFont(undefined, 'bold');
+    doc.text(`${recommendRate}%`, startX + (boxWidth + boxSpacing) + boxWidth/2, summaryY + 22, { align: 'center' });
+    
+    // Average Overall Rating box
+    doc.setFillColor(...secondaryColor);
+    doc.rect(startX + 2*(boxWidth + boxSpacing), summaryY, boxWidth, boxHeight, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(10);
+    doc.setFont(undefined, 'normal');
+    doc.text("Overall", startX + 2*(boxWidth + boxSpacing) + boxWidth/2, summaryY + 12, { align: 'center' });
+    doc.setFontSize(16);
+    doc.setFont(undefined, 'bold');
+    doc.text(averages.overall, startX + 2*(boxWidth + boxSpacing) + boxWidth/2, summaryY + 22, { align: 'center' });
+    
+    // Average Food Rating box
+    doc.setFillColor(...warningColor);
+    doc.rect(startX + 3*(boxWidth + boxSpacing), summaryY, boxWidth, boxHeight, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(10);
+    doc.setFont(undefined, 'normal');
+    doc.text("Food", startX + 3*(boxWidth + boxSpacing) + boxWidth/2, summaryY + 12, { align: 'center' });
+    doc.setFontSize(16);
+    doc.setFont(undefined, 'bold');
+    doc.text(averages.food, startX + 3*(boxWidth + boxSpacing) + boxWidth/2, summaryY + 22, { align: 'center' });
+    
+    // Add detailed ratings section
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(14);
+    doc.setFont(undefined, 'bold');
+    doc.text("Detailed Ratings", 14, summaryY + 45);
+    
+    // Create rating bars
+    const ratingStartY = summaryY + 55;
+    const ratingBarWidth = 100;
+    const ratingBarHeight = 8;
+    const maxRating = 5;
+    
+    const ratings = [
+      { label: 'Food', value: parseFloat(averages.food), color: warningColor },
+      { label: 'Service', value: parseFloat(averages.service), color: primaryColor },
+      { label: 'Ambience', value: parseFloat(averages.ambience), color: secondaryColor },
+      { label: 'Overall', value: parseFloat(averages.overall), color: successColor }
+    ];
+    
+    ratings.forEach((rating, index) => {
+      const y = ratingStartY + (index * 20);
+      
+      // Label
+      doc.setTextColor(0, 0, 0);
+      doc.setFontSize(12);
+      doc.setFont(undefined, 'normal');
+      doc.text(rating.label, 14, y);
+      
+      // Rating value
+      doc.setFont(undefined, 'bold');
+      doc.text(`${rating.value}/${maxRating}`, 60, y);
+      
+      // Background bar
+      doc.setFillColor(240, 240, 240);
+      doc.rect(90, y - 5, ratingBarWidth, ratingBarHeight, 'F');
+      
+      // Filled bar
+      const fillWidth = (rating.value / maxRating) * ratingBarWidth;
+      doc.setFillColor(...rating.color);
+      doc.rect(90, y - 5, fillWidth, ratingBarHeight, 'F');
+    });
+    
+    // Add recommendation chart
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(14);
+    doc.setFont(undefined, 'bold');
+    doc.text("Recommendation Breakdown", 14, ratingStartY + 85);
+    
+    // Create simple pie chart representation
+    const chartCenterX = 40;
+    const chartCenterY = ratingStartY + 110;
+    const chartRadius = 20;
+    
+    // Draw pie chart
+    const recommendPercentage = recommendCount / totalSubmissions;
+    const notRecommendPercentage = 1 - recommendPercentage;
+    
+    // Recommend segment
+    doc.setFillColor(...successColor);
+    doc.circle(chartCenterX, chartCenterY, chartRadius, 'F');
+    
+    // Not recommend segment
+    doc.setFillColor(...dangerColor);
+    const startAngle = recommendPercentage * 360;
+    doc.circle(chartCenterX, chartCenterY, chartRadius, 'F');
+    
+    // Add legend
+    doc.setFillColor(...successColor);
+    doc.rect(70, chartCenterY - 5, 10, 10, 'F');
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(10);
+    doc.setFont(undefined, 'normal');
+    doc.text(`Would Recommend (${recommendCount})`, 85, chartCenterY + 2);
+    
+    doc.setFillColor(...dangerColor);
+    doc.rect(70, chartCenterY + 10, 10, 10, 'F');
+    doc.text(`Would Not Recommend (${totalSubmissions - recommendCount})`, 85, chartCenterY + 17);
+    
+    // Add detailed feedback table
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(14);
+    doc.setFont(undefined, 'bold');
+    doc.text("Detailed Feedback", 14, ratingStartY + 145);
+    
+    // Add table with better styling
     autoTable(doc, {
       head: [[
         "Date", "Name/Group", "Email", "Contact", "Event",
         "Food", "Ambience", "Service", "Overall",
-        "Recommend", "Comments", "Archived"
+        "Recommend", "Comments", "Type"
       ]],
-      body: feedbacks.map((f) => [
-        f.date,
-        f.name,
-        f.email,
-        f.contact,
-        f.event,
-        f.food,
-        f.ambience,
-        f.service,
-        f.overall,
-        f.recommend || "No",
-        f.comments,
-        f.archived ? "Yes" : "No",
-      ]),
+      body: visibleFeedbacks.map((f) => {
+        // Color code ratings
+        const getRatingColor = (rating) => {
+          const numRating = parseFloat(rating);
+          if (numRating >= 4) return [76, 175, 80]; // Green
+          if (numRating >= 3) return [255, 152, 0]; // Orange
+          return [244, 67, 54]; // Red
+        };
+        
+        // Color code recommendation
+        const recommendColor = f.recommend === "Yes" ? [76, 175, 80] : [244, 67, 54];
+        
+        return [
+          f.date,
+          f.name,
+          f.email || "N/A",
+          f.contact || "N/A",
+          f.event,
+          { content: f.food || "N/A", styles: { textColor: getRatingColor(f.food) } },
+          { content: f.ambience || "N/A", styles: { textColor: getRatingColor(f.ambience) } },
+          { content: f.service || "N/A", styles: { textColor: getRatingColor(f.service) } },
+          { content: f.overall || "N/A", styles: { textColor: getRatingColor(f.overall) } },
+          { content: f.recommend || "No", styles: { textColor: recommendColor } },
+          f.comments || "No comments",
+          f.type || "Individual"
+        ];
+      }),
+      startY: ratingStartY + 155,
+      styles: {
+        fontSize: 9,
+        cellPadding: 3,
+        lineColor: [220, 220, 220],
+        lineWidth: 0.5,
+      },
+      headStyles: {
+        fillColor: [...primaryColor],
+        textColor: 255,
+        fontStyle: 'bold',
+        fontSize: 10,
+      },
+      alternateRowStyles: {
+        fillColor: [250, 250, 250],
+      },
+      columnStyles: {
+        0: { cellWidth: 25 }, // Date
+        1: { cellWidth: 25 }, // Name/Group
+        2: { cellWidth: 30 }, // Email
+        3: { cellWidth: 20 }, // Contact
+        4: { cellWidth: 25 }, // Event
+        5: { cellWidth: 15 }, // Food
+        6: { cellWidth: 15 }, // Ambience
+        7: { cellWidth: 15 }, // Service
+        8: { cellWidth: 15 }, // Overall
+        9: { cellWidth: 20 }, // Recommend
+        10: { cellWidth: 30 }, // Comments
+        11: { cellWidth: 20 }, // Type
+      },
+      didDrawPage: function (data) {
+        // Add footer with page number
+        const footerY = pageHeight - 15;
+        
+        // Footer line
+        doc.setDrawColor(220, 220, 220);
+        doc.setLineWidth(0.5);
+        doc.line(14, footerY, pageWidth - 14, footerY);
+        
+        // Page number
+        doc.setTextColor(100, 100, 100);
+        doc.setFontSize(8);
+        doc.setFont(undefined, 'normal');
+        doc.text(
+          `Page ${doc.internal.getNumberOfPages()}`,
+          pageWidth / 2,
+          footerY + 10,
+          { align: 'center' }
+        );
+        
+        // Footer text
+        doc.text(
+          `Generated on ${new Date().toLocaleDateString()} by Feedback Hub`,
+          pageWidth / 2,
+          footerY + 5,
+          { align: 'center' }
+        );
+      },
     });
-    doc.save("feedbacks.pdf");
+    
+    // Save the PDF
+    const fileName = `feedback-report-${new Date().toISOString().split('T')[0]}.pdf`;
+    doc.save(fileName);
   };
 
   const handleDelete = (index) => {
