@@ -1,35 +1,42 @@
-// components/Settings.jsx
-import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+// src/components/Settings.js
+
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./Settings.css";
 
-export default function Settings() {
-  const [darkMode, setDarkMode] = useState(false);
+export default function Settings({ 
+  adminDarkMode, 
+  clientDarkMode, 
+  toggleAdminTheme, 
+  toggleClientTheme, 
+  previousRoute 
+}) {
+  const [showNotification, setShowNotification] = useState(false);
+  const [notificationMessage, setNotificationMessage] = useState("");
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    // Check for saved dark mode preference
-    const darkModePreference = localStorage.getItem("darkMode") === "true";
-    setDarkMode(darkModePreference);
-    
-    // Apply both classes to ensure compatibility
-    if (darkModePreference) {
-      document.body.classList.add('dark-mode', 'dark');
-    } else {
-      document.body.classList.remove('dark-mode', 'dark');
-    }
-  }, []);
+  const isControllingAdmin = previousRoute === "/admin";
+  const currentDarkMode = isControllingAdmin ? adminDarkMode : clientDarkMode;
+  const handleToggle = isControllingAdmin ? toggleAdminTheme : toggleClientTheme;
+  const themeName = isControllingAdmin ? "Admin Panel" : "Feedback Form";
 
-  const toggleDarkMode = () => {
-    const newDarkMode = !darkMode;
-    setDarkMode(newDarkMode);
-    localStorage.setItem("darkMode", newDarkMode);
+  const handleToggleDarkMode = () => {
+    handleToggle();
+    const newMode = !currentDarkMode;
+    setNotificationMessage(`${themeName} theme changed to ${newMode ? "dark" : "light"} mode`);
+    setShowNotification(true);
     
-    // Apply both classes to ensure compatibility
-    if (newDarkMode) {
-      document.body.classList.add('dark-mode', 'dark');
-    } else {
-      document.body.classList.remove('dark-mode', 'dark');
-    }
+    setTimeout(() => {
+      setShowNotification(false);
+    }, 2000);
+    
+    setTimeout(() => {
+      navigate(previousRoute);
+    }, 500);
+  };
+
+  const handleDone = () => {
+    navigate(previousRoute);
   };
 
   return (
@@ -37,39 +44,73 @@ export default function Settings() {
       <div className="settings-card">
         <div className="settings-header">
           <h1>Settings</h1>
-          <Link to="/" className="back-button">
-            <i className="bx bx-arrow-back"></i>
-            Back to Feedback
-          </Link>
+          {/* --- UPDATED BUTTON --- */}
+          <button 
+            className="done-button" // Changed from back-button
+            onClick={handleDone}
+            title={`Return to ${previousRoute === "/admin" ? "Admin Dashboard" : "Feedback Form"}`}
+          >
+            <i className="bx bx-check"></i> {/* Changed from bx-arrow-back */}
+            Done
+          </button>
         </div>
         
+        {showNotification && (
+          <div className="notification">
+            <i className="bx bx-check-circle"></i>
+            {notificationMessage}
+          </div>
+        )}
+        
         <div className="settings-section">
-          <h2>Appearance</h2>
+          <h2>
+            <i className="bx bx-palette"></i>
+            Appearance
+          </h2>
           <div className="setting-item">
             <div className="setting-info">
-              <h3>Dark Mode</h3>
-              <p>Toggle dark mode for better viewing in low light environments</p>
+              <h3>{themeName} Theme</h3>
+              <p>
+                Toggle dark mode for the {themeName.toLowerCase()}
+              </p>
             </div>
             <div className="setting-control">
               <button 
-                className={`toggle-button ${darkMode ? 'active' : ''}`}
-                onClick={toggleDarkMode}
+                className={`toggle-button ${currentDarkMode ? 'active' : ''}`}
+                onClick={handleToggleDarkMode}
                 aria-label="Toggle dark mode"
               >
-                <div className="toggle-slider"></div>
+                <span className="toggle-slider"></span>
               </button>
             </div>
           </div>
         </div>
         
         <div className="settings-section">
-          <h2>About</h2>
-          <div className="setting-item">
-            <div className="setting-info">
-              <h3>Feedback Hub</h3>
-              <p>Version 1.0.0</p>
-            </div>
+          <h2>
+            <i className="bx bx-compass"></i>
+            Quick Navigation
+          </h2>
+          <div className="nav-buttons">
+            <button 
+              className="nav-button feedback-button"
+              onClick={() => navigate("/")}
+            >
+              <i className="bx bx-message-square-edit"></i>
+              <span>Go to Feedback Form</span>
+            </button>
+            <button 
+              className="nav-button admin-button"
+              onClick={() => navigate("/admin")}
+            >
+              <i className="bx bx-shield"></i>
+              <span>Go to Admin Dashboard</span>
+            </button>
           </div>
+        </div>
+        
+        <div className="settings-footer">
+          <p>Feedback Hub Version 1.0.0</p>
         </div>
       </div>
     </div>

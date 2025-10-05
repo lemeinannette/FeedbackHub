@@ -1,3 +1,5 @@
+// src/components/AdminPanel.js
+
 import React, { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import jsPDF from "jspdf";
@@ -5,54 +7,25 @@ import autoTable from "jspdf-autotable";
 import "./AdminPanel.css";
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
-function AdminPanel({ setIsAdminLoggedIn, previousRoute, setPreviousRoute }) {
+function AdminPanel({ 
+  setIsAdminLoggedIn, 
+  previousRoute, 
+  setPreviousRoute,
+  adminDarkMode,
+  toggleAdminTheme
+}) {
   const [feedbacks, setFeedbacks] = useState([]);
   const [showArchived, setShowArchived] = useState(false);
   const [timeFilter, setTimeFilter] = useState('all');
   const [customStartDate, setCustomStartDate] = useState('');
   const [customEndDate, setCustomEndDate] = useState('');
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const [darkMode, setDarkMode] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
+
   const navigate = useNavigate();
 
-  // Initialize dark mode from localStorage and apply it
-  useEffect(() => {
-    const darkModePreference = localStorage.getItem("darkMode") === "true";
-    setDarkMode(darkModePreference);
-    
-    // Apply both classes to ensure compatibility
-    if (darkModePreference) {
-      document.body.classList.add('dark-mode', 'dark');
-    } else {
-      document.body.classList.remove('dark-mode', 'dark');
-    }
-  }, []);
-
-  // Listen for storage changes from other components (like Settings)
-  useEffect(() => {
-    const handleStorageChange = (e) => {
-      if (e.key === 'darkMode') {
-        const newDarkMode = e.newValue === "true";
-        setDarkMode(newDarkMode);
-        
-        if (newDarkMode) {
-          document.body.classList.add('dark-mode', 'dark');
-        } else {
-          document.body.classList.remove('dark-mode', 'dark');
-        }
-      }
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-    };
-  }, []);
-
-  // Check session and load feedbacks
   useEffect(() => {
     const expiresAt = parseInt(localStorage.getItem("adminExpires"), 10);
     if (!expiresAt || Date.now() > expiresAt) {
@@ -68,13 +41,11 @@ function AdminPanel({ setIsAdminLoggedIn, previousRoute, setPreviousRoute }) {
     setFeedbacks(saved);
   }, [navigate, setIsAdminLoggedIn]);
 
-  // Memoized filtered feedbacks for better performance
   const filteredFeedbacks = useMemo(() => {
     let filtered = showArchived
       ? feedbacks
       : feedbacks.filter((f) => !f.archived);
     
-    // Apply search filter
     if (searchTerm.trim()) {
       const lowerSearchTerm = searchTerm.toLowerCase().trim();
       filtered = filtered.filter(f => {
@@ -94,7 +65,6 @@ function AdminPanel({ setIsAdminLoggedIn, previousRoute, setPreviousRoute }) {
       });
     }
     
-    // Apply time filter
     const now = new Date();
     if (timeFilter === '7days') {
       const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
@@ -114,7 +84,6 @@ function AdminPanel({ setIsAdminLoggedIn, previousRoute, setPreviousRoute }) {
     return filtered;
   }, [feedbacks, showArchived, searchTerm, timeFilter, customStartDate, customEndDate]);
 
-  // Pagination
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredFeedbacks.slice(indexOfFirstItem, indexOfLastItem);
@@ -129,7 +98,6 @@ function AdminPanel({ setIsAdminLoggedIn, previousRoute, setPreviousRoute }) {
     setCurrentPage(pageNumber);
   };
 
-  // --- Calculations ---
   const recommendCount = filteredFeedbacks.filter(
     (f) => f.recommend === "Yes"
   ).length;
@@ -153,7 +121,6 @@ function AdminPanel({ setIsAdminLoggedIn, previousRoute, setPreviousRoute }) {
     overall: average("overall"),
   };
 
-  // --- Trend Calculations ---
   const calculateTrend = (key) => {
     if (timeFilter === 'all') return null;
     
@@ -214,7 +181,6 @@ function AdminPanel({ setIsAdminLoggedIn, previousRoute, setPreviousRoute }) {
     overall: calculateTrend("overall"),
   };
 
-  // --- Chart Data ---
   const recommendData = [
     { name: 'Would Recommend', value: recommendCount, color: '#4CAF50' },
     { name: 'Would Not Recommend', value: filteredFeedbacks.length - recommendCount, color: '#F44336' }
@@ -227,7 +193,6 @@ function AdminPanel({ setIsAdminLoggedIn, previousRoute, setPreviousRoute }) {
     { name: 'Overall', rating: parseFloat(averages.overall) }
   ];
 
-  // --- Actions ---
   const handleLogout = () => {
     localStorage.removeItem("isAdminLoggedIn");
     localStorage.removeItem("adminExpires");
@@ -243,14 +208,8 @@ function AdminPanel({ setIsAdminLoggedIn, previousRoute, setPreviousRoute }) {
 
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.width;
-    const pageHeight = doc.internal.pageSize.height;
     
     const primaryColor = [66, 133, 244];
-    const secondaryColor = [43, 183, 169];
-    const successColor = [76, 175, 80];
-    const warningColor = [255, 152, 0];
-    const dangerColor = [244, 67, 54];
-    
     doc.setFillColor(...primaryColor);
     doc.rect(0, 0, pageWidth, 40, 'F');
     
@@ -290,36 +249,6 @@ function AdminPanel({ setIsAdminLoggedIn, previousRoute, setPreviousRoute }) {
     doc.setFont(undefined, 'bold');
     doc.text(filteredFeedbacks.length.toString(), startX + boxWidth/2, summaryY + 22, { align: 'center' });
     
-    doc.setFillColor(...successColor);
-    doc.rect(startX + (boxWidth + boxSpacing), summaryY, boxWidth, boxHeight, 'F');
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(10);
-    doc.setFont(undefined, 'normal');
-    doc.text("Recommend", startX + (boxWidth + boxSpacing) + boxWidth/2, summaryY + 12, { align: 'center' });
-    doc.setFontSize(16);
-    doc.setFont(undefined, 'bold');
-    doc.text(`${recommendRate}%`, startX + (boxWidth + boxSpacing) + boxWidth/2, summaryY + 22, { align: 'center' });
-    
-    doc.setFillColor(...secondaryColor);
-    doc.rect(startX + 2*(boxWidth + boxSpacing), summaryY, boxWidth, boxHeight, 'F');
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(10);
-    doc.setFont(undefined, 'normal');
-    doc.text("Overall", startX + 2*(boxWidth + boxSpacing) + boxWidth/2, summaryY + 12, { align: 'center' });
-    doc.setFontSize(16);
-    doc.setFont(undefined, 'bold');
-    doc.text(averages.overall, startX + 2*(boxWidth + boxSpacing) + boxWidth/2, summaryY + 22, { align: 'center' });
-    
-    doc.setFillColor(...warningColor);
-    doc.rect(startX + 3*(boxWidth + boxSpacing), summaryY, boxWidth, boxHeight, 'F');
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(10);
-    doc.setFont(undefined, 'normal');
-    doc.text("Food", startX + 3*(boxWidth + boxSpacing) + boxWidth/2, summaryY + 12, { align: 'center' });
-    doc.setFontSize(16);
-    doc.setFont(undefined, 'bold');
-    doc.text(averages.food, startX + 3*(boxWidth + boxSpacing) + boxWidth/2, summaryY + 22, { align: 'center' });
-    
     const fileName = `feedback-report-${new Date().toISOString().split('T')[0]}.pdf`;
     doc.save(fileName);
   };
@@ -354,17 +283,23 @@ function AdminPanel({ setIsAdminLoggedIn, previousRoute, setPreviousRoute }) {
     }
   };
 
-  // Reset pagination when filters change
   useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm, timeFilter, customStartDate, customEndDate, showArchived]);
 
   return (
-    <div className="admin-container">
-      {/* Header */}
+    <div className={`admin-container ${adminDarkMode ? 'dark-mode' : ''}`}>
       <div className="header">
         <h1>Admin Dashboard</h1>
         <div className="header-buttons">
+          <button
+            className={`theme-toggle-button ${adminDarkMode ? 'active' : ''}`}
+            onClick={toggleAdminTheme}
+            aria-label="Toggle admin dark mode"
+            title="Toggle Admin Panel Theme"
+          >
+            <span className="toggle-slider"></span>
+          </button>
           <button onClick={handleLogout} className="button logout-btn">
             Logout
           </button>
@@ -380,7 +315,6 @@ function AdminPanel({ setIsAdminLoggedIn, previousRoute, setPreviousRoute }) {
         </div>
       </div>
 
-      {/* Search Bar with Time Filter */}
       <div className="search-section">
         <div className="search-bar">
           <div className="search-input-wrapper">
@@ -463,7 +397,6 @@ function AdminPanel({ setIsAdminLoggedIn, previousRoute, setPreviousRoute }) {
         )}
       </div>
 
-      {/* Charts Section */}
       <div className="charts-section">
         <div className="chart-container">
           <h2>Recommendation Rate</h2>
@@ -502,7 +435,6 @@ function AdminPanel({ setIsAdminLoggedIn, previousRoute, setPreviousRoute }) {
         </div>
       </div>
 
-      {/* Summary Section with Trends */}
       <div className="top-section">
         <div className="card summary">
           <h2>Summary</h2>
@@ -562,7 +494,6 @@ function AdminPanel({ setIsAdminLoggedIn, previousRoute, setPreviousRoute }) {
         </div>
       </div>
 
-      {/* Feedback Table */}
       <div className="table-container">
         <table className="table">
           <thead>
@@ -622,7 +553,6 @@ function AdminPanel({ setIsAdminLoggedIn, previousRoute, setPreviousRoute }) {
         </table>
       </div>
 
-      {/* Pagination */}
       {totalPages > 1 && (
         <div className="pagination">
           <button 

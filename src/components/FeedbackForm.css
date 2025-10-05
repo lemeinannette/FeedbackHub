@@ -1,4 +1,6 @@
-/* FeedbackForm.css */
+/* src/components/FeedbackForm.css */
+
+/* --- Light Mode Styles --- */
 .feedback-form-container {
   display: flex;
   justify-content: center;
@@ -40,21 +42,59 @@
   transform: translateY(-2px);
 }
 
-/* Form Header */
+/* --- Form Header --- */
+.form-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
 .feedback-form h1 {
   font-size: 48px;
   font-weight: 700;
   color: #1f2937;
-  margin: 0 0 16px 0;
-  text-align: center;
+  margin: 0;
   background: linear-gradient(135deg, #2bb7a9 0%, #229287 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  position: relative;
-  z-index: 1;
   font-family: 'Fredoka', 'Poppins', cursive, sans-serif;
 }
+
+/* --- Theme Toggle Button --- */
+.theme-toggle-button {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 32px;
+  background-color: #ccc;
+  border: none;
+  border-radius: 34px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.theme-toggle-button .toggle-slider {
+  position: absolute;
+  content: "";
+  height: 24px;
+  width: 24px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  border-radius: 50%;
+  transition: transform 0.3s;
+}
+
+.theme-toggle-button.active {
+  background-color: #2bb7a9;
+}
+
+.theme-toggle-button.active .toggle-slider {
+  transform: translateX(28px);
+}
+
 
 .form-description {
   text-align: center;
@@ -401,97 +441,103 @@
   }
 }
 
-/* Dark Mode */
-body.dark-mode .feedback-form-container {
+
+/* ======================================================= */
+/* --- DARK MODE STYLES --- */
+/* ======================================================= */
+/* NOTE: I changed `body.dark-mode` to `.feedback-form-container.dark-mode` */
+
+.feedback-form-container.dark-mode {
   background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
 }
 
-body.dark-mode .feedback-form {
+.feedback-form-container.dark-mode .feedback-form {
   background: #1e293b;
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.4);
 }
 
-body.dark-mode .feedback-form h1 {
+.feedback-form-container.dark-mode .feedback-form h1 {
   background: linear-gradient(135deg, #2bb7a9 0%, #6ee7b7 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-body.dark-mode .form-description {
+.feedback-form-container.dark-mode .form-description {
   color: #94a3b8;
 }
 
-body.dark-mode .form-section {
+.feedback-form-container.dark-mode .form-section {
   border-bottom-color: #334155;
 }
 
-body.dark-mode .form-section h3 {
+.feedback-form-container.dark-mode .form-section h3 {
   background: #334155;
   color: #e2e8f0;
   border-left-color: #2bb7a9;
 }
 
-body.dark-mode .form-group label {
+.feedback-form-container.dark-mode .form-group label {
   color: #e2e8f0;
 }
 
-body.dark-mode .form-group input,
-body.dark-mode .form-group textarea,
-body.dark-mode .form-group select {
+.feedback-form-container.dark-mode .form-group input,
+.feedback-form-container.dark-mode .form-group textarea,
+.feedback-form-container.dark-mode .form-group select {
   background: #334155;
   border-color: #475569;
   color: #e2e8f0;
 }
 
-body.dark-mode .form-group input:focus,
-body.dark-mode .form-group textarea:focus,
-body.dark-mode .form-group select:focus {
+.feedback-form-container.dark-mode .form-group input:focus,
+.feedback-form-container.dark-mode .form-group textarea:focus,
+.feedback-form-container.dark-mode .form-group select:focus {
   border-color: #2bb7a9;
   box-shadow: 0 0 0 3px rgba(43, 183, 169, 0.2);
 }
 
-body.dark-mode .anonymous-option {
+.feedback-form-container.dark-mode .anonymous-option {
   background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
   border-color: #0f766e;
 }
 
-body.dark-mode .checkbox-label {
+.feedback-form-container.dark-mode .checkbox-label {
   color: #5eead4;
 }
 
-body.dark-mode .checkmark {
+.feedback-form-container.dark-mode .checkmark {
   background: #334155;
   border-color: #2bb7a9;
 }
 
-body.dark-mode .radio-label {
+.feedback-form-container.dark-mode .radio-label {
   background: #334155;
   border-color: #475569;
   color: #e2e8f0;
 }
 
-body.dark-mode .radio-custom {
+.feedback-form-container.dark-mode .radio-custom {
   background: #334155;
   border-color: #475569;
 }
 
-body.dark-mode .recommendation-custom {
+.feedback-form-container.dark-mode .recommendation-custom {
   background: #334155;
   border-color: #475569;
 }
 
-body.dark-mode .recommendation-custom.yes {
+.feedback-form-container.dark-mode .recommendation-custom.yes {
   color: #34d399;
 }
 
-body.dark-mode .recommendation-custom.no {
+.feedback-form-container.dark-mode .recommendation-custom.no {
   color: #f87171;
 }
 
-body.dark-mode .form-actions {
+.feedback-form-container.dark-mode .form-actions {
   border-top-color: #334155;
 }
+
 
 /* Mobile Responsiveness */
 @media (max-width: 768px) {

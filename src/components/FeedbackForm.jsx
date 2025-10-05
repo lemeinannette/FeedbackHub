@@ -1,3 +1,5 @@
+// src/components/FeedbackForm.js
+
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import StarRating from "./StarRating";
@@ -5,7 +7,7 @@ import EventDropdown from "./EventDropDown";
 import Toggle from "./Toggle";
 import "./FeedbackForm.css";
 
-export default function FeedbackForm({ previousRoute, setPreviousRoute }) {
+export default function FeedbackForm({ clientDarkMode, toggleClientTheme, previousRoute, setPreviousRoute }) {
   const [feedbackType, setFeedbackType] = useState("");
   const [formData, setFormData] = useState({
     name: "",
@@ -92,7 +94,6 @@ export default function FeedbackForm({ previousRoute, setPreviousRoute }) {
     setIsSubmitting(true);
     console.log("Submitting form...");
     
-    // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 1000));
     
     const finalData = {
@@ -117,41 +118,27 @@ export default function FeedbackForm({ previousRoute, setPreviousRoute }) {
 
     setIsSubmitting(false);
     
-    // Set previous route before navigating
-    setPreviousRoute("/");
-    
-    // Redirect to thank you page
     navigate('/thank-you');
   };
 
-  const handleBack = () => {
-    if (previousRoute === "/admin") {
-      navigate("/admin");
-    } else {
-      // Default to home if no previous route or if previous route is "/"
-      navigate("/");
-    }
-  };
-
   return (
-    <div className="feedback-form-container">
+    <div className={`feedback-form-container ${clientDarkMode ? 'dark-mode' : ''}`}>
       <form className="feedback-form" onSubmit={handleSubmit}>
-        {/* Back button - only show if coming from admin */}
-        {previousRoute === "/admin" && (
-          <div className="form-header">
-            <button type="button" className="back-btn" onClick={handleBack}>
-              <i className="bx bx-arrow-back"></i>
-              Back to Admin Dashboard
+        <div className="form-header">
+            <h1>Feedback Form</h1>
+            <button 
+                className={`theme-toggle-button ${clientDarkMode ? 'active' : ''}`}
+                onClick={toggleClientTheme}
+                aria-label="Toggle dark mode"
+                title="Toggle theme"
+            >
+                <span className="toggle-slider"></span>
             </button>
-          </div>
-        )}
-        
-        <h1>Feedback Form</h1>
+        </div>
         <p className="form-description">
           We value your feedback! Please share your experience with us.
         </p>
 
-        {/* Anonymous Option */}
         <div className="form-group anonymous-option">
           <label className="checkbox-label">
             <input
@@ -166,7 +153,6 @@ export default function FeedbackForm({ previousRoute, setPreviousRoute }) {
           </label>
         </div>
 
-        {/* Feedback Type */}
         {!formData.isAnonymous && (
           <div className="form-group">
             <label>
@@ -202,7 +188,6 @@ export default function FeedbackForm({ previousRoute, setPreviousRoute }) {
           </div>
         )}
 
-        {/* Individual */}
         {!formData.isAnonymous && feedbackType === "individual" && (
           <div className="form-section">
             <h3>Individual Information</h3>
@@ -247,7 +232,6 @@ export default function FeedbackForm({ previousRoute, setPreviousRoute }) {
           </div>
         )}
 
-        {/* Group */}
         {!formData.isAnonymous && feedbackType === "group" && (
           <div className="form-section">
             <h3>Group / Organization Information</h3>
@@ -288,7 +272,6 @@ export default function FeedbackForm({ previousRoute, setPreviousRoute }) {
           </div>
         )}
 
-        {/* Event Dropdown */}
         <div className="form-section">
           <h3>Event Information</h3>
           <EventDropdown
@@ -304,7 +287,6 @@ export default function FeedbackForm({ previousRoute, setPreviousRoute }) {
           )}
         </div>
 
-        {/* Ratings */}
         <div className="form-section">
           <h3>Your Ratings</h3>
           <div className="ratings-container">
@@ -339,7 +321,6 @@ export default function FeedbackForm({ previousRoute, setPreviousRoute }) {
           </div>
         </div>
 
-        {/* Recommend */}
         <div className="form-section">
           <h3>Recommendation</h3>
           <div className="form-group">
@@ -384,7 +365,6 @@ export default function FeedbackForm({ previousRoute, setPreviousRoute }) {
           </div>
         </div>
 
-        {/* Comments */}
         <div className="form-section">
           <h3>Additional Comments</h3>
           <div className="form-group">
@@ -399,7 +379,6 @@ export default function FeedbackForm({ previousRoute, setPreviousRoute }) {
           </div>
         </div>
 
-        {/* Submit */}
         <div className="form-actions">
           <button 
             type="submit" 
