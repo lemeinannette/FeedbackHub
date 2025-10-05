@@ -299,6 +299,7 @@ function AdminPanel({
             title="Toggle Admin Panel Theme"
           >
             <span className="toggle-slider"></span>
+            <i className={`bx ${adminDarkMode ? 'bx-sun' : 'bx-moon'} theme-icon`}></i>
           </button>
           <button onClick={handleLogout} className="button logout-btn">
             Logout

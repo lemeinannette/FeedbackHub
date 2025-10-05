@@ -133,6 +133,7 @@ export default function FeedbackForm({ clientDarkMode, toggleClientTheme, previo
                 title="Toggle theme"
             >
                 <span className="toggle-slider"></span>
+                <i className={`bx ${clientDarkMode ? 'bx-sun' : 'bx-moon'} theme-icon`}></i>
             </button>
         </div>
         <p className="form-description">

@@ -61,12 +61,12 @@ button[type="submit"] {
   overflow: hidden;
 }
 
-/* --- Theme Toggle Button --- */
+/* --- UPDATED Theme Toggle Button with Icon --- */
 .theme-toggle-button {
   position: relative;
   display: inline-block;
-  width: 60px;
-  height: 32px;
+  width: 70px; /* Slightly wider to accommodate the icon */
+  height: 34px;
   background-color: #ccc;
   border: none;
   border-radius: 34px;
@@ -77,13 +77,16 @@ button[type="submit"] {
 .theme-toggle-button .toggle-slider {
   position: absolute;
   content: "";
-  height: 24px;
-  width: 24px;
+  height: 26px;
+  width: 26px;
   left: 4px;
   bottom: 4px;
   background-color: white;
   border-radius: 50%;
   transition: transform 0.3s;
+  display: flex; /* Use flex to center the icon */
+  justify-content: center;
+  align-items: center;
 }
 
 .theme-toggle-button.active {
@@ -91,7 +94,19 @@ button[type="submit"] {
 }
 
 .theme-toggle-button.active .toggle-slider {
-  transform: translateX(28px);
+  transform: translateX(36px); /* Adjust for new width */
+}
+
+/* --- UPDATED Icon Styling --- */
+.theme-icon {
+  color: #6b7280; /* A muted gray for the icon */
+  font-size: 16px;
+  transition: color 0.3s;
+}
+
+/* Change icon color to white when the button is active (dark mode) */
+.theme-toggle-button.active .theme-icon {
+  color: #ffffff;
 }
 
 /* --- Button Hover Effects --- */
@@ -327,71 +342,6 @@ button[type="submit"]:active {
   color: #3b82f6;
 }
 
-/* Client theme section */
-.client-theme-section {
-  background: #f8fafc;
-  border-radius: 12px;
-  padding: 24px;
-  margin-bottom: 24px;
-  border: 1px solid #e2e8f0;
-}
-
-.client-theme-section h2 {
-  color: #1f2937;
-  font-size: 20px;
-  margin: 0 0 8px 0;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.client-theme-section h2 i {
-  font-size: 24px;
-  color: #2bb7a9;
-}
-
-.client-theme-section p {
-  color: #6b7280;
-  margin: 0 0 20px 0;
-}
-
-.theme-control {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16px;
-  background: white;
-  border-radius: 8px;
-  border: 1px solid #e5e7eb;
-}
-
-.theme-info h3 {
-  color: #374151;
-  font-size: 16px;
-  margin: 0 0 4px 0;
-}
-
-.theme-info p {
-  color: #6b7280;
-  font-size: 14px;
-  margin: 0;
-}
-
-.theme-toggle-btn {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 20px;
-  background: linear-gradient(135deg, #2bb7a9 0%, #229287 100%);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 500;
-  transition: all 0.2s ease;
-}
-
 /* Theme notification */
 .theme-notification {
   display: flex;
@@ -417,10 +367,42 @@ button[type="submit"]:active {
   }
 }
 
+/* Clear search button */
+.clear-search-btn {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #6b7280;
+  cursor: pointer;
+  font-size: 18px;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.clear-search-btn:hover {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+/* Search results info */
+.search-results-info {
+  margin-top: 8px;
+  padding: 8px 16px;
+  background: #f0fdfa;
+  border: 1px solid #b2f5ea;
+  border-radius: 8px;
+  color: #0f766e;
+  font-size: 14px;
+  animation: fadeIn 0.3s ease;
+}
+
 /* ======================================================= */
 /* --- DARK MODE STYLES --- */
 /* ======================================================= */
-/* NOTE: I changed `body.dark` to `.admin-container.dark-mode` */
 
 .admin-container.dark-mode {
   background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
@@ -508,34 +490,23 @@ button[type="submit"]:active {
   background: #0f766e;
 }
 
-.admin-container.dark-mode .client-theme-section {
-  background: #374151;
-  border-color: #4b5563;
-}
-
-.admin-container.dark-mode .client-theme-section h2 {
-  color: #e2e8f0;
-}
-
-.admin-container.dark-mode .client-theme-section p {
-  color: #9ca3af;
-}
-
-.admin-container.dark-mode .theme-control {
-  background: #1f2937;
-  border-color: #374151;
-}
-
-.admin-container.dark-mode .theme-info h3 {
-  color: #e2e8f0;
-}
-
-.admin-container.dark-mode .theme-info p {
-  color: #9ca3af;
-}
-
 .admin-container.dark-mode .theme-notification {
   background-color: #2E7D32;
+}
+
+.admin-container.dark-mode .search-results-info {
+  background: #0f766e;
+  border-color: #0d9488;
+  color: #a7f3d0;
+}
+
+.admin-container.dark-mode .clear-search-btn {
+  color: #9ca3af;
+}
+
+.admin-container.dark-mode .clear-search-btn:hover {
+  background: #374151;
+  color: #e5e7eb;
 }
 
 /* Mobile Responsiveness */

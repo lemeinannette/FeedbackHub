@@ -1,5 +1,3 @@
-/* src/components/FeedbackForm.css */
-
 /* --- Light Mode Styles --- */
 .feedback-form-container {
   display: flex;
@@ -62,12 +60,12 @@
   font-family: 'Fredoka', 'Poppins', cursive, sans-serif;
 }
 
-/* --- Theme Toggle Button --- */
+/* --- UPDATED Theme Toggle Button with Icon --- */
 .theme-toggle-button {
   position: relative;
   display: inline-block;
-  width: 60px;
-  height: 32px;
+  width: 70px; /* Slightly wider to accommodate the icon */
+  height: 34px;
   background-color: #ccc;
   border: none;
   border-radius: 34px;
@@ -78,13 +76,16 @@
 .theme-toggle-button .toggle-slider {
   position: absolute;
   content: "";
-  height: 24px;
-  width: 24px;
+  height: 26px;
+  width: 26px;
   left: 4px;
   bottom: 4px;
   background-color: white;
   border-radius: 50%;
   transition: transform 0.3s;
+  display: flex; /* Use flex to center the icon */
+  justify-content: center;
+  align-items: center;
 }
 
 .theme-toggle-button.active {
@@ -92,9 +93,20 @@
 }
 
 .theme-toggle-button.active .toggle-slider {
-  transform: translateX(28px);
+  transform: translateX(36px); /* Adjust for new width */
 }
 
+/* --- UPDATED Icon Styling --- */
+.theme-icon {
+  color: #6b7280; /* A muted gray for the icon */
+  font-size: 16px;
+  transition: color 0.3s;
+}
+
+/* Change icon color to white when the button is active (dark mode) */
+.theme-toggle-button.active .theme-icon {
+  color: #ffffff;
+}
 
 .form-description {
   text-align: center;
@@ -445,7 +457,6 @@
 /* ======================================================= */
 /* --- DARK MODE STYLES --- */
 /* ======================================================= */
-/* NOTE: I changed `body.dark-mode` to `.feedback-form-container.dark-mode` */
 
 .feedback-form-container.dark-mode {
   background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
