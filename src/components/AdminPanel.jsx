@@ -440,12 +440,11 @@ function AdminPanel({
         doc.text(i.toString(), chartX - 5, y, { align: 'right' });
       }
       
-      // Draw Y-axis title
-      doc.save();
-      doc.translate(chartX - 15, chartY + chartHeight/2);
-      doc.rotate(-90);
-      doc.text("Rating", 0, 0, { align: 'center' });
-      doc.restore();
+      // Draw Y-axis title (using text instead of translate)
+      doc.setTextColor(100, 100, 100);
+      doc.setFontSize(8);
+      doc.setFont(undefined, 'normal');
+      doc.text("Rating", chartX - 15, chartY + chartHeight/2, { align: 'center' });
       
       currentY += chartHeight + 25;
       
