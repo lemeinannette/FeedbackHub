@@ -342,31 +342,6 @@ button[type="submit"]:active {
   color: #3b82f6;
 }
 
-/* Theme notification */
-.theme-notification {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background-color: #4CAF50;
-  color: white;
-  padding: 12px 20px;
-  border-radius: 8px;
-  margin-bottom: 20px;
-  animation: slideIn 0.3s ease-out;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-}
-
-@keyframes slideIn {
-  from { 
-    opacity: 0; 
-    transform: translateY(-20px); 
-  }
-  to { 
-    opacity: 1; 
-    transform: translateY(0); 
-  }
-}
-
 /* Clear search button */
 .clear-search-btn {
   position: absolute;
@@ -497,30 +472,6 @@ button[type="submit"]:active {
   to { transform: rotate(360deg); }
 }
 
-/* Error message styling */
-.error-message {
-  background-color: #fee2e2;
-  color: #b91c1c;
-  padding: 12px 16px;
-  margin: 16px 0;
-  border-radius: 8px;
-  border-left: 4px solid #b91c1c;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.close-error {
-  background: none;
-  border: none;
-  color: #b91c1c;
-  font-weight: bold;
-  cursor: pointer;
-  font-size: 16px;
-  padding: 0;
-  margin-left: 10px;
-}
-
 /* ======================================================= */
 /* --- DARK MODE STYLES --- */
 /* ======================================================= */
@@ -611,10 +562,6 @@ button[type="submit"]:active {
   background: #0f766e;
 }
 
-.admin-container.dark-mode .theme-notification {
-  background-color: #2E7D32;
-}
-
 .admin-container.dark-mode .search-results-info {
   background: #0f766e;
   border-color: #0d9488;
@@ -651,16 +598,6 @@ button[type="submit"]:active {
 
 .admin-container.dark-mode .pagination button:hover:not(:disabled) {
   background-color: #475569;
-}
-
-.admin-container.dark-mode .error-message {
-  background-color: #7f1d1d;
-  color: #fca5a5;
-  border-left-color: #dc2626;
-}
-
-.admin-container.dark-mode .close-error {
-  color: #dc2626;
 }
 
 /* Mobile Responsiveness */

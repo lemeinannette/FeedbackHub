@@ -229,38 +229,52 @@ function AdminPanel({
         return currentY;
       };
       
-      // Add a professional header with logo
+      // Add a professional header with improved logo
       doc.setFillColor(25, 55, 109);
-      doc.rect(0, 0, pageWidth, 35, 'F');
+      doc.rect(0, 0, pageWidth, 40, 'F');
       
-      // Add logo - using a simple text-based logo that matches the design
-      doc.setTextColor(255, 255, 255);
-      doc.setFontSize(16);
-      doc.setFont(undefined, 'bold');
-      doc.text("FeedbackHub", 20, 15);
-      
-      // Add a simple logo icon using shapes
+      // Create a more professional logo with shapes
+      // Logo container
       doc.setFillColor(255, 255, 255);
-      doc.circle(15, 15, 3, 'F');
+      doc.roundedRect(15, 10, 25, 20, 3, 3, 'F');
+      
+      // Logo icon - more sophisticated design
+      doc.setFillColor(25, 55, 109);
+      // Main circle
+      doc.circle(22.5, 20, 6, 'F');
+      // Inner circle
+      doc.setFillColor(255, 255, 255);
+      doc.circle(22.5, 20, 3, 'F');
+      
+      // Add company name with better typography
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(18);
+      doc.setFont(undefined, 'bold');
+      doc.text("FeedbackHub", 48, 20);
       
       // Add tagline
       doc.setFontSize(10);
       doc.setFont(undefined, 'normal');
-      doc.text("Customer Experience Management", 20, 22);
+      doc.text("Customer Experience Management", 48, 28);
       
-      // Add report title
-      doc.setFontSize(18);
+      // Add report title centered
+      doc.setFontSize(20);
       doc.setFont(undefined, 'bold');
       doc.text("Feedback Analytics Report", pageWidth / 2, 20, { align: 'center' });
       
       // Add report date
-      doc.setFontSize(9);
+      doc.setFontSize(10);
       doc.setFont(undefined, 'normal');
-      doc.text(`Generated: ${new Date().toLocaleDateString()}`, pageWidth / 2, 28, { align: 'center' });
+      doc.text(`Generated: ${new Date().toLocaleDateString()}`, pageWidth / 2, 30, { align: 'center' });
       
-      let currentY = 50;
+      // Add report ID
+      const reportId = `FB-${new Date().getFullYear()}${String(new Date().getMonth() + 1).padStart(2, '0')}${String(new Date().getDate()).padStart(2, '0')}-${Math.floor(Math.random() * 1000)}`;
+      doc.setFontSize(9);
+      doc.text(`ID: ${reportId}`, pageWidth / 2, 35, { align: 'center' });
       
-      // Report info
+      let currentY = 55;
+      
+      // Report info with better formatting
       doc.setTextColor(100, 100, 100);
       doc.setFontSize(10);
       doc.setFont(undefined, 'normal');
@@ -275,75 +289,147 @@ function AdminPanel({
         currentY += 7;
       }
       
-      // Summary Statistics
+      // Summary Statistics with improved styling
       currentY = checkPageBreak(currentY, 50);
       doc.setTextColor(0, 0, 0);
-      doc.setFontSize(14);
+      doc.setFontSize(16);
       doc.setFont(undefined, 'bold');
       doc.text("Summary Statistics", 14, currentY);
       currentY += 10;
       
-      const boxWidth = 40;
-      const boxHeight = 25;
-      const boxSpacing = 10;
+      // Add a subtle line under the section title
+      doc.setDrawColor(200, 200, 200);
+      doc.setLineWidth(0.5);
+      doc.line(14, currentY, pageWidth - 14, currentY);
+      currentY += 10;
+      
+      const boxWidth = 45;
+      const boxHeight = 30;
+      const boxSpacing = 12;
       const startX = 14;
       
-      // Total feedback box
+      // Total feedback box with rounded corners
       doc.setFillColor(25, 55, 109);
-      doc.rect(startX, currentY, boxWidth, boxHeight, 'F');
+      doc.roundedRect(startX, currentY, boxWidth, boxHeight, 3, 3, 'F');
       doc.setTextColor(255, 255, 255);
-      doc.setFontSize(10);
+      doc.setFontSize(11);
       doc.setFont(undefined, 'normal');
-      doc.text("Total", startX + boxWidth/2, currentY + 10, { align: 'center' });
-      doc.setFontSize(14);
+      doc.text("Total Responses", startX + boxWidth/2, currentY + 12, { align: 'center' });
+      doc.setFontSize(18);
       doc.setFont(undefined, 'bold');
-      doc.text(filteredFeedbacks.length.toString(), startX + boxWidth/2, currentY + 18, { align: 'center' });
+      doc.text(filteredFeedbacks.length.toString(), startX + boxWidth/2, currentY + 22, { align: 'center' });
       
       // Recommendation rate box
       doc.setFillColor(76, 175, 80);
-      doc.rect(startX + boxWidth + boxSpacing, currentY, boxWidth, boxHeight, 'F');
+      doc.roundedRect(startX + boxWidth + boxSpacing, currentY, boxWidth, boxHeight, 3, 3, 'F');
       doc.setTextColor(255, 255, 255);
-      doc.setFontSize(10);
+      doc.setFontSize(11);
       doc.setFont(undefined, 'normal');
-      doc.text("Recommend", startX + boxWidth + boxSpacing + boxWidth/2, currentY + 10, { align: 'center' });
-      doc.setFontSize(14);
+      doc.text("Recommendation Rate", startX + boxWidth + boxSpacing + boxWidth/2, currentY + 12, { align: 'center' });
+      doc.setFontSize(18);
       doc.setFont(undefined, 'bold');
-      doc.text(`${recommendRate}%`, startX + boxWidth + boxSpacing + boxWidth/2, currentY + 18, { align: 'center' });
+      doc.text(`${recommendRate}%`, startX + boxWidth + boxSpacing + boxWidth/2, currentY + 22, { align: 'center' });
       
       // Average rating box
       doc.setFillColor(255, 152, 0);
-      doc.rect(startX + 2*(boxWidth + boxSpacing), currentY, boxWidth, boxHeight, 'F');
+      doc.roundedRect(startX + 2*(boxWidth + boxSpacing), currentY, boxWidth, boxHeight, 3, 3, 'F');
       doc.setTextColor(255, 255, 255);
-      doc.setFontSize(10);
+      doc.setFontSize(11);
       doc.setFont(undefined, 'normal');
-      doc.text("Avg Rating", startX + 2*(boxWidth + boxSpacing) + boxWidth/2, currentY + 10, { align: 'center' });
-      doc.setFontSize(14);
+      doc.text("Average Rating", startX + 2*(boxWidth + boxSpacing) + boxWidth/2, currentY + 12, { align: 'center' });
+      doc.setFontSize(18);
       doc.setFont(undefined, 'bold');
-      doc.text(averages.overall, startX + 2*(boxWidth + boxSpacing) + boxWidth/2, currentY + 18, { align: 'center' });
+      doc.text(averages.overall, startX + 2*(boxWidth + boxSpacing) + boxWidth/2, currentY + 22, { align: 'center' });
       
-      currentY += boxHeight + 15;
+      // Report Period box
+      doc.setFillColor(103, 58, 183);
+      doc.roundedRect(startX + 3*(boxWidth + boxSpacing), currentY, boxWidth, boxHeight, 3, 3, 'F');
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(11);
+      doc.setFont(undefined, 'normal');
+      doc.text("Report Period", startX + 3*(boxWidth + boxSpacing) + boxWidth/2, currentY + 12, { align: 'center' });
+      doc.setFontSize(10);
+      doc.setFont(undefined, 'bold');
+      const periodText = getTimeFilterLabel().length > 12 ? 
+        getTimeFilterLabel().substring(0, 12) + "..." : 
+        getTimeFilterLabel();
+      doc.text(periodText, startX + 3*(boxWidth + boxSpacing) + boxWidth/2, currentY + 22, { align: 'center' });
       
-      // Add ratings details
+      currentY += boxHeight + 20;
+      
+      // Add ratings details with improved styling
       currentY = checkPageBreak(currentY, 30);
       doc.setTextColor(0, 0, 0);
-      doc.setFontSize(12);
+      doc.setFontSize(14);
       doc.setFont(undefined, 'bold');
       doc.text("Average Ratings by Category", 14, currentY);
       currentY += 10;
       
-      doc.setFontSize(10);
-      doc.setFont(undefined, 'normal');
-      doc.text(`Food: ${averages.food}`, 14, currentY);
-      doc.text(`Ambience: ${averages.ambience}`, 70, currentY);
-      doc.text(`Service: ${averages.service}`, 130, currentY);
-      doc.text(`Overall: ${averages.overall}`, 190, currentY);
-      currentY += 15;
+      // Add a subtle line under the section title
+      doc.setDrawColor(200, 200, 200);
+      doc.setLineWidth(0.5);
+      doc.line(14, currentY, pageWidth - 14, currentY);
+      currentY += 10;
+      
+      // Create visual rating bars
+      const categories = [
+        { name: 'Food', value: averages.food, color: [76, 175, 80] },
+        { name: 'Ambience', value: averages.ambience, color: [33, 150, 243] },
+        { name: 'Service', value: averages.service, color: [255, 152, 0] },
+        { name: 'Overall', value: averages.overall, color: [156, 39, 176] }
+      ];
+      
+      categories.forEach((category, index) => {
+        const y = currentY + (index * 15);
+        
+        // Category name
+        doc.setTextColor(0, 0, 0);
+        doc.setFontSize(11);
+        doc.setFont(undefined, 'normal');
+        doc.text(category.name, 14, y);
+        
+        // Rating bar background
+        doc.setFillColor(230, 230, 230);
+        doc.rect(70, y - 5, 60, 8, 'F');
+        
+        // Rating bar fill
+        doc.setFillColor(...category.color);
+        const fillWidth = (parseFloat(category.value) / 5) * 60;
+        doc.rect(70, y - 5, fillWidth, 8, 'F');
+        
+        // Rating value
+        doc.setTextColor(0, 0, 0);
+        doc.setFontSize(11);
+        doc.setFont(undefined, 'bold');
+        doc.text(`${category.value}/5.0`, 135, y);
+        
+        // Trend indicator if available
+        const trend = trends[category.name.toLowerCase()];
+        if (trend) {
+          if (trend.isPositive) {
+            doc.setTextColor(76, 175, 80);
+          } else {
+            doc.setTextColor(244, 67, 54);
+          }
+          doc.setFontSize(9);
+          doc.text(`${trend.isPositive ? '↑' : '↓'} ${trend.value}%`, 155, y);
+        }
+      });
+      
+      currentY += categories.length * 15 + 15;
       
       // Add feedback data table
       currentY = checkPageBreak(currentY, 30);
-      doc.setFontSize(12);
+      doc.setTextColor(0, 0, 0);
+      doc.setFontSize(14);
       doc.setFont(undefined, 'bold');
       doc.text("Feedback Details", 14, currentY);
+      currentY += 10;
+      
+      // Add a subtle line under the section title
+      doc.setDrawColor(200, 200, 200);
+      doc.setLineWidth(0.5);
+      doc.line(14, currentY, pageWidth - 14, currentY);
       currentY += 10;
       
       // Define table columns with proper widths for landscape
@@ -446,21 +532,23 @@ function AdminPanel({
           // Footer line
           doc.setDrawColor(25, 55, 109);
           doc.setLineWidth(0.5);
-          doc.line(14, pageHeight - 10, pageWidth - 14, pageHeight - 10);
+          doc.line(14, pageHeight - 15, pageWidth - 14, pageHeight - 15);
           
           // Footer text
           doc.setFontSize(8);
           doc.setTextColor(100, 100, 100);
-          doc.text(`© ${new Date().getFullYear()} FeedbackHub - Customer Experience Management System | Confidential Report`, pageWidth / 2, pageHeight - 5, { align: 'center' });
-          doc.text(`Page ${data.pageNumber} of ${pageCount}`, pageWidth - 20, pageHeight - 5, { align: 'center' });
+          doc.text(`© ${new Date().getFullYear()} FeedbackHub - Customer Experience Management System | Confidential Report`, pageWidth / 2, pageHeight - 10, { align: 'center' });
+          doc.text(`Page ${data.pageNumber} of ${pageCount}`, pageWidth - 30, pageHeight - 10, { align: 'center' });
           
-          // Add logo to footer
+          // Add improved logo to footer
           doc.setFillColor(25, 55, 109);
-          doc.circle(20, pageHeight - 7, 2, 'F');
+          doc.circle(20, pageHeight - 10, 3, 'F');
+          doc.setFillColor(255, 255, 255);
+          doc.circle(20, pageHeight - 10, 1.5, 'F');
           doc.setTextColor(25, 55, 109);
           doc.setFontSize(8);
           doc.setFont(undefined, 'bold');
-          doc.text("FeedbackHub", 25, pageHeight - 5);
+          doc.text("FeedbackHub", 26, pageHeight - 10);
         }
       });
       
