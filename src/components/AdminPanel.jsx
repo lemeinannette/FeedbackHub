@@ -24,7 +24,6 @@ function AdminPanel({
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
-  const [pdfError, setPdfError] = useState(null);
 
   const navigate = useNavigate();
 
@@ -209,104 +208,151 @@ function AdminPanel({
     }
 
     setIsGeneratingPDF(true);
-    setPdfError(null);
 
     try {
-      // Create a new PDF document
-      const doc = new jsPDF();
+      // Create a new PDF document with landscape orientation for better table fit
+      const doc = new jsPDF({
+        orientation: 'landscape',
+        unit: 'mm',
+        format: 'a4'
+      });
+      
       const pageWidth = doc.internal.pageSize.width;
       const pageHeight = doc.internal.pageSize.height;
       
-      // Add a simple header
-      doc.setFillColor(25, 55, 109);
-      doc.rect(0, 0, pageWidth, 40, 'F');
+      // Helper function to add new page if needed
+      const checkPageBreak = (currentY, requiredSpace = 20) => {
+        if (currentY > pageHeight - requiredSpace) {
+          doc.addPage();
+          return 20; // Return new Y position at top of page
+        }
+        return currentY;
+      };
       
+      // Add a professional header with logo
+      doc.setFillColor(25, 55, 109);
+      doc.rect(0, 0, pageWidth, 35, 'F');
+      
+      // Add logo - using a simple text-based logo that matches the design
       doc.setTextColor(255, 255, 255);
-      doc.setFontSize(24);
+      doc.setFontSize(16);
       doc.setFont(undefined, 'bold');
-      doc.text("Feedback Report", pageWidth / 2, 25, { align: 'center' });
+      doc.text("FeedbackHub", 20, 15);
+      
+      // Add a simple logo icon using shapes
+      doc.setFillColor(255, 255, 255);
+      doc.circle(15, 15, 3, 'F');
+      
+      // Add tagline
+      doc.setFontSize(10);
+      doc.setFont(undefined, 'normal');
+      doc.text("Customer Experience Management", 20, 22);
+      
+      // Add report title
+      doc.setFontSize(18);
+      doc.setFont(undefined, 'bold');
+      doc.text("Feedback Analytics Report", pageWidth / 2, 20, { align: 'center' });
+      
+      // Add report date
+      doc.setFontSize(9);
+      doc.setFont(undefined, 'normal');
+      doc.text(`Generated: ${new Date().toLocaleDateString()}`, pageWidth / 2, 28, { align: 'center' });
+      
+      let currentY = 50;
       
       // Report info
       doc.setTextColor(100, 100, 100);
       doc.setFontSize(10);
       doc.setFont(undefined, 'normal');
-      doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 50);
-      doc.text(`Filter: ${getTimeFilterLabel()}`, 14, 57);
-      doc.text(`Showing: ${showArchived ? 'All Feedback' : 'Active Feedback Only'}`, 14, 64);
+      doc.text(`Generated: ${new Date().toLocaleString()}`, 14, currentY);
+      currentY += 7;
+      doc.text(`Filter: ${getTimeFilterLabel()}`, 14, currentY);
+      currentY += 7;
+      doc.text(`Showing: ${showArchived ? 'All Feedback' : 'Active Feedback Only'}`, 14, currentY);
+      currentY += 7;
       if (searchTerm.trim()) {
-        doc.text(`Search: "${searchTerm}"`, 14, 71);
+        doc.text(`Search: "${searchTerm}"`, 14, currentY);
+        currentY += 7;
       }
       
       // Summary Statistics
+      currentY = checkPageBreak(currentY, 50);
       doc.setTextColor(0, 0, 0);
       doc.setFontSize(14);
       doc.setFont(undefined, 'bold');
-      doc.text("Summary Statistics", 14, 87);
+      doc.text("Summary Statistics", 14, currentY);
+      currentY += 10;
       
-      const summaryY = 97;
-      const boxWidth = 45;
-      const boxHeight = 30;
-      const boxSpacing = 5;
+      const boxWidth = 40;
+      const boxHeight = 25;
+      const boxSpacing = 10;
       const startX = 14;
       
       // Total feedback box
       doc.setFillColor(25, 55, 109);
-      doc.rect(startX, summaryY, boxWidth, boxHeight, 'F');
+      doc.rect(startX, currentY, boxWidth, boxHeight, 'F');
       doc.setTextColor(255, 255, 255);
       doc.setFontSize(10);
       doc.setFont(undefined, 'normal');
-      doc.text("Total", startX + boxWidth/2, summaryY + 12, { align: 'center' });
-      doc.setFontSize(16);
+      doc.text("Total", startX + boxWidth/2, currentY + 10, { align: 'center' });
+      doc.setFontSize(14);
       doc.setFont(undefined, 'bold');
-      doc.text(filteredFeedbacks.length.toString(), startX + boxWidth/2, summaryY + 22, { align: 'center' });
+      doc.text(filteredFeedbacks.length.toString(), startX + boxWidth/2, currentY + 18, { align: 'center' });
       
       // Recommendation rate box
       doc.setFillColor(76, 175, 80);
-      doc.rect(startX + boxWidth + boxSpacing, summaryY, boxWidth, boxHeight, 'F');
+      doc.rect(startX + boxWidth + boxSpacing, currentY, boxWidth, boxHeight, 'F');
       doc.setTextColor(255, 255, 255);
       doc.setFontSize(10);
       doc.setFont(undefined, 'normal');
-      doc.text("Recommend", startX + boxWidth + boxSpacing + boxWidth/2, summaryY + 12, { align: 'center' });
-      doc.setFontSize(16);
+      doc.text("Recommend", startX + boxWidth + boxSpacing + boxWidth/2, currentY + 10, { align: 'center' });
+      doc.setFontSize(14);
       doc.setFont(undefined, 'bold');
-      doc.text(`${recommendRate}%`, startX + boxWidth + boxSpacing + boxWidth/2, summaryY + 22, { align: 'center' });
+      doc.text(`${recommendRate}%`, startX + boxWidth + boxSpacing + boxWidth/2, currentY + 18, { align: 'center' });
       
       // Average rating box
       doc.setFillColor(255, 152, 0);
-      doc.rect(startX + 2*(boxWidth + boxSpacing), summaryY, boxWidth, boxHeight, 'F');
+      doc.rect(startX + 2*(boxWidth + boxSpacing), currentY, boxWidth, boxHeight, 'F');
       doc.setTextColor(255, 255, 255);
       doc.setFontSize(10);
       doc.setFont(undefined, 'normal');
-      doc.text("Avg Rating", startX + 2*(boxWidth + boxSpacing) + boxWidth/2, summaryY + 12, { align: 'center' });
-      doc.setFontSize(16);
+      doc.text("Avg Rating", startX + 2*(boxWidth + boxSpacing) + boxWidth/2, currentY + 10, { align: 'center' });
+      doc.setFontSize(14);
       doc.setFont(undefined, 'bold');
-      doc.text(averages.overall, startX + 2*(boxWidth + boxSpacing) + boxWidth/2, summaryY + 22, { align: 'center' });
+      doc.text(averages.overall, startX + 2*(boxWidth + boxSpacing) + boxWidth/2, currentY + 18, { align: 'center' });
+      
+      currentY += boxHeight + 15;
       
       // Add ratings details
+      currentY = checkPageBreak(currentY, 30);
       doc.setTextColor(0, 0, 0);
       doc.setFontSize(12);
       doc.setFont(undefined, 'bold');
-      doc.text("Average Ratings by Category", 14, summaryY + boxHeight + 15);
+      doc.text("Average Ratings by Category", 14, currentY);
+      currentY += 10;
       
       doc.setFontSize(10);
       doc.setFont(undefined, 'normal');
-      doc.text(`Food: ${averages.food}`, 14, summaryY + boxHeight + 25);
-      doc.text(`Ambience: ${averages.ambience}`, 70, summaryY + boxHeight + 25);
-      doc.text(`Service: ${averages.service}`, 140, summaryY + boxHeight + 25);
-      doc.text(`Overall: ${averages.overall}`, 190, summaryY + boxHeight + 25);
+      doc.text(`Food: ${averages.food}`, 14, currentY);
+      doc.text(`Ambience: ${averages.ambience}`, 70, currentY);
+      doc.text(`Service: ${averages.service}`, 130, currentY);
+      doc.text(`Overall: ${averages.overall}`, 190, currentY);
+      currentY += 15;
       
       // Add feedback data table
+      currentY = checkPageBreak(currentY, 30);
       doc.setFontSize(12);
       doc.setFont(undefined, 'bold');
-      doc.text("Feedback Details", 14, summaryY + boxHeight + 40);
+      doc.text("Feedback Details", 14, currentY);
+      currentY += 10;
       
-      // Define table columns with proper widths
+      // Define table columns with proper widths for landscape
       const tableColumns = [
-        { header: 'Date', dataKey: 'date', width: 22 },
-        { header: 'Name', dataKey: 'name', width: 28 },
-        { header: 'Email', dataKey: 'email', width: 35 },
+        { header: 'Date', dataKey: 'date', width: 20 },
+        { header: 'Name', dataKey: 'name', width: 25 },
+        { header: 'Email', dataKey: 'email', width: 30 },
         { header: 'Contact', dataKey: 'contact', width: 25 },
-        { header: 'Event', dataKey: 'event', width: 28 },
+        { header: 'Event', dataKey: 'event', width: 25 },
         { header: 'Food', dataKey: 'food', width: 15 },
         { header: 'Ambience', dataKey: 'ambience', width: 20 },
         { header: 'Service', dataKey: 'service', width: 20 },
@@ -334,29 +380,30 @@ function AdminPanel({
       autoTable(doc, {
         head: [tableColumns.map(col => col.header)],
         body: tableData.map(row => tableColumns.map(col => row[col.dataKey])),
-        startY: summaryY + boxHeight + 50,
+        startY: currentY,
         theme: 'grid',
         headStyles: {
           fillColor: [25, 55, 109],
           textColor: 255,
           fontStyle: 'bold',
-          fontSize: 10
+          fontSize: 9
         },
         bodyStyles: {
           textColor: 50,
-          fontSize: 9,
+          fontSize: 8,
           lineColor: [200, 200, 200],
           lineWidth: 0.1
         },
         alternateRowStyles: {
           fillColor: [245, 245, 250]
         },
-        margin: { top: 10, bottom: 25 },
+        margin: { top: 10, bottom: 20 },
         styles: {
-          fontSize: 9,
-          cellPadding: 4,
+          fontSize: 8,
+          cellPadding: 3,
           overflow: 'linebreak',
-          cellWidth: 'wrap'
+          cellWidth: 'wrap',
+          minCellHeight: 10
         },
         columnStyles: tableColumns.reduce((acc, col, index) => {
           acc[index] = { cellWidth: col.width };
@@ -399,13 +446,21 @@ function AdminPanel({
           // Footer line
           doc.setDrawColor(25, 55, 109);
           doc.setLineWidth(0.5);
-          doc.line(14, pageHeight - 15, pageWidth - 14, pageHeight - 15);
+          doc.line(14, pageHeight - 10, pageWidth - 14, pageHeight - 10);
           
           // Footer text
           doc.setFontSize(8);
           doc.setTextColor(100, 100, 100);
-          doc.text(`© ${new Date().getFullYear()} Customer Experience Management System | Confidential Report`, pageWidth / 2, pageHeight - 10, { align: 'center' });
-          doc.text(`Page ${data.pageNumber} of ${pageCount}`, pageWidth - 30, pageHeight - 10, { align: 'center' });
+          doc.text(`© ${new Date().getFullYear()} FeedbackHub - Customer Experience Management System | Confidential Report`, pageWidth / 2, pageHeight - 5, { align: 'center' });
+          doc.text(`Page ${data.pageNumber} of ${pageCount}`, pageWidth - 20, pageHeight - 5, { align: 'center' });
+          
+          // Add logo to footer
+          doc.setFillColor(25, 55, 109);
+          doc.circle(20, pageHeight - 7, 2, 'F');
+          doc.setTextColor(25, 55, 109);
+          doc.setFontSize(8);
+          doc.setFont(undefined, 'bold');
+          doc.text("FeedbackHub", 25, pageHeight - 5);
         }
       });
       
@@ -419,12 +474,10 @@ function AdminPanel({
       // Show success message
       setTimeout(() => {
         setIsGeneratingPDF(false);
-        alert(`PDF report "${fileName}" has been generated and downloaded successfully!`);
       }, 500);
       
     } catch (error) {
       console.error("Error generating PDF:", error);
-      setPdfError(error.message || "Unknown error occurred");
       setIsGeneratingPDF(false);
       
       // Show error message with details
@@ -505,13 +558,6 @@ function AdminPanel({
           </button>
         </div>
       </div>
-
-      {pdfError && (
-        <div className="error-message">
-          <strong>Error:</strong> {pdfError}
-          <button onClick={() => setPdfError(null)} className="close-error">X</button>
-        </div>
-      )}
 
       <div className="search-section">
         <div className="search-bar">
