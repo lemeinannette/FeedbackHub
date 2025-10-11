@@ -229,20 +229,20 @@ function AdminPanel({
         return currentY;
       };
       
-      // Add a professional header with company name at top right
+      // Add a professional header with company name at top left
       doc.setFillColor(25, 55, 109);
       doc.rect(0, 0, pageWidth, 35, 'F');
       
-      // Add company name at top right
+      // Add company name at top left
       doc.setTextColor(255, 255, 255);
       doc.setFontSize(18);
       doc.setFont(undefined, 'bold');
-      doc.text("FeedbackHub", pageWidth - 20, 20, { align: 'right' });
+      doc.text("FeedbackHub", 20, 20);
       
       // Add tagline below company name
       doc.setFontSize(10);
       doc.setFont(undefined, 'normal');
-      doc.text("Customer Experience Management", pageWidth - 20, 28, { align: 'right' });
+      doc.text("Customer Experience Management", 20, 28);
       
       // Add report title centered
       doc.setFontSize(20);
