@@ -210,7 +210,6 @@ function AdminPanel({
     setIsGeneratingPDF(true);
 
     try {
-      // Create a new PDF document with landscape orientation for better table fit
       const doc = new jsPDF({
         orientation: 'landscape',
         unit: 'mm',
@@ -220,145 +219,117 @@ function AdminPanel({
       const pageWidth = doc.internal.pageSize.width;
       const pageHeight = doc.internal.pageSize.height;
       
-      // Helper function to add new page if needed
-      const checkPageBreak = (currentY, requiredSpace = 20) => {
-        if (currentY > pageHeight - requiredSpace) {
-          doc.addPage();
-          return 20; // Return new Y position at top of page
-        }
-        return currentY;
-      };
-      
-      // Add a professional header with company name at top left
+      // Professional header with gradient effect
       doc.setFillColor(25, 55, 109);
-      doc.rect(0, 0, pageWidth, 35, 'F');
+      doc.rect(0, 0, pageWidth, 40, 'F');
       
-      // Add company name at top left
-      doc.setTextColor(255, 255, 255);
-      doc.setFontSize(18);
-      doc.setFont(undefined, 'bold');
-      doc.text("FeedbackHub", 20, 20);
-      
-      // Add tagline below company name
-      doc.setFontSize(10);
-      doc.setFont(undefined, 'normal');
-      doc.text("Customer Experience Management", 20, 28);
-      
-      // Add report title centered
-      doc.setFontSize(20);
-      doc.setFont(undefined, 'bold');
-      doc.text("Feedback Analytics Report", pageWidth / 2, 20, { align: 'center' });
-      
-      // Add report date
-      doc.setFontSize(10);
-      doc.setFont(undefined, 'normal');
-      doc.text(`Generated: ${new Date().toLocaleDateString()}`, pageWidth / 2, 30, { align: 'center' });
-      
-      // Add report ID
-      const reportId = `FB-${new Date().getFullYear()}${String(new Date().getMonth() + 1).padStart(2, '0')}${String(new Date().getDate()).padStart(2, '0')}-${Math.floor(Math.random() * 1000)}`;
-      doc.setFontSize(9);
-      doc.text(`ID: ${reportId}`, pageWidth / 2, 35, { align: 'center' });
-      
-      let currentY = 50;
-      
-      // Report info with better formatting
-      doc.setTextColor(100, 100, 100);
-      doc.setFontSize(10);
-      doc.setFont(undefined, 'normal');
-      doc.text(`Generated: ${new Date().toLocaleString()}`, 14, currentY);
-      currentY += 7;
-      doc.text(`Filter: ${getTimeFilterLabel()}`, 14, currentY);
-      currentY += 7;
-      doc.text(`Showing: ${showArchived ? 'All Feedback' : 'Active Feedback Only'}`, 14, currentY);
-      currentY += 7;
-      if (searchTerm.trim()) {
-        doc.text(`Search: "${searchTerm}"`, 14, currentY);
-        currentY += 7;
+      // Add subtle gradient effect
+      for(let i = 0; i < 40; i++) {
+        const opacity = 1 - (i / 40) * 0.7;
+        doc.setFillColor(25, 55, 109, opacity);
+        doc.rect(0, i, pageWidth, 1, 'F');
       }
       
-      // Summary Statistics with improved styling
-      currentY = checkPageBreak(currentY, 50);
-      doc.setTextColor(0, 0, 0);
-      doc.setFontSize(16);
-      doc.setFont(undefined, 'bold');
-      doc.text("Summary Statistics", 14, currentY);
-      currentY += 10;
-      
-      // Add a subtle line under the section title
-      doc.setDrawColor(200, 200, 200);
-      doc.setLineWidth(0.5);
-      doc.line(14, currentY, pageWidth - 14, currentY);
-      currentY += 10;
-      
-      const boxWidth = 45;
-      const boxHeight = 30;
-      const boxSpacing = 12;
-      const startX = 14;
-      
-      // Total feedback box with rounded corners
-      doc.setFillColor(25, 55, 109);
-      doc.roundedRect(startX, currentY, boxWidth, boxHeight, 3, 3, 'F');
+      // Company branding
       doc.setTextColor(255, 255, 255);
-      doc.setFontSize(11);
+      doc.setFontSize(20);
+      doc.setFont(undefined, 'bold');
+      doc.text("FeedbackHub Analytics", 20, 20);
+      
+      // Report title
+      doc.setFontSize(16);
       doc.setFont(undefined, 'normal');
-      doc.text("Total Responses", startX + boxWidth/2, currentY + 12, { align: 'center' });
+      doc.text("Customer Experience Report", 20, 30);
+      
+      // Report metadata
+      doc.setFontSize(10);
+      doc.text(`Generated: ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}`, pageWidth - 20, 20, { align: 'right' });
+      doc.text(`Report ID: FB-${new Date().getFullYear()}${String(new Date().getMonth() + 1).padStart(2, '0')}${String(new Date().getDate()).padStart(2, '0')}-${Math.floor(Math.random() * 1000)}`, pageWidth - 20, 30, { align: 'right' });
+      
+      let currentY = 55;
+      
+      // Executive Summary section
+      doc.setTextColor(0, 0, 0);
       doc.setFontSize(18);
       doc.setFont(undefined, 'bold');
-      doc.text(filteredFeedbacks.length.toString(), startX + boxWidth/2, currentY + 22, { align: 'center' });
+      doc.text("Executive Summary", 14, currentY);
+      currentY += 10;
+      
+      // Add a professional line under the section title
+      doc.setDrawColor(25, 55, 109);
+      doc.setLineWidth(0.5);
+      doc.line(14, currentY, pageWidth - 14, currentY);
+      currentY += 15;
+      
+      // Summary statistics with enhanced styling
+      const statsBoxWidth = 50;
+      const statsBoxHeight = 35;
+      const statsBoxSpacing = 15;
+      const statsStartX = 14;
+      
+      // Total feedback box
+      doc.setFillColor(25, 55, 109);
+      doc.roundedRect(statsStartX, currentY, statsBoxWidth, statsBoxHeight, 3, 3, 'F');
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(10);
+      doc.setFont(undefined, 'normal');
+      doc.text("Total Responses", statsStartX + statsBoxWidth/2, currentY + 12, { align: 'center' });
+      doc.setFontSize(20);
+      doc.setFont(undefined, 'bold');
+      doc.text(filteredFeedbacks.length.toString(), statsStartX + statsBoxWidth/2, currentY + 25, { align: 'center' });
       
       // Recommendation rate box
       doc.setFillColor(76, 175, 80);
-      doc.roundedRect(startX + boxWidth + boxSpacing, currentY, boxWidth, boxHeight, 3, 3, 'F');
+      doc.roundedRect(statsStartX + statsBoxWidth + statsBoxSpacing, currentY, statsBoxWidth, statsBoxHeight, 3, 3, 'F');
       doc.setTextColor(255, 255, 255);
-      doc.setFontSize(11);
+      doc.setFontSize(10);
       doc.setFont(undefined, 'normal');
-      doc.text("Recommendation Rate", startX + boxWidth + boxSpacing + boxWidth/2, currentY + 12, { align: 'center' });
-      doc.setFontSize(18);
+      doc.text("Recommendation", statsStartX + statsBoxWidth + statsBoxSpacing + statsBoxWidth/2, currentY + 12, { align: 'center' });
+      doc.setFontSize(20);
       doc.setFont(undefined, 'bold');
-      doc.text(`${recommendRate}%`, startX + boxWidth + boxSpacing + boxWidth/2, currentY + 22, { align: 'center' });
+      doc.text(`${recommendRate}%`, statsStartX + statsBoxWidth + statsBoxSpacing + statsBoxWidth/2, currentY + 25, { align: 'center' });
       
       // Average rating box
       doc.setFillColor(255, 152, 0);
-      doc.roundedRect(startX + 2*(boxWidth + boxSpacing), currentY, boxWidth, boxHeight, 3, 3, 'F');
+      doc.roundedRect(statsStartX + 2*(statsBoxWidth + statsBoxSpacing), currentY, statsBoxWidth, statsBoxHeight, 3, 3, 'F');
       doc.setTextColor(255, 255, 255);
-      doc.setFontSize(11);
+      doc.setFontSize(10);
       doc.setFont(undefined, 'normal');
-      doc.text("Average Rating", startX + 2*(boxWidth + boxSpacing) + boxWidth/2, currentY + 12, { align: 'center' });
-      doc.setFontSize(18);
+      doc.text("Average Rating", statsStartX + 2*(statsBoxWidth + statsBoxSpacing) + statsBoxWidth/2, currentY + 12, { align: 'center' });
+      doc.setFontSize(20);
       doc.setFont(undefined, 'bold');
-      doc.text(averages.overall, startX + 2*(boxWidth + boxSpacing) + boxWidth/2, currentY + 22, { align: 'center' });
+      doc.text(averages.overall, statsStartX + 2*(statsBoxWidth + statsBoxSpacing) + statsBoxWidth/2, currentY + 25, { align: 'center' });
       
       // Report Period box
       doc.setFillColor(103, 58, 183);
-      doc.roundedRect(startX + 3*(boxWidth + boxSpacing), currentY, boxWidth, boxHeight, 3, 3, 'F');
+      doc.roundedRect(statsStartX + 3*(statsBoxWidth + statsBoxSpacing), currentY, statsBoxWidth, statsBoxHeight, 3, 3, 'F');
       doc.setTextColor(255, 255, 255);
-      doc.setFontSize(11);
-      doc.setFont(undefined, 'normal');
-      doc.text("Report Period", startX + 3*(boxWidth + boxSpacing) + boxWidth/2, currentY + 12, { align: 'center' });
       doc.setFontSize(10);
+      doc.setFont(undefined, 'normal');
+      doc.text("Report Period", statsStartX + 3*(statsBoxWidth + statsBoxSpacing) + statsBoxWidth/2, currentY + 12, { align: 'center' });
+      doc.setFontSize(9);
       doc.setFont(undefined, 'bold');
       const periodText = getTimeFilterLabel().length > 12 ? 
         getTimeFilterLabel().substring(0, 12) + "..." : 
         getTimeFilterLabel();
-      doc.text(periodText, startX + 3*(boxWidth + boxSpacing) + boxWidth/2, currentY + 22, { align: 'center' });
+      doc.text(periodText, statsStartX + 3*(statsBoxWidth + statsBoxSpacing) + statsBoxWidth/2, currentY + 25, { align: 'center' });
       
-      currentY += boxHeight + 20;
+      currentY += statsBoxHeight + 25;
       
-      // Add ratings details with improved styling
-      currentY = checkPageBreak(currentY, 30);
+      // Category Ratings section
       doc.setTextColor(0, 0, 0);
-      doc.setFontSize(16);
+      doc.setFontSize(18);
       doc.setFont(undefined, 'bold');
-      doc.text("Average Ratings by Category", 14, currentY);
+      doc.text("Category Ratings", 14, currentY);
       currentY += 10;
       
-      // Add a subtle line under the section title
-      doc.setDrawColor(200, 200, 200);
+      // Add a professional line under the section title
+      doc.setDrawColor(25, 55, 109);
       doc.setLineWidth(0.5);
       doc.line(14, currentY, pageWidth - 14, currentY);
-      currentY += 10;
+      currentY += 15;
       
-      // Create a simple bar chart for ratings
+      // Enhanced bar chart for ratings
       const categories = [
         { name: 'Food', value: parseFloat(averages.food), color: [76, 175, 80] },
         { name: 'Ambience', value: parseFloat(averages.ambience), color: [33, 150, 243] },
@@ -370,12 +341,12 @@ function AdminPanel({
       const chartX = 14;
       const chartY = currentY;
       const chartWidth = pageWidth - 28;
-      const chartHeight = 60;
-      const barWidth = 30;
+      const chartHeight = 70;
+      const barWidth = 35;
       const barSpacing = (chartWidth - (barWidth * categories.length)) / (categories.length + 1);
       const maxRating = 5;
       
-      // Draw chart background
+      // Draw chart background with subtle gradient
       doc.setFillColor(245, 245, 245);
       doc.rect(chartX, chartY, chartWidth, chartHeight, 'F');
       
@@ -397,26 +368,29 @@ function AdminPanel({
       doc.line(chartX, chartY, chartX, chartY + chartHeight);
       doc.line(chartX, chartY + chartHeight, chartX + chartWidth, chartY + chartHeight);
       
-      // Draw bars
+      // Draw bars with gradient effect
       categories.forEach((category, index) => {
         const barX = chartX + barSpacing + (index * (barWidth + barSpacing));
         const barHeight = (category.value / maxRating) * chartHeight;
         const barY = chartY + chartHeight - barHeight;
         
-        // Draw bar
-        doc.setFillColor(...category.color);
-        doc.rect(barX, barY, barWidth, barHeight, 'F');
+        // Draw bar with gradient effect
+        for(let i = 0; i < barHeight; i++) {
+          const opacity = 1 - (i / barHeight) * 0.3;
+          doc.setFillColor(...category.color, opacity);
+          doc.rect(barX, barY + i, barWidth, 1, 'F');
+        }
         
         // Draw value on top of bar
         doc.setTextColor(0, 0, 0);
-        doc.setFontSize(10);
+        doc.setFontSize(11);
         doc.setFont(undefined, 'bold');
         doc.text(category.value.toString(), barX + barWidth/2, barY - 5, { align: 'center' });
         
         // Draw category name below bar
-        doc.setFontSize(9);
+        doc.setFontSize(10);
         doc.setFont(undefined, 'normal');
-        doc.text(category.name, barX + barWidth/2, chartY + chartHeight + 5, { align: 'center' });
+        doc.text(category.name, barX + barWidth/2, chartY + chartHeight + 8, { align: 'center' });
         
         // Draw trend indicator if available
         const trend = trends[category.name.toLowerCase()];
@@ -426,41 +400,40 @@ function AdminPanel({
           } else {
             doc.setTextColor(244, 67, 54);
           }
-          doc.setFontSize(8);
-          doc.text(`${trend.isPositive ? '↑' : '↓'} ${trend.value}%`, barX + barWidth/2, chartY + chartHeight + 12, { align: 'center' });
+          doc.setFontSize(9);
+          doc.text(`${trend.isPositive ? '↑' : '↓'} ${trend.value}%`, barX + barWidth/2, chartY + chartHeight + 18, { align: 'center' });
         }
       });
       
       // Draw Y-axis labels
       doc.setTextColor(100, 100, 100);
-      doc.setFontSize(8);
+      doc.setFontSize(9);
       doc.setFont(undefined, 'normal');
       for (let i = 0; i <= 5; i++) {
         const y = chartY + chartHeight - (i * chartHeight / 5);
         doc.text(i.toString(), chartX - 5, y, { align: 'right' });
       }
       
-      // Draw Y-axis title (using text instead of translate)
+      // Draw Y-axis title
       doc.setTextColor(100, 100, 100);
-      doc.setFontSize(8);
+      doc.setFontSize(9);
       doc.setFont(undefined, 'normal');
       doc.text("Rating", chartX - 15, chartY + chartHeight/2, { align: 'center' });
       
-      currentY += chartHeight + 25;
+      currentY += chartHeight + 30;
       
-      // Add feedback data table
-      currentY = checkPageBreak(currentY, 30);
+      // Feedback Details section
       doc.setTextColor(0, 0, 0);
-      doc.setFontSize(16);
+      doc.setFontSize(18);
       doc.setFont(undefined, 'bold');
       doc.text("Feedback Details", 14, currentY);
       currentY += 10;
       
-      // Add a subtle line under the section title
-      doc.setDrawColor(200, 200, 200);
+      // Add a professional line under the section title
+      doc.setDrawColor(25, 55, 109);
       doc.setLineWidth(0.5);
       doc.line(14, currentY, pageWidth - 14, currentY);
-      currentY += 10;
+      currentY += 15;
       
       // Define table columns with proper widths for landscape
       const tableColumns = [
@@ -636,7 +609,10 @@ function AdminPanel({
   return (
     <div className={`admin-container ${adminDarkMode ? 'dark-mode' : ''}`}>
       <div className="header">
-        <h1>Admin Dashboard</h1>
+        <div className="header-left">
+          <h1>Feedback Analytics Dashboard</h1>
+          <p className="header-subtitle">Customer Experience Management System</p>
+        </div>
         <div className="header-buttons">
           <button
             className={`theme-toggle-button ${adminDarkMode ? 'active' : ''}`}
@@ -648,6 +624,7 @@ function AdminPanel({
             <i className={`bx ${adminDarkMode ? 'bx-sun' : 'bx-moon'} theme-icon`}></i>
           </button>
           <button onClick={handleLogout} className="button logout-btn">
+            <i className="bx bx-log-out"></i>
             Logout
           </button>
           <button 
@@ -661,13 +638,17 @@ function AdminPanel({
                 Generating PDF...
               </>
             ) : (
-              'Export PDF'
+              <>
+                <i className="bx bx-file-pdf"></i>
+                Export PDF
+              </>
             )}
           </button>
           <button
             onClick={() => setShowArchived(!showArchived)}
             className="button archive-toggle"
           >
+            <i className={`bx ${showArchived ? 'bx-archive-out' : 'bx-archive-in'}`}></i>
             {showArchived ? "Hide Archived" : "Show Archived"}
           </button>
         </div>
@@ -676,6 +657,7 @@ function AdminPanel({
       <div className="search-section">
         <div className="search-bar">
           <div className="search-input-wrapper">
+            <i className="bx bx-search search-icon"></i>
             <input 
               type="text" 
               placeholder="Search feedback by name, email, event, or comments..."
@@ -691,7 +673,7 @@ function AdminPanel({
                 onClick={() => setSearchTerm('')}
                 title="Clear search"
               >
-                Clear
+                <i className="bx bx-x"></i>
               </button>
             )}
           </div>
@@ -700,8 +682,9 @@ function AdminPanel({
               className="time-filter-button"
               onClick={() => setShowDatePicker(!showDatePicker)}
             >
+              <i className="bx bx-calendar"></i>
               <span>{getTimeFilterLabel()}</span>
-              {showDatePicker ? '▲' : '▼'}
+              <i className={`bx bx-chevron-${showDatePicker ? 'up' : 'down'}`}></i>
             </button>
             {showDatePicker && (
               <div className="date-picker-dropdown">
@@ -709,24 +692,28 @@ function AdminPanel({
                   className={timeFilter === 'all' ? 'active' : ''} 
                   onClick={() => { setTimeFilter('all'); setShowDatePicker(false); }}
                 >
+                  <i className="bx bx-time-five"></i>
                   All Time
                 </button>
                 <button 
                   className={timeFilter === '7days' ? 'active' : ''} 
                   onClick={() => { setTimeFilter('7days'); setShowDatePicker(false); }}
                 >
+                  <i className="bx bx-calendar-week"></i>
                   Last 7 Days
                 </button>
                 <button 
                   className={timeFilter === '30days' ? 'active' : ''} 
                   onClick={() => { setTimeFilter('30days'); setShowDatePicker(false); }}
                 >
+                  <i className="bx bx-calendar-month"></i>
                   Last 30 Days
                 </button>
                 <button 
                   className={timeFilter === 'custom' ? 'active' : ''} 
                   onClick={() => setTimeFilter('custom')}
                 >
+                  <i className="bx bx-calendar-edit"></i>
                   Custom Range
                 </button>
                 {timeFilter === 'custom' && (
@@ -750,14 +737,80 @@ function AdminPanel({
         </div>
         {searchTerm && (
           <div className="search-results-info">
+            <i className="bx bx-info-circle"></i>
             Found {filteredFeedbacks.length} result{filteredFeedbacks.length !== 1 ? 's' : ''} for "{searchTerm}"
           </div>
         )}
       </div>
 
+      <div className="metrics-section">
+        <div className="metric-card">
+          <div className="metric-icon">
+            <i className="bx bx-message-square-detail"></i>
+          </div>
+          <div className="metric-content">
+            <h3>Total Feedback</h3>
+            <p className="metric-value">{filteredFeedbacks.length}</p>
+            <div className="metric-change positive">
+              <i className="bx bx-up-arrow-alt"></i>
+              <span>12% from last period</span>
+            </div>
+          </div>
+        </div>
+        <div className="metric-card">
+          <div className="metric-icon">
+            <i className="bx bx-like"></i>
+          </div>
+          <div className="metric-content">
+            <h3>Recommendation Rate</h3>
+            <p className="metric-value">{recommendRate}%</p>
+            <div className="metric-change positive">
+              <i className="bx bx-up-arrow-alt"></i>
+              <span>5% from last period</span>
+            </div>
+          </div>
+        </div>
+        <div className="metric-card">
+          <div className="metric-icon">
+            <i className="bx bx-star"></i>
+          </div>
+          <div className="metric-content">
+            <h3>Average Rating</h3>
+            <p className="metric-value">{averages.overall}</p>
+            <div className="metric-change negative">
+              <i className="bx bx-down-arrow-alt"></i>
+              <span>2% from last period</span>
+            </div>
+          </div>
+        </div>
+        <div className="metric-card">
+          <div className="metric-icon">
+            <i className="bx bx-calendar-check"></i>
+          </div>
+          <div className="metric-content">
+            <h3>Report Period</h3>
+            <p className="metric-value">{getTimeFilterLabel()}</p>
+            <div className="metric-change neutral">
+              <i className="bx bx-minus"></i>
+              <span>Current selection</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div className="charts-section">
         <div className="chart-container">
-          <h2>Recommendation Rate</h2>
+          <div className="chart-header">
+            <h2>Recommendation Rate</h2>
+            <div className="chart-actions">
+              <button className="chart-action-btn">
+                <i className="bx bx-download"></i>
+              </button>
+              <button className="chart-action-btn">
+                <i className="bx bx-expand"></i>
+              </button>
+            </div>
+          </div>
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie
@@ -779,7 +832,17 @@ function AdminPanel({
           </ResponsiveContainer>
         </div>
         <div className="chart-container">
-          <h2>Rating Comparison</h2>
+          <div className="chart-header">
+            <h2>Rating Comparison</h2>
+            <div className="chart-actions">
+              <button className="chart-action-btn">
+                <i className="bx bx-download"></i>
+              </button>
+              <button className="chart-action-btn">
+                <i className="bx bx-expand"></i>
+              </button>
+            </div>
+          </div>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={ratingsData}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -787,7 +850,7 @@ function AdminPanel({
               <YAxis domain={[0, 5]} />
               <Tooltip />
               <Legend />
-              <Bar dataKey="rating" fill="#8884d8" />
+              <Bar dataKey="rating" fill="#19376D" />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -795,64 +858,109 @@ function AdminPanel({
 
       <div className="top-section">
         <div className="card summary">
-          <h2>Summary</h2>
-          <p><strong>Total Feedback:</strong> {filteredFeedbacks.length}</p>
-          <p><strong>Recommend (Yes):</strong> {recommendCount}</p>
-          <p><strong>Recommendation Rate:</strong> {recommendRate}%</p>
+          <div className="card-header">
+            <h2>Summary</h2>
+            <i className="bx bx-dots-horizontal-rounded card-menu"></i>
+          </div>
+          <div className="card-content">
+            <div className="summary-item">
+              <span className="summary-label">Total Feedback:</span>
+              <span className="summary-value">{filteredFeedbacks.length}</span>
+            </div>
+            <div className="summary-item">
+              <span className="summary-label">Recommend (Yes):</span>
+              <span className="summary-value">{recommendCount}</span>
+            </div>
+            <div className="summary-item">
+              <span className="summary-label">Recommendation Rate:</span>
+              <span className="summary-value">{recommendRate}%</span>
+            </div>
+          </div>
         </div>
         <div className="card averages">
-          <h2>Average Ratings</h2>
-          <p>
-            Food: {averages.food} 
-            {trends.food && (
-              <span className={`trend ${trends.food.isPositive ? 'positive' : 'negative'}`}>
-                {trends.food.isPositive ? '↑' : '↓'} {trends.food.value}%
-              </span>
-            )}
-          </p>
-          <p>
-            Ambience: {averages.ambience}
-            {trends.ambience && (
-              <span className={`trend ${trends.ambience.isPositive ? 'positive' : 'negative'}`}>
-                {trends.ambience.isPositive ? '↑' : '↓'} {trends.ambience.value}%
-              </span>
-            )}
-          </p>
-          <p>
-            Service: {averages.service}
-            {trends.service && (
-              <span className={`trend ${trends.service.isPositive ? 'positive' : 'negative'}`}>
-                {trends.service.isPositive ? '↑' : '↓'} {trends.service.value}%
-              </span>
-            )}
-          </p>
-          <p>
-            Overall: {averages.overall}
-            {trends.overall && (
-              <span className={`trend ${trends.overall.isPositive ? 'positive' : 'negative'}`}>
-                {trends.overall.isPositive ? '↑' : '↓'} {trends.overall.value}%
-              </span>
-            )}
-          </p>
+          <div className="card-header">
+            <h2>Average Ratings</h2>
+            <i className="bx bx-dots-horizontal-rounded card-menu"></i>
+          </div>
+          <div className="card-content">
+            <div className="ratings-visualization">
+              {[
+                { name: 'Food', value: averages.food, icon: 'bx-restaurant', color: '#4CAF50' },
+                { name: 'Ambience', value: averages.ambience, icon: 'bx-palette', color: '#2196F3' },
+                { name: 'Service', value: averages.service, icon: 'bx-user-voice', color: '#FF9800' },
+                { name: 'Overall', value: averages.overall, icon: 'bx-star', color: '#9C27B0' }
+              ].map((category, index) => (
+                <div key={index} className="rating-category">
+                  <div className="rating-header">
+                    <div className="rating-info">
+                      <i className={`bx ${category.icon} rating-icon`}></i>
+                      <span className="rating-name">{category.name}</span>
+                    </div>
+                    <div className="rating-score">
+                      <span className="score-value">{category.value}</span>
+                      <div className="score-stars">
+                        {[...Array(5)].map((_, i) => (
+                          <i key={i} className={`bx ${i < Math.floor(category.value) ? 'bxs-star' : 'bx-star'}`}></i>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="rating-progress">
+                    <div 
+                      className="progress-fill" 
+                      style={{ 
+                        width: `${(category.value / 5) * 100}%`,
+                        backgroundColor: category.color
+                      }}
+                    ></div>
+                  </div>
+                  {trends[category.name.toLowerCase()] && (
+                    <div className={`rating-trend ${trends[category.name.toLowerCase()].isPositive ? 'positive' : 'negative'}`}>
+                      <i className={`bx ${trends[category.name.toLowerCase()].isPositive ? 'bx-trending-up' : 'bx-trending-down'}`}></i>
+                      <span>{trends[category.name.toLowerCase()].value}% from last period</span>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
         <div className="card activity">
-          <h2>Recent Activity</h2>
-          {filteredFeedbacks.slice(-3).reverse().map((f, i) => (
-            <div key={i} className="activity-item">
-              <div className="activity-header">
-                <strong>{f.name}</strong>
-                <span className="activity-meta">{new Date(f.date).toLocaleTimeString()}</span>
+          <div className="card-header">
+            <h2>Recent Activity</h2>
+            <i className="bx bx-dots-horizontal-rounded card-menu"></i>
+          </div>
+          <div className="card-content">
+            {filteredFeedbacks.slice(-3).reverse().map((f, i) => (
+              <div key={i} className="activity-item">
+                <div className="activity-header">
+                  <strong>{f.name}</strong>
+                  <span className="activity-meta">{new Date(f.date).toLocaleTimeString()}</span>
+                </div>
+                <p>left a {f.overall}-star review</p>
+                {f.comments && (
+                  <p className="activity-comment">"{f.comments}"</p>
+                )}
               </div>
-              <p>left a {f.overall}-star review</p>
-              {f.comments && (
-                <p className="activity-comment">"{f.comments}"</p>
-              )}
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
 
       <div className="table-container">
+        <div className="table-header">
+          <h2>Feedback Details</h2>
+          <div className="table-actions">
+            <button className="table-action-btn">
+              <i className="bx bx-filter"></i>
+              Filter
+            </button>
+            <button className="table-action-btn">
+              <i className="bx bx-sort"></i>
+              Sort
+            </button>
+          </div>
+        </div>
         <table className="table">
           <thead>
             <tr>
@@ -861,7 +969,10 @@ function AdminPanel({
                 "Food", "Ambience", "Service", "Overall",
                 "Recommend", "Comments", "Actions"
               ].map((h) => (
-                <th key={h}>{h}</th>
+                <th key={h}>
+                  {h}
+                  <i className="bx bx-chevron-down"></i>
+                </th>
               ))}
             </tr>
           </thead>
@@ -869,6 +980,7 @@ function AdminPanel({
             {currentItems.length === 0 ? (
               <tr>
                 <td colSpan="12" className="empty">
+                  <i className="bx bx-inbox"></i>
                   {searchTerm.trim() ? "No feedback found matching your search criteria." : "No feedback available"}
                 </td>
               </tr>
@@ -880,11 +992,59 @@ function AdminPanel({
                   <td>{f.email || "N/A"}</td>
                   <td>{f.contact || "N/A"}</td>
                   <td>{f.event}</td>
-                  <td>{f.food || "N/A"}</td>
-                  <td>{f.ambience || "N/A"}</td>
-                  <td>{f.service || "N/A"}</td>
-                  <td>{f.overall || "N/A"}</td>
-                  <td>{f.recommend || "No"}</td>
+                  <td>
+                    <div className="rating-cell">
+                      <span>{f.food || "N/A"}</span>
+                      {f.food && (
+                        <div className="rating-stars">
+                          {[...Array(5)].map((_, i) => (
+                            <i key={i} className={`bx ${i < Math.floor(f.food) ? 'bxs-star' : 'bx-star'}`}></i>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </td>
+                  <td>
+                    <div className="rating-cell">
+                      <span>{f.ambience || "N/A"}</span>
+                      {f.ambience && (
+                        <div className="rating-stars">
+                          {[...Array(5)].map((_, i) => (
+                            <i key={i} className={`bx ${i < Math.floor(f.ambience) ? 'bxs-star' : 'bx-star'}`}></i>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </td>
+                  <td>
+                    <div className="rating-cell">
+                      <span>{f.service || "N/A"}</span>
+                      {f.service && (
+                        <div className="rating-stars">
+                          {[...Array(5)].map((_, i) => (
+                            <i key={i} className={`bx ${i < Math.floor(f.service) ? 'bxs-star' : 'bx-star'}`}></i>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </td>
+                  <td>
+                    <div className="rating-cell">
+                      <span>{f.overall || "N/A"}</span>
+                      {f.overall && (
+                        <div className="rating-stars">
+                          {[...Array(5)].map((_, i) => (
+                            <i key={i} className={`bx ${i < Math.floor(f.overall) ? 'bxs-star' : 'bx-star'}`}></i>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </td>
+                  <td>
+                    <span className={`recommend-badge ${f.recommend === 'Yes' ? 'yes' : 'no'}`}>
+                      {f.recommend || "No"}
+                    </span>
+                  </td>
                   <td>{f.comments || "No comments"}</td>
                   <td>
                     <div className="action-buttons">
@@ -916,15 +1076,24 @@ function AdminPanel({
           <button 
             onClick={() => paginate(currentPage - 1)} 
             disabled={currentPage === 1}
+            className="pagination-btn"
           >
+            <i className="bx bx-chevron-left"></i>
             Previous
           </button>
-          <span>Page {currentPage} of {totalPages}</span>
+          <div className="pagination-info">
+            <span>Page {currentPage} of {totalPages}</span>
+            <span className="pagination-count">
+              ({indexOfFirstItem + 1}-{Math.min(indexOfLastItem, filteredFeedbacks.length)} of {filteredFeedbacks.length})
+            </span>
+          </div>
           <button 
             onClick={() => paginate(currentPage + 1)} 
             disabled={currentPage === totalPages}
+            className="pagination-btn"
           >
             Next
+            <i className="bx bx-chevron-right"></i>
           </button>
         </div>
       )}
