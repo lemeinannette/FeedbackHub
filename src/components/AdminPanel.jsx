@@ -229,33 +229,20 @@ function AdminPanel({
         return currentY;
       };
       
-      // Add a professional header with improved logo
+      // Add a professional header with company name at top right
       doc.setFillColor(25, 55, 109);
-      doc.rect(0, 0, pageWidth, 40, 'F');
+      doc.rect(0, 0, pageWidth, 35, 'F');
       
-      // Create a more professional logo with shapes
-      // Logo container
-      doc.setFillColor(255, 255, 255);
-      doc.roundedRect(15, 10, 25, 20, 3, 3, 'F');
-      
-      // Logo icon - more sophisticated design
-      doc.setFillColor(25, 55, 109);
-      // Main circle
-      doc.circle(22.5, 20, 6, 'F');
-      // Inner circle
-      doc.setFillColor(255, 255, 255);
-      doc.circle(22.5, 20, 3, 'F');
-      
-      // Add company name with better typography
+      // Add company name at top right
       doc.setTextColor(255, 255, 255);
       doc.setFontSize(18);
       doc.setFont(undefined, 'bold');
-      doc.text("FeedbackHub", 48, 20);
+      doc.text("FeedbackHub", pageWidth - 20, 20, { align: 'right' });
       
-      // Add tagline
+      // Add tagline below company name
       doc.setFontSize(10);
       doc.setFont(undefined, 'normal');
-      doc.text("Customer Experience Management", 48, 28);
+      doc.text("Customer Experience Management", pageWidth - 20, 28, { align: 'right' });
       
       // Add report title centered
       doc.setFontSize(20);
@@ -272,7 +259,7 @@ function AdminPanel({
       doc.setFontSize(9);
       doc.text(`ID: ${reportId}`, pageWidth / 2, 35, { align: 'center' });
       
-      let currentY = 55;
+      let currentY = 50;
       
       // Report info with better formatting
       doc.setTextColor(100, 100, 100);
@@ -540,15 +527,11 @@ function AdminPanel({
           doc.text(`© ${new Date().getFullYear()} FeedbackHub - Customer Experience Management System | Confidential Report`, pageWidth / 2, pageHeight - 10, { align: 'center' });
           doc.text(`Page ${data.pageNumber} of ${pageCount}`, pageWidth - 30, pageHeight - 10, { align: 'center' });
           
-          // Add improved logo to footer
-          doc.setFillColor(25, 55, 109);
-          doc.circle(20, pageHeight - 10, 3, 'F');
-          doc.setFillColor(255, 255, 255);
-          doc.circle(20, pageHeight - 10, 1.5, 'F');
+          // Add company name to footer
           doc.setTextColor(25, 55, 109);
           doc.setFontSize(8);
           doc.setFont(undefined, 'bold');
-          doc.text("FeedbackHub", 26, pageHeight - 10);
+          doc.text("FeedbackHub", 20, pageHeight - 10);
         }
       });
       
