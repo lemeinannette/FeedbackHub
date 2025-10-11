@@ -347,7 +347,7 @@ function AdminPanel({
       // Add ratings details with improved styling
       currentY = checkPageBreak(currentY, 30);
       doc.setTextColor(0, 0, 0);
-      doc.setFontSize(14);
+      doc.setFontSize(16);
       doc.setFont(undefined, 'bold');
       doc.text("Average Ratings by Category", 14, currentY);
       currentY += 10;
@@ -358,39 +358,67 @@ function AdminPanel({
       doc.line(14, currentY, pageWidth - 14, currentY);
       currentY += 10;
       
-      // Create visual rating bars
+      // Create a simple bar chart for ratings
       const categories = [
-        { name: 'Food', value: averages.food, color: [76, 175, 80] },
-        { name: 'Ambience', value: averages.ambience, color: [33, 150, 243] },
-        { name: 'Service', value: averages.service, color: [255, 152, 0] },
-        { name: 'Overall', value: averages.overall, color: [156, 39, 176] }
+        { name: 'Food', value: parseFloat(averages.food), color: [76, 175, 80] },
+        { name: 'Ambience', value: parseFloat(averages.ambience), color: [33, 150, 243] },
+        { name: 'Service', value: parseFloat(averages.service), color: [255, 152, 0] },
+        { name: 'Overall', value: parseFloat(averages.overall), color: [156, 39, 176] }
       ];
       
+      // Chart dimensions
+      const chartX = 14;
+      const chartY = currentY;
+      const chartWidth = pageWidth - 28;
+      const chartHeight = 60;
+      const barWidth = 30;
+      const barSpacing = (chartWidth - (barWidth * categories.length)) / (categories.length + 1);
+      const maxRating = 5;
+      
+      // Draw chart background
+      doc.setFillColor(245, 245, 245);
+      doc.rect(chartX, chartY, chartWidth, chartHeight, 'F');
+      
+      // Draw chart border
+      doc.setDrawColor(200, 200, 200);
+      doc.rect(chartX, chartY, chartWidth, chartHeight);
+      
+      // Draw grid lines
+      doc.setDrawColor(220, 220, 220);
+      doc.setLineWidth(0.5);
+      for (let i = 1; i <= 5; i++) {
+        const y = chartY + chartHeight - (i * chartHeight / 5);
+        doc.line(chartX, y, chartX + chartWidth, y);
+      }
+      
+      // Draw axes
+      doc.setDrawColor(100, 100, 100);
+      doc.setLineWidth(1);
+      doc.line(chartX, chartY, chartX, chartY + chartHeight);
+      doc.line(chartX, chartY + chartHeight, chartX + chartWidth, chartY + chartHeight);
+      
+      // Draw bars
       categories.forEach((category, index) => {
-        const y = currentY + (index * 15);
+        const barX = chartX + barSpacing + (index * (barWidth + barSpacing));
+        const barHeight = (category.value / maxRating) * chartHeight;
+        const barY = chartY + chartHeight - barHeight;
         
-        // Category name
-        doc.setTextColor(0, 0, 0);
-        doc.setFontSize(11);
-        doc.setFont(undefined, 'normal');
-        doc.text(category.name, 14, y);
-        
-        // Rating bar background
-        doc.setFillColor(230, 230, 230);
-        doc.rect(70, y - 5, 60, 8, 'F');
-        
-        // Rating bar fill
+        // Draw bar
         doc.setFillColor(...category.color);
-        const fillWidth = (parseFloat(category.value) / 5) * 60;
-        doc.rect(70, y - 5, fillWidth, 8, 'F');
+        doc.rect(barX, barY, barWidth, barHeight, 'F');
         
-        // Rating value
+        // Draw value on top of bar
         doc.setTextColor(0, 0, 0);
-        doc.setFontSize(11);
+        doc.setFontSize(10);
         doc.setFont(undefined, 'bold');
-        doc.text(`${category.value}/5.0`, 135, y);
+        doc.text(category.value.toString(), barX + barWidth/2, barY - 5, { align: 'center' });
         
-        // Trend indicator if available
+        // Draw category name below bar
+        doc.setFontSize(9);
+        doc.setFont(undefined, 'normal');
+        doc.text(category.name, barX + barWidth/2, chartY + chartHeight + 5, { align: 'center' });
+        
+        // Draw trend indicator if available
         const trend = trends[category.name.toLowerCase()];
         if (trend) {
           if (trend.isPositive) {
@@ -398,17 +426,33 @@ function AdminPanel({
           } else {
             doc.setTextColor(244, 67, 54);
           }
-          doc.setFontSize(9);
-          doc.text(`${trend.isPositive ? '↑' : '↓'} ${trend.value}%`, 155, y);
+          doc.setFontSize(8);
+          doc.text(`${trend.isPositive ? '↑' : '↓'} ${trend.value}%`, barX + barWidth/2, chartY + chartHeight + 12, { align: 'center' });
         }
       });
       
-      currentY += categories.length * 15 + 15;
+      // Draw Y-axis labels
+      doc.setTextColor(100, 100, 100);
+      doc.setFontSize(8);
+      doc.setFont(undefined, 'normal');
+      for (let i = 0; i <= 5; i++) {
+        const y = chartY + chartHeight - (i * chartHeight / 5);
+        doc.text(i.toString(), chartX - 5, y, { align: 'right' });
+      }
+      
+      // Draw Y-axis title
+      doc.save();
+      doc.translate(chartX - 15, chartY + chartHeight/2);
+      doc.rotate(-90);
+      doc.text("Rating", 0, 0, { align: 'center' });
+      doc.restore();
+      
+      currentY += chartHeight + 25;
       
       // Add feedback data table
       currentY = checkPageBreak(currentY, 30);
       doc.setTextColor(0, 0, 0);
-      doc.setFontSize(14);
+      doc.setFontSize(16);
       doc.setFont(undefined, 'bold');
       doc.text("Feedback Details", 14, currentY);
       currentY += 10;
