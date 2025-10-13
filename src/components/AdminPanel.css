@@ -1,34 +1,60 @@
 /* 
-  Minimal Professional Design System
+  Design System matching the login page with light blue background and teal buttons
+  Updated with consistent purple color scheme for charts and buttons
 */
 
 :root {
-  /* Neutral monochromatic palette */
-  --gray-50: #f9fafb;
-  --gray-100: #f3f4f6;
-  --gray-200: #e5e7eb;
-  --gray-300: #d1d5db;
-  --gray-400: #9ca3af;
-  --gray-500: #6b7280;
-  --gray-600: #4b5563;
-  --gray-700: #374151;
-  --gray-800: #1f2937;
-  --gray-900: #111827;
+  /* Light blue background to match AdminLogin */
+  --bg-primary: #e6f7ff;
+  --bg-secondary: #ffffff;
+  --text-primary: #333333;
+  --text-secondary: #666666;
+  --text-muted: #8a8a8a;
+  --border: #e5e7eb;
+  --border-light: #f3f4f6;
   
-  /* Semantic colors - minimal usage */
+  /* Teal accent colors matching the login button */
+  --teal-50: #f0fdfa;
+  --teal-100: #ccfbf1;
+  --teal-200: #99f6e4;
+  --teal-300: #5eead4;
+  --teal-400: #2dd4bf;
+  --teal-500: #14b8a6;
+  --teal-600: #0d9488;
+  --teal-700: #0f766e;
+  --teal-800: #115e59;
+  --teal-900: #134e4a;
+  
+  /* Purple colors for charts and buttons - matching the screenshot */
+  --purple-50: #f5f3ff;
+  --purple-100: #ede9fe;
+  --purple-200: #ddd6fe;
+  --purple-300: #c4b5fd;
+  --purple-400: #a78bfa;
+  --purple-500: #8b5cf6;
+  --purple-600: #7c3aed;
+  --purple-700: #6d28d9;
+  --purple-800: #5b21b6;
+  --purple-900: #4c1d95;
+  
+  /* Semantic colors */
   --success: #059669;
   --warning: #d97706;
   --danger: #dc2626;
   --info: #0891b2;
+  --primary: #14b8a6;
+  --primary-dark: #0d9488;
   
-  /* Design tokens */
-  --bg-primary: var(--gray-50);
-  --bg-secondary: #ffffff;
-  --text-primary: var(--gray-900);
-  --text-secondary: var(--gray-600);
-  --text-muted: var(--gray-400);
-  --border: var(--gray-200);
-  --border-light: var(--gray-100);
+  /* Chart colors - using the same shade for all bars as Food and Ambience in the screenshot */
+  --chart-primary: #8b5cf6;      /* Exact shade matching Food and Ambience bars */
+  --chart-secondary: #8b5cf6;    /* Same shade for consistency */
+  --chart-tertiary: #8b5cf6;     /* Same shade for consistency */
+  --chart-quaternary: #8b5cf6;   /* Same shade for consistency */
+  
+  /* Button colors - using the same purple as charts */
+  --button-primary: #8b5cf6;     /* Same purple as charts */
+  --button-primary-hover: #7c3aed; /* Darker purple on hover */
+  --button-primary-active: #6d28d9; /* Even darker when active */
   
   /* Shadows - minimal */
   --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
@@ -53,9 +79,9 @@
   min-height: 100vh;
   background: var(--bg-primary);
   padding: 24px;
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   color: var(--text-primary);
-  line-height: 1.5;
+  line-height: 1.6;
 }
 
 /* Notification System */
@@ -73,9 +99,9 @@
 }
 
 .notification-success {
-  background: #f0fdf4;
-  color: #065f46;
-  border-color: #bbf7d0;
+  background: var(--teal-50);
+  color: var(--teal-900);
+  border-color: var(--teal-200);
 }
 
 .notification-error {
@@ -247,7 +273,7 @@
   align-items: center;
 }
 
-/* Buttons */
+/* Buttons - updated with purple color scheme */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -266,46 +292,46 @@
 }
 
 .btn:hover {
-  background: var(--gray-50);
-  border-color: var(--gray-300);
+  background: var(--teal-50);
+  border-color: var(--teal-300);
 }
 
 .btn:focus {
   outline: none;
-  box-shadow: 0 0 0 2px rgba(55, 65, 81, 0.1);
+  box-shadow: 0 0 0 2px rgba(20, 184, 166, 0.1);
 }
 
-.btn-primary {
-  background: var(--gray-700);
+.btn-logout {
+  background: var(--button-primary);
   color: white;
-  border-color: var(--gray-700);
+  border-color: var(--button-primary);
 }
 
-.btn-primary:hover {
-  background: var(--gray-800);
-  border-color: var(--gray-800);
+.btn-logout:hover {
+  background: var(--button-primary-hover);
+  border-color: var(--button-primary-hover);
 }
 
-.btn-secondary {
-  background: var(--gray-500);
+.btn-export {
+  background: var(--button-primary);
   color: white;
-  border-color: var(--gray-500);
+  border-color: var(--button-primary);
 }
 
-.btn-secondary:hover {
-  background: var(--gray-600);
-  border-color: var(--gray-600);
+.btn-export:hover {
+  background: var(--button-primary-hover);
+  border-color: var(--button-primary-hover);
 }
 
-.btn-outline {
-  background: transparent;
-  color: var(--text-secondary);
-  border-color: var(--border);
+.btn-archive {
+  background: var(--button-primary);
+  color: white;
+  border-color: var(--button-primary);
 }
 
-.btn-outline:hover {
-  background: var(--gray-50);
-  color: var(--text-primary);
+.btn-archive:hover {
+  background: var(--button-primary-hover);
+  border-color: var(--button-primary-hover);
 }
 
 .btn:disabled {
@@ -313,13 +339,13 @@
   cursor: not-allowed;
 }
 
-/* Theme Toggle */
+/* Theme Toggle - updated with purple color scheme */
 .theme-toggle-button {
   position: relative;
   display: inline-block;
   width: 44px;
   height: 22px;
-  background: var(--gray-300);
+  background: var(--purple-200);
   border: none;
   border-radius: 22px;
   cursor: pointer;
@@ -342,7 +368,7 @@
 }
 
 .theme-toggle-button.active {
-  background: var(--gray-600);
+  background: var(--button-primary);
 }
 
 .theme-toggle-button.active .toggle-slider {
@@ -351,7 +377,7 @@
 
 .theme-icon {
   font-size: 10px;
-  color: var(--gray-400);
+  color: var(--purple-400);
 }
 
 .theme-toggle-button.active .theme-icon {
@@ -403,8 +429,8 @@
 
 .search-input:focus {
   outline: none;
-  border-color: var(--gray-400);
-  box-shadow: 0 0 0 2px rgba(107, 114, 128, 0.1);
+  border-color: var(--button-primary);
+  box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.1);
 }
 
 .clear-search-btn {
@@ -423,8 +449,8 @@
 }
 
 .clear-search-btn:hover {
-  background: var(--gray-100);
-  color: var(--text-secondary);
+  background: var(--purple-50);
+  color: var(--button-primary);
 }
 
 .time-filter-container {
@@ -447,7 +473,7 @@
 }
 
 .time-filter-button:hover {
-  border-color: var(--gray-300);
+  border-color: var(--button-primary);
 }
 
 .date-picker-dropdown {
@@ -479,12 +505,12 @@
 }
 
 .date-picker-dropdown button:hover {
-  background: var(--gray-50);
+  background: var(--purple-50);
 }
 
 .date-picker-dropdown button.active {
-  background: var(--gray-100);
-  color: var(--gray-700);
+  background: var(--purple-50);
+  color: var(--button-primary);
   font-weight: 600;
 }
 
@@ -511,10 +537,10 @@
   gap: 6px;
   margin-top: 8px;
   padding: 10px 14px;
-  background: var(--gray-50);
-  border: 1px solid var(--gray-200);
+  background: var(--purple-50);
+  border: 1px solid var(--purple-200);
   border-radius: var(--radius);
-  color: var(--text-secondary);
+  color: var(--button-primary);
   font-size: 13px;
 }
 
@@ -539,6 +565,7 @@
   gap: 14px;
   transition: var(--transition);
   border: 1px solid var(--border);
+  border-left: 4px solid var(--chart-primary);
 }
 
 .metric-card:hover {
@@ -553,8 +580,8 @@
   width: 48px;
   height: 48px;
   border-radius: var(--radius);
-  background: var(--gray-100);
-  color: var(--gray-600);
+  background: var(--purple-50);
+  color: var(--chart-primary);
   font-size: 20px;
 }
 
@@ -612,7 +639,7 @@
   font-size: 12px;
 }
 
-/* Charts */
+/* Charts - Updated with consistent purple color scheme */
 .charts-section {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -648,8 +675,8 @@
 }
 
 .chart-badge {
-  background: var(--gray-100);
-  color: var(--text-secondary);
+  background: var(--purple-50);
+  color: var(--chart-primary);
   padding: 4px 10px;
   border-radius: 12px;
   font-size: 11px;
@@ -676,14 +703,120 @@
 }
 
 .chart-toggle:hover {
-  background: var(--gray-50);
-  color: var(--text-primary);
+  background: var(--purple-50);
+  color: var(--chart-primary);
 }
 
 .chart-toggle.active {
-  background: var(--gray-700);
+  background: var(--chart-primary);
   color: white;
-  border-color: var(--gray-700);
+  border-color: var(--chart-primary);
+}
+
+/* Chart specific styles - for bar charts matching the screenshot */
+.bar-chart {
+  height: 250px;
+  position: relative;
+}
+
+.bar-chart .bar {
+  position: absolute;
+  bottom: 40px;
+  width: 60px;
+  background: var(--chart-primary);
+  border-radius: 4px 4px 0 0;
+  transition: height 0.3s ease;
+}
+
+.bar-chart .bar-label {
+  position: absolute;
+  bottom: 10px;
+  width: 60px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.bar-chart .bar-value {
+  position: absolute;
+  top: -20px;
+  width: 60px;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.bar-chart .bar:nth-child(1) { left: 20px; height: 200px; }
+.bar-chart .bar:nth-child(2) { left: 100px; height: 200px; }
+.bar-chart .bar:nth-child(3) { left: 180px; height: 180px; }
+.bar-chart .bar:nth-child(4) { left: 260px; height: 160px; }
+
+/* Line chart styles */
+.line-chart {
+  height: 250px;
+  position: relative;
+}
+
+.line-chart .line {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-bottom: 1px solid var(--border);
+}
+
+.line-chart .line-path {
+  stroke: var(--chart-primary);
+  stroke-width: 2;
+  fill: none;
+}
+
+.line-chart .line-area {
+  fill: var(--purple-200);
+  opacity: 0.3;
+}
+
+.line-chart .line-point {
+  fill: var(--chart-primary);
+  stroke: white;
+  stroke-width: 2;
+}
+
+/* Pie chart styles */
+.pie-chart {
+  height: 250px;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.pie-chart .pie-slice {
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  clip-path: polygon(50% 50%, 50% 0%, 100% 0%, 100% 50%);
+}
+
+.pie-chart .pie-slice:nth-child(1) { background: var(--chart-primary); }
+.pie-chart .pie-slice:nth-child(2) { background: var(--chart-primary); transform: rotate(90deg); }
+.pie-chart .pie-slice:nth-child(3) { background: var(--chart-primary); transform: rotate(180deg); }
+.pie-chart .pie-slice:nth-child(4) { background: var(--chart-primary); transform: rotate(270deg); }
+
+.pie-chart .pie-center {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  background: var(--bg-secondary);
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: 600;
+  color: var(--text-primary);
 }
 
 /* Insights */
@@ -1011,8 +1144,8 @@
 }
 
 .pagination-btn:hover:not(:disabled) {
-  background: var(--gray-50);
-  border-color: var(--gray-300);
+  background: var(--purple-50);
+  border-color: var(--button-primary);
 }
 
 .pagination-btn:disabled {
@@ -1047,10 +1180,10 @@
   to { transform: rotate(360deg); }
 }
 
-/* Dark Mode */
+/* Dark Mode - Updated with consistent purple for charts and buttons */
 .admin-container.dark-mode {
-  background: var(--gray-900);
-  color: var(--gray-100);
+  background: #1a202c;
+  color: #e2e8f0;
 }
 
 .admin-container.dark-mode .header-content,
@@ -1062,8 +1195,8 @@
 .admin-container.dark-mode .pagination,
 .admin-container.dark-mode .date-picker-dropdown,
 .admin-container.dark-mode .export-tooltip {
-  background: var(--gray-800);
-  border-color: var(--gray-700);
+  background: #334155;
+  border-color: #475569;
 }
 
 .admin-container.dark-mode .dashboard-title,
@@ -1073,14 +1206,14 @@
 .admin-container.dark-mode .insight-title,
 .admin-container.dark-mode .metric-value,
 .admin-container.dark-mode .insight-value {
-  color: var(--gray-100);
+  color: #f1f5f9;
 }
 
 .admin-container.dark-mode .dashboard-subtitle,
 .admin-container.dark-mode .metric-label,
 .admin-container.dark-mode .insight-description,
 .admin-container.dark-mode .table-info {
-  color: var(--gray-300);
+  color: #d1d5db;
 }
 
 .admin-container.dark-mode .search-input,
@@ -1088,43 +1221,73 @@
 .admin-container.dark-mode .pagination-btn,
 .admin-container.dark-mode .chart-toggle,
 .admin-container.dark-mode .btn {
-  background: var(--gray-700);
-  border-color: var(--gray-600);
-  color: var(--gray-100);
+  background: #475569;
+  border-color: #64748b;
+  color: #e2e8f0;
 }
 
 .admin-container.dark-mode .btn:hover {
-  background: var(--gray-600);
+  background: #64748b;
+}
+
+.admin-container.dark-mode .btn-logout {
+  background: var(--button-primary);
+  border-color: var(--button-primary);
+}
+
+.admin-container.dark-mode .btn-logout:hover {
+  background: var(--button-primary-hover);
+  border-color: var(--button-primary-hover);
+}
+
+.admin-container.dark-mode .btn-export {
+  background: var(--button-primary);
+  border-color: var(--button-primary);
+}
+
+.admin-container.dark-mode .btn-export:hover {
+  background: var(--button-primary-hover);
+  border-color: var(--button-primary-hover);
+}
+
+.admin-container.dark-mode .btn-archive {
+  background: var(--button-primary);
+  border-color: var(--button-primary);
+}
+
+.admin-container.dark-mode .btn-archive:hover {
+  background: var(--button-primary-hover);
+  border-color: var(--button-primary-hover);
 }
 
 .admin-container.dark-mode .date-picker-dropdown button:hover {
-  background: var(--gray-700);
+  background: #475569;
 }
 
 .admin-container.dark-mode .date-picker-dropdown button.active {
-  background: var(--gray-700);
-  color: var(--gray-100);
+  background: #475569;
+  color: #e2e8f0;
 }
 
 .admin-container.dark-mode .feedback-table thead {
-  background: var(--gray-700);
+  background: #475569;
 }
 
 .admin-container.dark-mode .feedback-table th {
-  color: var(--gray-100);
-  border-bottom-color: var(--gray-600);
+  color: #f1f5f9;
+  border-bottom-color: #64748b;
 }
 
 .admin-container.dark-mode .feedback-table td {
-  border-bottom-color: var(--gray-700);
+  border-bottom-color: #475569;
 }
 
 .admin-container.dark-mode .feedback-table tr.even {
-  background: var(--gray-800);
+  background: #334155;
 }
 
 .admin-container.dark-mode .feedback-table tr:hover {
-  background: var(--gray-700);
+  background: #475569;
 }
 
 .admin-container.dark-mode .recommend-badge.yes {
@@ -1148,16 +1311,20 @@
 }
 
 .admin-container.dark-mode .theme-toggle-button {
-  background: var(--gray-600);
+  background: var(--purple-200);
 }
 
 .admin-container.dark-mode .theme-icon {
-  color: var(--gray-400);
+  color: var(--purple-400);
+}
+
+.admin-container.dark-mode .theme-toggle-button.active {
+  background: var(--button-primary);
 }
 
 .admin-container.dark-mode .chart-toggle.active {
-  background: var(--gray-600);
-  border-color: var(--gray-600);
+  background: var(--chart-primary);
+  border-color: var(--chart-primary);
 }
 
 .admin-container.dark-mode .notification-success {
@@ -1182,6 +1349,28 @@
   background: #0c4a6e;
   color: #7dd3fc;
   border-color: #075985;
+}
+
+/* Dark mode chart colors */
+.admin-container.dark-mode .bar-chart .bar {
+  background: var(--chart-primary);
+}
+
+.admin-container.dark-mode .line-chart .line-path {
+  stroke: var(--chart-primary);
+}
+
+.admin-container.dark-mode .line-chart .line-area {
+  fill: var(--purple-200);
+  opacity: 0.3;
+}
+
+.admin-container.dark-mode .line-chart .line-point {
+  fill: var(--chart-primary);
+}
+
+.admin-container.dark-mode .pie-chart .pie-center {
+  background: #334155;
 }
 
 /* Responsive */

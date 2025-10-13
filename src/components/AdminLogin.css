@@ -1,10 +1,10 @@
-/* AdminLogin.css */
+/* AdminLogin.css - Updated with original green theme from screenshots */
 .admin-login-container {
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background: #e6f2ff;
+  background: #e6f7ff;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   padding: 20px;
   box-sizing: border-box;
@@ -50,7 +50,7 @@
 
 .login-icon i {
   font-size: 36px;
-  color: #8a8a8a;
+  color: #2bb7a9;
 }
 
 .login-header h2 {
@@ -125,9 +125,9 @@
 }
 
 .input-container input:focus {
-  border-color: #4285f4;
+  border-color: #2bb7a9;
   background: #fff;
-  box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.2);
+  box-shadow: 0 0 0 2px rgba(43, 183, 169, 0.2);
 }
 
 .password-toggle {
@@ -147,12 +147,12 @@
 }
 
 .password-toggle:hover {
-  color: #4285f4;
+  color: #2bb7a9;
 }
 
 .login-button {
   width: 100%;
-  background: #4285f4;
+  background: #2bb7a9;
   color: white;
   padding: 12px;
   border: none;
@@ -173,7 +173,7 @@
 }
 
 .login-button:hover {
-  background: #3367d6;
+  background: #229287;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 

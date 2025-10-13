@@ -142,48 +142,48 @@ function AdminPanel({
     overall: average("overall"),
   };
 
-  // Professional color scheme
-  const professionalColors = {
-    primary: '#475569',
-    secondary: '#64748b',
-    accent: '#3b82f6',
-    success: '#10b981',
-    warning: '#f59e0b',
-    danger: '#ef4444',
-    neutral: '#94a3b8'
+  // Consistent purple color scheme for charts - using the same shade for all bars
+  const chartColors = {
+    primary: '#8b5cf6',      // Purple-500 - matching Food and Ambience bars
+    secondary: '#8b5cf6',    // Same shade for consistency
+    tertiary: '#8b5cf6',     // Same shade for consistency
+    quaternary: '#8b5cf6',   // Same shade for consistency
+    success: '#059669',
+    danger: '#dc2626',
+    neutral: '#e5e7eb'
   };
 
-  // Enhanced data for charts with professional colors
+  // Enhanced data for charts with consistent purple colors
   const recommendData = [
-    { name: 'Would Recommend', value: recommendCount, color: professionalColors.success },
-    { name: 'Would Not Recommend', value: notRecommendCount, color: professionalColors.danger }
+    { name: 'Would Recommend', value: recommendCount, color: chartColors.success },
+    { name: 'Would Not Recommend', value: notRecommendCount, color: chartColors.danger }
   ];
 
-  // Professional ratings data for bar chart
+  // Consistent purple ratings data for bar chart - all bars use the same shade
   const ratingsData = [
     { 
       name: 'Food', 
       rating: parseFloat(averages.food) || 0,
       fullMark: 5,
-      fill: professionalColors.primary
+      fill: chartColors.primary
     },
     { 
       name: 'Ambience', 
       rating: parseFloat(averages.ambience) || 0,
       fullMark: 5,
-      fill: professionalColors.secondary
+      fill: chartColors.primary
     },
     { 
       name: 'Service', 
       rating: parseFloat(averages.service) || 0,
       fullMark: 5,
-      fill: professionalColors.accent
+      fill: chartColors.primary
     },
     { 
       name: 'Overall', 
       rating: parseFloat(averages.overall) || 0,
       fullMark: 5,
-      fill: professionalColors.success
+      fill: chartColors.primary
     }
   ];
 
@@ -208,7 +208,7 @@ function AdminPanel({
     return isNaN(num) ? defaultValue : num;
   };
 
-  // Function to generate a proper bar chart for PDF
+  // Function to generate a proper bar chart for PDF with consistent purple colors
   const generateBarChartForPDF = () => {
     const maxRating = 5;
     const chartHeight = 250;
@@ -219,10 +219,10 @@ function AdminPanel({
     const startY = 30;
     
     const categories = [
-      { name: 'Food', value: parseFloat(averages.food) || 0, color: professionalColors.primary },
-      { name: 'Ambience', value: parseFloat(averages.ambience) || 0, color: professionalColors.secondary },
-      { name: 'Service', value: parseFloat(averages.service) || 0, color: professionalColors.accent },
-      { name: 'Overall', value: parseFloat(averages.overall) || 0, color: professionalColors.success }
+      { name: 'Food', value: parseFloat(averages.food) || 0, color: chartColors.primary },
+      { name: 'Ambience', value: parseFloat(averages.ambience) || 0, color: chartColors.primary },
+      { name: 'Service', value: parseFloat(averages.service) || 0, color: chartColors.primary },
+      { name: 'Overall', value: parseFloat(averages.overall) || 0, color: chartColors.primary }
     ];
     
     let svgContent = `
@@ -332,7 +332,7 @@ function AdminPanel({
             }
             
             body {
-              font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+              font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
               line-height: 1.6;
               color: #334155;
               background: #ffffff;
@@ -346,7 +346,7 @@ function AdminPanel({
             
             /* Header */
             .report-header {
-              background: linear-gradient(135deg, #475569 0%, #64748b 100%);
+              background: linear-gradient(135deg, #8b5cf6 0%, #8b5cf6 100%);
               color: white;
               padding: 40px;
               border-radius: 12px;
@@ -413,7 +413,7 @@ function AdminPanel({
               border-radius: 12px;
               padding: 30px;
               margin-bottom: 30px;
-              border-left: 4px solid #475569;
+              border-left: 4px solid #8b5cf6;
             }
             
             .executive-summary h2 {
@@ -501,19 +501,19 @@ function AdminPanel({
               border-radius: 8px;
               padding: 20px;
               box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-              border-left: 4px solid #475569;
+              border-left: 4px solid #8b5cf6;
             }
             
             .insight-card.strength {
-              border-left-color: #10b981;
+              border-left-color: #059669;
             }
             
             .insight-card.improvement {
-              border-left-color: #f59e0b;
+              border-left-color: #d97706;
             }
             
             .insight-card.sentiment {
-              border-left-color: #3b82f6;
+              border-left-color: #0891b2;
             }
             
             .insight-title {
@@ -628,7 +628,7 @@ function AdminPanel({
               border-radius: 12px;
               padding: 30px;
               margin-bottom: 30px;
-              border-left: 4px solid #3b82f6;
+              border-left: 4px solid #0891b2;
             }
             
             .recommendations-section h2 {
@@ -655,7 +655,7 @@ function AdminPanel({
               content: "→";
               position: absolute;
               left: 0;
-              color: #3b82f6;
+              color: #0891b2;
               font-weight: bold;
             }
             
@@ -819,15 +819,15 @@ function AdminPanel({
                 <div class="chart-title">Recommendation Distribution</div>
                 <div style="display: flex; justify-content: center; align-items: center; height: 250px;">
                   <div style="text-align: center;">
-                    <div style="font-size: 48px; font-weight: 600; color: #10b981; margin-bottom: 10px;">${recommendRate}%</div>
+                    <div style="font-size: 48px; font-weight: 600; color: #059669; margin-bottom: 10px;">${recommendRate}%</div>
                     <div style="font-size: 16px; color: #64748b; margin-bottom: 20px;">Would Recommend</div>
                     <div style="display: flex; justify-content: center; gap: 30px;">
                       <div style="display: flex; align-items: center; gap: 8px;">
-                        <div style="width: 12px; height: 12px; background: #10b981; border-radius: 2px;"></div>
+                        <div style="width: 12px; height: 12px; background: #059669; border-radius: 2px;"></div>
                         <span style="font-size: 14px; color: #475569;">Yes (${recommendCount})</span>
                       </div>
                       <div style="display: flex; align-items: center; gap: 8px;">
-                        <div style="width: 12px; height: 12px; background: #ef4444; border-radius: 2px;"></div>
+                        <div style="width: 12px; height: 12px; background: #dc2626; border-radius: 2px;"></div>
                         <span style="font-size: 14px; color: #475569;">No (${notRecommendCount})</span>
                       </div>
                     </div>
@@ -1021,14 +1021,14 @@ function AdminPanel({
               <span className="toggle-slider"></span>
               <i className={`bx ${adminDarkMode ? 'bx-sun' : 'bx-moon'} theme-icon`}></i>
             </button>
-            <button onClick={handleLogout} className="btn btn-secondary">
+            <button onClick={handleLogout} className="btn btn-logout">
               <i className="bx bx-log-out"></i>
               Logout
             </button>
             <div className="export-button-container">
               <button 
                 onClick={handleExportPDF} 
-                className={`btn btn-primary ${isGeneratingPDF ? 'loading' : ''}`}
+                className={`btn btn-export ${isGeneratingPDF ? 'loading' : ''}`}
                 disabled={isGeneratingPDF}
                 onMouseEnter={() => setShowExportTooltip(true)}
                 onMouseLeave={() => setShowExportTooltip(false)}
@@ -1057,7 +1057,7 @@ function AdminPanel({
             </div>
             <button
               onClick={() => setShowArchived(!showArchived)}
-              className="btn btn-outline"
+              className="btn btn-archive"
             >
               <i className={`bx ${showArchived ? 'bx-archive-out' : 'bx-archive-in'}`}></i>
               {showArchived ? "Hide Archived" : "Show Archived"}
@@ -1281,7 +1281,7 @@ function AdminPanel({
                 <Tooltip content={<CustomTooltip />} />
                 <Bar 
                   dataKey="rating" 
-                  fill={professionalColors.primary}
+                  fill={chartColors.primary}
                   radius={[8, 8, 0, 0]}
                   animationDuration={1000}
                 >
@@ -1302,8 +1302,8 @@ function AdminPanel({
                 <Radar 
                   name="Rating" 
                   dataKey="value" 
-                  stroke={professionalColors.primary} 
-                  fill={professionalColors.primary} 
+                  stroke={chartColors.primary} 
+                  fill={chartColors.primary} 
                   fillOpacity={0.6}
                 />
                 <Tooltip />
