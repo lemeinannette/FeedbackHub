@@ -134,6 +134,7 @@ const PerformanceInsights = ({
             <div className="insight-title">7-Day Performance Trend</div>
           </div>
           <div className="insight-content">
+            {/* This ResponsiveContainer is used correctly because it has a percentage width */}
             <ResponsiveContainer width="100%" height={200}>
               <AreaChart data={trendData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
@@ -292,24 +293,23 @@ const PerformanceInsights = ({
           </div>
           <div className="metric-visual">
             <div className="sentiment-donut">
-              <ResponsiveContainer width={120} height={120}>
-                <PieChart>
-                  <Pie
-                    data={sentimentData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={30}
-                    outerRadius={50}
-                    paddingAngle={2}
-                    dataKey="value"
-                  >
-                    {sentimentData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                </PieChart>
-              </ResponsiveContainer>
+              {/* --- FIX: Removed ResponsiveContainer and added fixed dimensions to PieChart --- */}
+              <PieChart width={120} height={120}>
+                <Pie
+                  data={sentimentData}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={30}
+                  outerRadius={50}
+                  paddingAngle={2}
+                  dataKey="value"
+                >
+                  {sentimentData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip />
+              </PieChart>
             </div>
           </div>
         </div>

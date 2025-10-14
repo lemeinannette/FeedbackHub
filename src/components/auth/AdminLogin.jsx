@@ -1,129 +1,144 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
-import "./AdminLogin.css";
+// src/components/auth/AdminLogin.jsx
 
-export default function AdminLogin({ setIsAdminLoggedIn }) {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import './AdminLogin.css';
+
+const AdminLogin = ({ onLoginSuccess, darkMode }) => {
+  const [credentials, setCredentials] = useState({
+    username: '',
+    password: ''
+  });
   const [isLoading, setIsLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState('');
   const navigate = useNavigate();
-  const location = useLocation();
 
-  // Check if user is already logged in
-  useEffect(() => {
-    const isLoggedIn = localStorage.getItem("isAdminLoggedIn") === "true";
-    const expiresAt = parseInt(localStorage.getItem("adminExpires"), 10);
-    
-    if (isLoggedIn && expiresAt && Date.now() < expiresAt) {
-      setIsAdminLoggedIn(true);
-      navigate("/admin");
-    }
-  }, [navigate, setIsAdminLoggedIn]);
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setCredentials(prev => ({
+      ...prev,
+      [name]: value
+    }));
+    // Clear error when user starts typing
+    if (error) setError('');
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
+    
+    // Basic validation
+    if (!credentials.username || !credentials.password) {
+      setError('Please enter both username and password');
+      return;
+    }
+    
     setIsLoading(true);
-
-    // Simulate API call with a delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
-
-    // Hardcoded credentials
-    if (username === "admin" && password === "1234") {
-      const expiresAt = Date.now() + 60 * 60 * 1000; // 1 hour session
-      localStorage.setItem("isAdminLoggedIn", "true");
-      localStorage.setItem("adminExpires", expiresAt.toString());
-      setIsAdminLoggedIn(true);
-      navigate("/admin");
-    } else {
-      setError("Invalid username or password. Please try again.");
+    setError('');
+    
+    try {
+      // Simulate API call delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Call the login function passed from App.jsx
+      const success = onLoginSuccess(credentials);
+      
+      if (success) {
+        navigate('/admin');
+      } else {
+        setError('Invalid username or password');
+      }
+    } catch (error) {
+      setError('An error occurred during login. Please try again.');
+      console.error('Login error:', error);
+    } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="admin-login-container">
+    <div className={`admin-login-container ${darkMode ? 'dark-mode' : ''}`}>
       <div className="admin-login-card">
-        <div className="login-header">
-          <div className="login-icon">
-            <i className="bx bx-lock-alt"></i>
+        <div className="admin-login-header">
+          <div className="admin-logo">
+            <i className="bx bx-shield"></i>
           </div>
-          <h2>Admin Login</h2>
+          <h1>Admin Login</h1>
           <p>Enter your credentials to access the admin panel</p>
         </div>
-
-        <form onSubmit={handleSubmit} className="login-form">
+        
+        <form onSubmit={handleSubmit} className="admin-login-form">
           {error && (
             <div className="error-message">
               <i className="bx bx-error-circle"></i>
               <span>{error}</span>
             </div>
           )}
-
+          
           <div className="form-group">
             <label htmlFor="username">Username</label>
-            <div className="input-container">
-              <i className="bx bx-user input-icon"></i>
+            <div className="input-group">
+              <i className="bx bx-user"></i>
               <input
                 type="text"
                 id="username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                required
+                name="username"
+                value={credentials.username}
+                onChange={handleChange}
                 placeholder="Enter your username"
-                autoComplete="username"
+                required
               />
             </div>
           </div>
-
+          
           <div className="form-group">
             <label htmlFor="password">Password</label>
-            <div className="input-container">
-              <i className="bx bx-lock input-icon"></i>
+            <div className="input-group">
+              <i className="bx bx-lock-alt"></i>
               <input
-                type={showPassword ? "text" : "password"}
+                type="password"
                 id="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
+                name="password"
+                value={credentials.password}
+                onChange={handleChange}
                 placeholder="Enter your password"
-                autoComplete="current-password"
+                required
               />
-              <button
-                type="button"
-                className="password-toggle"
-                onClick={() => setShowPassword(!showPassword)}
-              >
-                <i className={`bx ${showPassword ? "bx-hide" : "bx-show"}`}></i>
-              </button>
             </div>
           </div>
-
-          <button
-            type="submit"
-            className={`login-button ${isLoading ? "loading" : ""}`}
+          
+          <button 
+            type="submit" 
+            className="login-btn"
             disabled={isLoading}
           >
             {isLoading ? (
               <>
-                <i className="bx bx-loader-alt bx-spin"></i>
-                Authenticating...
+                <div className="spinner"></div>
+                <span>Logging in...</span>
               </>
             ) : (
               <>
-                <i className="bx bx-log-in-circle"></i>
-                Login
+                <i className="bx bx-log-in"></i>
+                <span>Login</span>
               </>
             )}
           </button>
         </form>
-
-        <div className="login-footer">
-          
+        
+        <div className="admin-login-footer">
+          <p>
+            <Link to="/" className="back-link">
+              <i className="bx bx-arrow-back"></i>
+              Back to Home
+            </Link>
+          </p>
+          <p className="demo-hint">
+            Demo: username: <strong>admin</strong>, password: <strong>password</strong>
+          </p>
         </div>
       </div>
     </div>
   );
-}
+};
+
+export default AdminLogin;

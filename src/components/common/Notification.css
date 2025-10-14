@@ -14,7 +14,6 @@
   overflow: hidden;
 }
 
-/* Notification Types */
 .notification-success {
   background: linear-gradient(135deg, #10b981 0%, #059669 100%);
   color: white;
@@ -35,7 +34,6 @@
   color: white;
 }
 
-/* Notification Content */
 .notification-content {
   display: flex;
   align-items: center;
@@ -75,12 +73,6 @@
   transform: scale(1.1);
 }
 
-.notification-close:focus-visible {
-  outline: 2px solid white;
-  outline-offset: 2px;
-}
-
-/* Progress Bar */
 .notification-progress {
   position: absolute;
   bottom: 0;
@@ -90,7 +82,6 @@
   animation: progress 5s linear;
 }
 
-/* Animations */
 @keyframes slideIn {
   from {
     transform: translateX(100%);
@@ -108,44 +99,5 @@
   }
   to {
     width: 0%;
-  }
-}
-
-/* Responsive Design */
-@media (max-width: 640px) {
-  .notification {
-    top: 10px;
-    right: 10px;
-    left: 10px;
-    min-width: auto;
-    max-width: none;
-  }
-  
-  .notification-content {
-    padding: 12px 16px;
-  }
-  
-  .notification-icon {
-    font-size: 20px;
-  }
-  
-  .notification-message {
-    font-size: 13px;
-  }
-}
-
-/* Dark Mode Support */
-.admin-container.dark-mode .notification {
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-}
-
-/* Reduced Motion */
-@media (prefers-reduced-motion: reduce) {
-  .notification {
-    animation: none;
-  }
-  
-  .notification-progress {
-    animation: none;
   }
 }
