@@ -1,9 +1,9 @@
 // src/components/AdminPanel.jsx
-
+/*
 import React, { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import "./AdminPanel.css";
-import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
+import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, LineChart, Line, Area, AreaChart } from 'recharts';
 
 function AdminPanel({ 
   setIsAdminLoggedIn, 
@@ -57,6 +57,16 @@ function AdminPanel({
     }
   };
 
+  // Move the average function definition here, before it's used
+  const average = (key) => {
+    if (!filteredFeedbacks.length) return "0.0";
+    const sum = filteredFeedbacks.reduce((sum, f) => {
+      const val = parseFloat(f[key]);
+      return sum + (isNaN(val) ? 0 : val);
+    }, 0);
+    return (sum / filteredFeedbacks.length).toFixed(1);
+  };
+
   const filteredFeedbacks = useMemo(() => {
     let filtered = showArchived
       ? feedbacks
@@ -102,6 +112,163 @@ function AdminPanel({
     return filtered;
   }, [feedbacks, showArchived, searchTerm, timeFilter, customStartDate, customEndDate]);
 
+  // Real-time sentiment analysis
+  const sentimentAnalysis = useMemo(() => {
+    const positiveWords = ['excellent', 'amazing', 'great', 'good', 'fantastic', 'wonderful', 'perfect', 'love', 'best', 'awesome', 'brilliant', 'outstanding'];
+    const negativeWords = ['bad', 'poor', 'terrible', 'awful', 'disappointing', 'worst', 'hate', 'horrible', 'unacceptable', 'needs improvement', 'slow', 'rude'];
+    
+    let positiveCount = 0;
+    let negativeCount = 0;
+    let neutralCount = 0;
+    
+    filteredFeedbacks.forEach(feedback => {
+      const text = (feedback.comments || '').toLowerCase();
+      let hasPositive = false;
+      let hasNegative = false;
+      
+      positiveWords.forEach(word => {
+        if (text.includes(word)) hasPositive = true;
+      });
+      
+      negativeWords.forEach(word => {
+        if (text.includes(word)) hasNegative = true;
+      });
+      
+      if (hasPositive && !hasNegative) positiveCount++;
+      else if (hasNegative && !hasPositive) negativeCount++;
+      else neutralCount++;
+    });
+    
+    const total = positiveCount + negativeCount + neutralCount;
+    return {
+      positive: total > 0 ? (positiveCount / total * 100).toFixed(1) : 0,
+      negative: total > 0 ? (negativeCount / total * 100).toFixed(1) : 0,
+      neutral: total > 0 ? (neutralCount / total * 100).toFixed(1) : 0,
+      total
+    };
+  }, [filteredFeedbacks]);
+
+  // Extract key themes from comments
+  const keyThemes = useMemo(() => {
+    const themes = {
+      food: { keywords: ['food', 'meal', 'dish', 'taste', 'flavor', 'menu', 'cuisine'], count: 0, examples: [] },
+      service: { keywords: ['service', 'staff', 'waiter', 'waitress', 'friendly', 'helpful', 'attitude'], count: 0, examples: [] },
+      ambience: { keywords: ['ambience', 'atmosphere', 'decor', 'music', 'lighting', 'environment', 'clean'], count: 0, examples: [] },
+      price: { keywords: ['price', 'cost', 'expensive', 'cheap', 'value', 'money', 'affordable'], count: 0, examples: [] },
+      time: { keywords: ['time', 'wait', 'slow', 'fast', 'quick', 'delay', 'prompt'], count: 0, examples: [] }
+    };
+    
+    filteredFeedbacks.forEach(feedback => {
+      const text = (feedback.comments || '').toLowerCase();
+      
+      Object.keys(themes).forEach(theme => {
+        themes[theme].keywords.forEach(keyword => {
+          if (text.includes(keyword)) {
+            themes[theme].count++;
+            if (themes[theme].examples.length < 3 && feedback.comments) {
+              themes[theme].examples.push(feedback.comments.substring(0, 100) + (feedback.comments.length > 100 ? '...' : ''));
+            }
+          }
+        });
+      });
+    });
+    
+    return Object.entries(themes)
+      .sort(([,a], [,b]) => b.count - a.count)
+      .slice(0, 3)
+      .map(([name, data]) => ({ name, ...data }));
+  }, [filteredFeedbacks]);
+
+  // Generate actionable insights
+  const actionableInsights = useMemo(() => {
+    const insights = [];
+    
+    // Analyze ratings
+    const avgFood = parseFloat(average("food"));
+    const avgService = parseFloat(average("service"));
+    const avgAmbience = parseFloat(average("ambience"));
+    const avgOverall = parseFloat(average("overall"));
+    
+    if (avgFood < 3.5) {
+      insights.push({
+        type: 'improvement',
+        priority: 'high',
+        title: 'Food Quality Needs Attention',
+        description: `Average food rating is ${avgFood}/5. Consider reviewing menu items and chef performance.`,
+        action: 'Schedule a menu review and chef feedback session'
+      });
+    }
+    
+    if (avgService < 3.5) {
+      insights.push({
+        type: 'improvement',
+        priority: 'high',
+        title: 'Service Standards Declining',
+        description: `Service rating at ${avgService}/5 requires immediate staff training.`,
+        action: 'Implement customer service training program'
+      });
+    }
+    
+    if (sentimentAnalysis.negative > 30) {
+      insights.push({
+        type: 'urgent',
+        priority: 'critical',
+        title: 'High Negative Sentiment Detected',
+        description: `${sentimentAnalysis.negative}% of feedback shows negative sentiment.`,
+        action: 'Conduct emergency meeting to address customer concerns'
+      });
+    }
+    
+    if (avgFood > 4.5) {
+      insights.push({
+        type: 'strength',
+        priority: 'maintain',
+        title: 'Excellent Food Quality',
+        description: `Food rating of ${avgFood}/5 is a key strength.`,
+        action: 'Maintain current standards and consider featuring in marketing'
+      });
+    }
+    
+    if (filteredFeedbacks.length > 0) {
+      const recentTrend = filteredFeedbacks.slice(0, 10);
+      const recentAvg = recentTrend.reduce((sum, f) => sum + parseFloat(f.overall || 0), 0) / recentTrend.length;
+      
+      if (recentAvg > avgOverall + 0.5) {
+        insights.push({
+          type: 'positive',
+          priority: 'info',
+          title: 'Recent Improvement Trend',
+          description: 'Recent feedback shows positive improvement.',
+          action: 'Identify what changed and maintain momentum'
+        });
+      }
+    }
+    
+    return insights.slice(0, 4);
+  }, [filteredFeedbacks, sentimentAnalysis]);
+
+  // Time series data for trend analysis
+  const trendData = useMemo(() => {
+    const last7Days = [];
+    for (let i = 6; i >= 0; i--) {
+      const date = new Date();
+      date.setDate(date.getDate() - i);
+      const dateStr = date.toISOString().split('T')[0];
+      
+      const dayFeedbacks = feedbacks.filter(f => f.date === dateStr);
+      const avgRating = dayFeedbacks.length > 0 
+        ? dayFeedbacks.reduce((sum, f) => sum + parseFloat(f.overall || 0), 0) / dayFeedbacks.length 
+        : 0;
+      
+      last7Days.push({
+        date: date.toLocaleDateString('en', { weekday: 'short' }),
+        rating: avgRating.toFixed(1),
+        count: dayFeedbacks.length
+      });
+    }
+    return last7Days;
+  }, [feedbacks]);
+
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredFeedbacks.slice(indexOfFirstItem, indexOfLastItem);
@@ -125,15 +292,6 @@ function AdminPanel({
   const recommendRate = filteredFeedbacks.length
     ? ((recommendCount / filteredFeedbacks.length) * 100).toFixed(1)
     : "0.0";
-
-  const average = (key) => {
-    if (!filteredFeedbacks.length) return "0.0";
-    const sum = filteredFeedbacks.reduce((sum, f) => {
-      const val = parseFloat(f[key]);
-      return sum + (isNaN(val) ? 0 : val);
-    }, 0);
-    return (sum / filteredFeedbacks.length).toFixed(1);
-  };
 
   const averages = {
     food: average("food"),
@@ -193,6 +351,13 @@ function AdminPanel({
     { category: 'Ambience', value: parseFloat(averages.ambience) || 0, fullMark: 5 },
     { category: 'Service', value: parseFloat(averages.service) || 0, fullMark: 5 },
     { category: 'Overall', value: parseFloat(averages.overall) || 0, fullMark: 5 }
+  ];
+
+  // Sentiment data for pie chart
+  const sentimentData = [
+    { name: 'Positive', value: parseFloat(sentimentAnalysis.positive), color: '#059669' },
+    { name: 'Neutral', value: parseFloat(sentimentAnalysis.neutral), color: '#6b7280' },
+    { name: 'Negative', value: parseFloat(sentimentAnalysis.negative), color: '#dc2626' }
   ];
 
   const handleLogout = () => {
@@ -346,7 +511,7 @@ function AdminPanel({
             
             /* Header */
             .report-header {
-              background: linear-gradient(135deg, #8b5cf6 0%, #8b5cf6 100%);
+              background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
               color: white;
               padding: 40px;
               border-radius: 12px;
@@ -413,7 +578,7 @@ function AdminPanel({
               border-radius: 12px;
               padding: 30px;
               margin-bottom: 30px;
-              border-left: 4px solid #8b5cf6;
+              border-left: 4px solid #14b8a6;
             }
             
             .executive-summary h2 {
@@ -619,7 +784,7 @@ function AdminPanel({
             
             .rating-value {
               font-weight: 600;
-              color: #1e293b;
+              color: #1f2937;
             }
             
             /* Recommendations Section */
@@ -1009,7 +1174,7 @@ function AdminPanel({
         <div className="header-content">
           <div className="header-left">
             <h1 className="dashboard-title">Feedback Analytics Dashboard</h1>
-            <p className="dashboard-subtitle">Customer Experience Management System</p>
+            <p className="dashboard-subtitle">Real-time Customer Experience Management</p>
           </div>
           <div className="header-actions">
             <button
@@ -1156,58 +1321,260 @@ function AdminPanel({
         )}
       </section>
 
-      {/* Metrics Section */}
-      <section className="metrics-section">
-        <div className="metrics-grid">
-          <div className="metric-card">
-            <div className="metric-icon">
-              <i className="bx bx-message-square-detail"></i>
-            </div>
-            <div className="metric-content">
-              <h3 className="metric-label">Total Feedback</h3>
-              <p className="metric-value">{filteredFeedbacks.length}</p>
-              <div className="metric-change positive">
-                <i className="bx bx-up-arrow-alt"></i>
-                <span>12% from last period</span>
-              </div>
-            </div>
-          </div>
-          <div className="metric-card">
-            <div className="metric-icon">
-              <i className="bx bx-like"></i>
-            </div>
-            <div className="metric-content">
-              <h3 className="metric-label">Recommendation Rate</h3>
-              <p className="metric-value">{recommendRate}%</p>
-              <div className="recommendation-breakdown">
-                <span className="recommend-yes">{recommendCount} Yes</span>
-                <span className="recommend-no">{notRecommendCount} No</span>
-              </div>
-            </div>
-          </div>
-          <div className="metric-card">
-            <div className="metric-icon">
+      {/* Enhanced Performance Insights Section */}
+      <section className="performance-insights-section">
+        <div className="section-header">
+          <h2 className="section-title">Performance Insights</h2>
+          <p className="section-subtitle">Real-time analysis of {filteredFeedbacks.length} customer feedbacks</p>
+        </div>
+        
+        {/* Summary Cards */}
+        <div className="insights-summary-grid">
+          <div className="summary-card overall-score">
+            <div className="summary-icon">
               <i className="bx bx-star"></i>
             </div>
-            <div className="metric-content">
-              <h3 className="metric-label">Average Rating</h3>
-              <p className="metric-value">{averages.overall}</p>
-              <div className="metric-change negative">
-                <i className="bx bx-down-arrow-alt"></i>
-                <span>2% from last period</span>
+            <div className="summary-content">
+              <h3>Overall Score</h3>
+              <div className="score-value">{averages.overall}</div>
+              <div className="score-max">/ 5.0</div>
+              <div className="score-trend">
+                <span className="trend-label">Based on {filteredFeedbacks.length} reviews</span>
               </div>
             </div>
           </div>
-          <div className="metric-card">
-            <div className="metric-icon">
-              <i className="bx bx-calendar-check"></i>
+          
+          <div className="summary-card sentiment-score">
+            <div className="summary-icon">
+              <i className="bx bx-smile"></i>
             </div>
-            <div className="metric-content">
-              <h3 className="metric-label">Report Period</h3>
-              <p className="metric-value">{getTimeFilterLabel()}</p>
-              <div className="metric-change neutral">
-                <i className="bx bx-minus"></i>
-                <span>Current selection</span>
+            <div className="summary-content">
+              <h3>Sentiment Score</h3>
+              <div className="sentiment-value">{sentimentAnalysis.positive}%</div>
+              <div className="sentiment-label">Positive</div>
+              <div className="sentiment-breakdown">
+                <div className="sentiment-bar positive" style={{width: `${sentimentAnalysis.positive}%`}}></div>
+                <div className="sentiment-bar neutral" style={{width: `${sentimentAnalysis.neutral}%`}}></div>
+                <div className="sentiment-bar negative" style={{width: `${sentimentAnalysis.negative}%`}}></div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="summary-card recommendation-score">
+            <div className="summary-icon">
+              <i className="bx bx-like"></i>
+            </div>
+            <div className="summary-content">
+              <h3>Recommendation</h3>
+              <div className="recommend-value">{recommendRate}%</div>
+              <div className="recommend-label">Would Recommend</div>
+              <div className="recommend-count">
+                {recommendCount} out of {filteredFeedbacks.length}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Key Themes and Insights */}
+        <div className="insights-detailed-grid">
+          {/* Key Themes from Comments */}
+          <div className="insight-card themes-card">
+            <div className="insight-header">
+              <div className="insight-icon">
+                <i className="bx bx-chat"></i>
+              </div>
+              <div className="insight-title">Key Themes from Comments</div>
+            </div>
+            <div className="insight-content">
+              <div className="themes-list">
+                {keyThemes.map((theme, index) => (
+                  <div key={index} className="theme-item">
+                    <div className="theme-header">
+                      <span className="theme-name">{theme.name.charAt(0).toUpperCase() + theme.name.slice(1)}</span>
+                      <span className="theme-count">{theme.count} mentions</span>
+                    </div>
+                    {theme.examples.length > 0 && (
+                      <div className="theme-example">
+                        "{theme.examples[0]}"
+                      </div>
+                    )}
+                  </div>
+                ))}
+                {keyThemes.length === 0 && (
+                  <div className="no-themes">
+                    <i className="bx bx-info-circle"></i>
+                    <span>Not enough data to analyze themes</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Performance Trend */}
+          <div className="insight-card trend-card">
+            <div className="insight-header">
+              <div className="insight-icon">
+                <i className="bx bx-trending-up"></i>
+              </div>
+              <div className="insight-title">7-Day Performance Trend</div>
+            </div>
+            <div className="insight-content">
+              <ResponsiveContainer width="100%" height={200}>
+                <AreaChart data={trendData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                  <XAxis dataKey="date" tick={{ fill: '#64748b' }} />
+                  <YAxis domain={[0, 5]} tick={{ fill: '#64748b' }} />
+                  <Tooltip />
+                  <Area 
+                    type="monotone" 
+                    dataKey="rating" 
+                    stroke="#14b8a6" 
+                    fill="#14b8a6" 
+                    fillOpacity={0.3}
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        </div>
+
+        {/* Actionable Insights */}
+        <div className="actionable-insights">
+          <div className="insights-header">
+            <h3>AI-Powered Insights & Recommendations</h3>
+            <span className="insights-subtitle">Automatically generated from your feedback data</span>
+          </div>
+          <div className="insights-list">
+            {actionableInsights.map((insight, index) => (
+              <div key={index} className={`insight-item ${insight.type}`}>
+                <div className="insight-item-header">
+                  <div className="insight-priority">
+                    <span className={`priority-badge ${insight.priority}`}>
+                      {insight.priority.toUpperCase()}
+                    </span>
+                  </div>
+                  <h4 className="insight-item-title">{insight.title}</h4>
+                </div>
+                <p className="insight-item-description">{insight.description}</p>
+                <div className="insight-item-action">
+                  <i className="bx bx-bullseye"></i>
+                  <span>{insight.action}</span>
+                </div>
+              </div>
+            ))}
+            {actionableInsights.length === 0 && (
+              <div className="no-insights">
+                <i className="bx bx-check-circle"></i>
+                <span>All metrics are performing well. Keep up the great work!</span>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Detailed Metrics Grid */}
+        <div className="detailed-metrics-grid">
+          <div className="metric-detailed-card">
+            <div className="metric-header">
+              <div className="metric-icon strength">
+                <i className="bx bx-trophy"></i>
+              </div>
+              <div className="metric-info">
+                <h4>Top Strength</h4>
+                <p>{topStrength.name}</p>
+              </div>
+            </div>
+            <div className="metric-visual">
+              <div className="circular-progress">
+                <svg viewBox="0 0 36 36">
+                  <path
+                    d="M18 2.0845
+                      a 15.9155 15.9155 0 0 1 0 31.831
+                      a 15.9155 15.9155 0 0 1 0 -31.831"
+                    fill="none"
+                    stroke="#e5e7eb"
+                    strokeWidth="3"
+                  />
+                  <path
+                    d="M18 2.0845
+                      a 15.9155 15.9155 0 0 1 0 31.831
+                      a 15.9155 15.9155 0 0 1 0 -31.831"
+                    fill="none"
+                    stroke="#059669"
+                    strokeWidth="3"
+                    strokeDasharray={`${(parseFloat(averages[topStrength.name.toLowerCase()]) / 5) * 100}, 100`}
+                  />
+                </svg>
+                <div className="progress-value">{averages[topStrength.name.toLowerCase()]}</div>
+              </div>
+            </div>
+          </div>
+
+          <div className="metric-detailed-card">
+            <div className="metric-header">
+              <div className="metric-icon improvement">
+                <i className="bx bx-trending-up"></i>
+              </div>
+              <div className="metric-info">
+                <h4>Improvement Area</h4>
+                <p>{improvementArea.name}</p>
+              </div>
+            </div>
+            <div className="metric-visual">
+              <div className="circular-progress">
+                <svg viewBox="0 0 36 36">
+                  <path
+                    d="M18 2.0845
+                      a 15.9155 15.9155 0 0 1 0 31.831
+                      a 15.9155 15.9155 0 0 1 0 -31.831"
+                    fill="none"
+                    stroke="#e5e7eb"
+                    strokeWidth="3"
+                  />
+                  <path
+                    d="M18 2.0845
+                      a 15.9155 15.9155 0 0 1 0 31.831
+                      a 15.9155 15.9155 0 0 1 0 -31.831"
+                    fill="none"
+                    stroke="#d97706"
+                    strokeWidth="3"
+                    strokeDasharray={`${(parseFloat(averages[improvementArea.name.toLowerCase()]) / 5) * 100}, 100`}
+                  />
+                </svg>
+                <div className="progress-value">{averages[improvementArea.name.toLowerCase()]}</div>
+              </div>
+            </div>
+          </div>
+
+          <div className="metric-detailed-card">
+            <div className="metric-header">
+              <div className="metric-icon sentiment">
+                <i className="bx bx-smile"></i>
+              </div>
+              <div className="metric-info">
+                <h4>Customer Sentiment</h4>
+                <p>Analysis</p>
+              </div>
+            </div>
+            <div className="metric-visual">
+              <div className="sentiment-donut">
+                <ResponsiveContainer width={120} height={120}>
+                  <PieChart>
+                    <Pie
+                      data={sentimentData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={30}
+                      outerRadius={50}
+                      paddingAngle={2}
+                      dataKey="value"
+                    >
+                      {sentimentData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                  </PieChart>
+                </ResponsiveContainer>
               </div>
             </div>
           </div>
@@ -1218,13 +1585,33 @@ function AdminPanel({
       <section className="charts-section">
         <div className="chart-container">
           <div className="chart-header">
-            <h2 className="chart-title">Recommendation Rate</h2>
-            <div className="chart-badge">{recommendCount} responses</div>
+            <h2 className="chart-title">Category Ratings</h2>
+            <div className="chart-badge">Average Scores</div>
+          </div>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={ratingsData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+              <XAxis dataKey="name" tick={{ fill: '#64748b' }} />
+              <YAxis domain={[0, 5]} tick={{ fill: '#64748b' }} />
+              <Tooltip />
+              <Bar dataKey="rating" fill="#8b5cf6" radius={[8, 8, 0, 0]}>
+                {ratingsData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.fill} />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+        
+        <div className="chart-container">
+          <div className="chart-header">
+            <h2 className="chart-title">Sentiment Distribution</h2>
+            <div className="chart-badge">{sentimentAnalysis.total} analyzed</div>
           </div>
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie
-                data={recommendData}
+                data={sentimentData}
                 cx="50%"
                 cy="50%"
                 labelLine={false}
@@ -1233,7 +1620,7 @@ function AdminPanel({
                 fill="#8884d8"
                 dataKey="value"
               >
-                {recommendData.map((entry, index) => (
+                {sentimentData.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={entry.color} />
                 ))}
               </Pie>
@@ -1241,153 +1628,12 @@ function AdminPanel({
             </PieChart>
           </ResponsiveContainer>
         </div>
-        <div className="chart-container">
-          <div className="chart-header">
-            <h2 className="chart-title">Category Ratings</h2>
-            <div className="chart-actions">
-              <button 
-                className={`chart-toggle ${chartType === 'bar' ? 'active' : ''}`}
-                onClick={() => setChartType('bar')}
-              >
-                <i className="bx bx-bar-chart"></i>
-              </button>
-              <button 
-                className={`chart-toggle ${chartType === 'radar' ? 'active' : ''}`}
-                onClick={() => setChartType('radar')}
-              >
-                <i className="bx bx-radar"></i>
-              </button>
-            </div>
-          </div>
-          <ResponsiveContainer width="100%" height={300}>
-            {chartType === 'bar' ? (
-              <BarChart 
-                data={ratingsData}
-                margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                <XAxis 
-                  dataKey="name" 
-                  tick={{ fill: '#64748b' }}
-                  axisLine={{ stroke: '#e2e8f0' }}
-                />
-                <YAxis 
-                  domain={[0, 5]} 
-                  ticks={[0, 1, 2, 3, 4, 5]}
-                  tick={{ fill: '#64748b' }}
-                  axisLine={{ stroke: '#e2e8f0' }}
-                  label={{ value: 'Rating', angle: -90, position: 'insideLeft', style: { fill: '#64748b' } }}
-                />
-                <Tooltip content={<CustomTooltip />} />
-                <Bar 
-                  dataKey="rating" 
-                  fill={chartColors.primary}
-                  radius={[8, 8, 0, 0]}
-                  animationDuration={1000}
-                >
-                  {ratingsData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.fill} />
-                  ))}
-                </Bar>
-              </BarChart>
-            ) : (
-              <RadarChart data={radarData}>
-                <PolarGrid stroke="#e2e8f0" />
-                <PolarAngleAxis dataKey="category" tick={{ fill: '#64748b' }} />
-                <PolarRadiusAxis 
-                  angle={90} 
-                  domain={[0, 5]} 
-                  tick={{ fill: '#64748b' }}
-                />
-                <Radar 
-                  name="Rating" 
-                  dataKey="value" 
-                  stroke={chartColors.primary} 
-                  fill={chartColors.primary} 
-                  fillOpacity={0.6}
-                />
-                <Tooltip />
-              </RadarChart>
-            )}
-          </ResponsiveContainer>
-        </div>
-      </section>
-
-      {/* Performance Insights Section */}
-      <section className="insights-section">
-        <div className="section-header">
-          <h2 className="section-title">Performance Insights</h2>
-        </div>
-        <div className="insights-grid">
-          <div className="insight-card">
-            <div className="insight-header">
-              <div className="insight-icon strength">
-                <i className="bx bx-trophy"></i>
-              </div>
-              <div className="insight-title">Top Strength</div>
-            </div>
-            <div className="insight-content">
-              <div className="insight-value">{averages[topStrength.name.toLowerCase()]}/5</div>
-              <div className="insight-description">
-                {topStrength.name} quality stands out as our strongest performance area with exceptional ratings from customers.
-              </div>
-              <div className="insight-progress">
-                <div 
-                  className="insight-progress-bar strength" 
-                  style={{width: `${Math.min(100, (parseFloat(averages[topStrength.name.toLowerCase()]) / 5) * 100)}%`}}
-                ></div>
-              </div>
-            </div>
-          </div>
-          
-          <div className="insight-card">
-            <div className="insight-header">
-              <div className="insight-icon improvement">
-                <i className="bx bx-trending-up"></i>
-              </div>
-              <div className="insight-title">Improvement Area</div>
-            </div>
-            <div className="insight-content">
-              <div className="insight-value">{averages[improvementArea.name.toLowerCase()]}/5</div>
-              <div className="insight-description">
-                {improvementArea.name} quality shows room for improvement and should be prioritized in our enhancement efforts.
-              </div>
-              <div className="insight-progress">
-                <div 
-                  className="insight-progress-bar improvement" 
-                  style={{width: `${Math.min(100, (parseFloat(averages[improvementArea.name.toLowerCase()]) / 5) * 100)}%`}}
-                ></div>
-              </div>
-            </div>
-          </div>
-          
-          <div className="insight-card">
-            <div className="insight-header">
-              <div className="insight-icon sentiment">
-                <i className="bx bx-smile"></i>
-              </div>
-              <div className="insight-title">Customer Sentiment</div>
-            </div>
-            <div className="insight-content">
-              <div className="insight-value">{recommendRate}%</div>
-              <div className="insight-description">
-                Customer sentiment is {parseFloat(recommendRate) > 50 ? 'positive' : 'neutral'} with recommendation rates indicating brand loyalty.
-              </div>
-              <div className="insight-progress">
-                <div 
-                  className="insight-progress-bar sentiment" 
-                  style={{width: `${recommendRate}%`}}
-                ></div>
-              </div>
-            </div>
-          </div>
-        </div>
       </section>
 
       {/* Feedback Table Section */}
       <section className="table-section">
         <div className="table-header">
-          <h2 className="table-title">Feedback Details</h2>
+          <h2 className="table-title">Recent Feedback</h2>
           <div className="table-info">
             Showing {Math.min(itemsPerPage, filteredFeedbacks.length)} of {filteredFeedbacks.length} entries
           </div>
@@ -1398,8 +1644,6 @@ function AdminPanel({
               <tr>
                 <th>Date</th>
                 <th>Name/Group</th>
-                <th>Email</th>
-                <th>Contact</th>
                 <th>Event</th>
                 <th>Food</th>
                 <th>Ambience</th>
@@ -1413,7 +1657,7 @@ function AdminPanel({
             <tbody>
               {currentItems.length === 0 ? (
                 <tr>
-                  <td colSpan="12" className="empty-state">
+                  <td colSpan="10" className="empty-state">
                     <i className="bx bx-inbox"></i>
                     {searchTerm.trim() ? "No feedback found matching your search criteria." : "No feedback available"}
                   </td>
@@ -1423,8 +1667,6 @@ function AdminPanel({
                   <tr key={index} className={index % 2 === 0 ? "even" : "odd"}>
                     <td>{f.date}</td>
                     <td>{f.name}</td>
-                    <td>{f.email || "N/A"}</td>
-                    <td>{f.contact || "N/A"}</td>
                     <td>{f.event}</td>
                     <td>
                       <div className="rating-cell">
@@ -1544,3 +1786,4 @@ function AdminPanel({
 }
 
 export default AdminPanel;
+*/

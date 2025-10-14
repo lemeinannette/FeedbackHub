@@ -1,10 +1,11 @@
 /* 
-  Design System matching the login page with light blue background and teal buttons
-  Updated with consistent purple color scheme for charts and buttons
+  Design System with teal green color scheme
+  Chart bars maintain purple color as requested
 */
 
 :root {
   /* Light blue background to match AdminLogin */
+  /*
   --bg-primary: #e6f7ff;
   --bg-secondary: #ffffff;
   --text-primary: #333333;
@@ -13,7 +14,8 @@
   --border: #e5e7eb;
   --border-light: #f3f4f6;
   
-  /* Teal accent colors matching the login button */
+  /* Teal accent colors matching the login button - now primary colors */
+  /*
   --teal-50: #f0fdfa;
   --teal-100: #ccfbf1;
   --teal-200: #99f6e4;
@@ -24,8 +26,10 @@
   --teal-700: #0f766e;
   --teal-800: #115e59;
   --teal-900: #134e4a;
+  */
   
-  /* Purple colors for charts and buttons - matching the screenshot */
+  /* Purple colors - now secondary, used only for charts */
+  /*
   --purple-50: #f5f3ff;
   --purple-100: #ede9fe;
   --purple-200: #ddd6fe;
@@ -36,25 +40,29 @@
   --purple-700: #6d28d9;
   --purple-800: #5b21b6;
   --purple-900: #4c1d95;
+  */
   
   /* Semantic colors */
+  /*
   --success: #059669;
   --warning: #d97706;
   --danger: #dc2626;
   --info: #0891b2;
-  --primary: #14b8a6;
-  --primary-dark: #0d9488;
+  --primary: #14b8a6;           /* Changed from purple to teal */
+  --primary-dark: #0d9488;      /* Darker teal */
+  --primary-light: #5eead4;     /* Lighter teal */
+  */    /* Changed from purple to teal */
   
-  /* Chart colors - using the same shade for all bars as Food and Ambience in the screenshot */
-  --chart-primary: #8b5cf6;      /* Exact shade matching Food and Ambience bars */
+  /* Chart colors - keeping purple as requested */
+  --chart-primary: #8b5cf6;      /* Purple for chart bars */
   --chart-secondary: #8b5cf6;    /* Same shade for consistency */
   --chart-tertiary: #8b5cf6;     /* Same shade for consistency */
   --chart-quaternary: #8b5cf6;   /* Same shade for consistency */
   
-  /* Button colors - using the same purple as charts */
-  --button-primary: #8b5cf6;     /* Same purple as charts */
-  --button-primary-hover: #7c3aed; /* Darker purple on hover */
-  --button-primary-active: #6d28d9; /* Even darker when active */
+  /* Button colors - using teal instead of purple */
+  --button-primary: #14b8a6;     /* Teal instead of purple */
+  --button-primary-hover: #0d9488; /* Darker teal on hover */
+  --button-primary-active: #0f766e; /* Even darker when active */
   
   /* Shadows - minimal */
   --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
@@ -232,7 +240,7 @@
   }
 }
 
-/* Header */
+/* Header - Updated with teal title */
 .dashboard-header {
   margin-bottom: 32px;
 }
@@ -257,7 +265,7 @@
 .dashboard-title {
   font-size: 24px;
   font-weight: 600;
-  color: var(--text-primary);
+  color: var(--primary);
   margin: 0;
 }
 
@@ -273,7 +281,7 @@
   align-items: center;
 }
 
-/* Buttons - updated with purple color scheme */
+/* Buttons - updated with teal color scheme */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -298,7 +306,7 @@
 
 .btn:focus {
   outline: none;
-  box-shadow: 0 0 0 2px rgba(20, 184, 166, 0.1);
+  box-shadow: 0 0 0 0 2px rgba(20, 184, 166, 0.1);
 }
 
 .btn-logout {
@@ -339,13 +347,13 @@
   cursor: not-allowed;
 }
 
-/* Theme Toggle - updated with purple color scheme */
+/* Theme Toggle - updated with teal color scheme */
 .theme-toggle-button {
   position: relative;
   display: inline-block;
   width: 44px;
   height: 22px;
-  background: var(--purple-200);
+  background: var(--teal-200);
   border: none;
   border-radius: 22px;
   cursor: pointer;
@@ -377,7 +385,7 @@
 
 .theme-icon {
   font-size: 10px;
-  color: var(--purple-400);
+  color: var(--teal-400);
 }
 
 .theme-toggle-button.active .theme-icon {
@@ -430,7 +438,7 @@
 .search-input:focus {
   outline: none;
   border-color: var(--button-primary);
-  box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.1);
+  box-shadow: 0 0 0 0 2px rgba(20, 184, 166, 0.1);
 }
 
 .clear-search-btn {
@@ -449,7 +457,7 @@
 }
 
 .clear-search-btn:hover {
-  background: var(--purple-50);
+  background: var(--teal-50);
   color: var(--button-primary);
 }
 
@@ -505,11 +513,11 @@
 }
 
 .date-picker-dropdown button:hover {
-  background: var(--purple-50);
+  background: var(--teal-50);
 }
 
 .date-picker-dropdown button.active {
-  background: var(--purple-50);
+  background: var(--teal-50);
   color: var(--button-primary);
   font-weight: 600;
 }
@@ -537,8 +545,8 @@
   gap: 6px;
   margin-top: 8px;
   padding: 10px 14px;
-  background: var(--purple-50);
-  border: 1px solid var(--purple-200);
+  background: var(--teal-50);
+  border: 1px solid var(--teal-200);
   border-radius: var(--radius);
   color: var(--button-primary);
   font-size: 13px;
@@ -565,7 +573,7 @@
   gap: 14px;
   transition: var(--transition);
   border: 1px solid var(--border);
-  border-left: 4px solid var(--chart-primary);
+  border-left: 4px solid var(--primary);
 }
 
 .metric-card:hover {
@@ -580,8 +588,8 @@
   width: 48px;
   height: 48px;
   border-radius: var(--radius);
-  background: var(--purple-50);
-  color: var(--chart-primary);
+  background: var(--teal-50);
+  color: var(--primary);
   font-size: 20px;
 }
 
@@ -639,7 +647,7 @@
   font-size: 12px;
 }
 
-/* Charts - Updated with consistent purple color scheme */
+/* Charts - Updated with teal color scheme but purple bars */
 .charts-section {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -675,8 +683,8 @@
 }
 
 .chart-badge {
-  background: var(--purple-50);
-  color: var(--chart-primary);
+  background: var(--teal-50);
+  color: var(--primary);
   padding: 4px 10px;
   border-radius: 12px;
   font-size: 11px;
@@ -703,17 +711,17 @@
 }
 
 .chart-toggle:hover {
-  background: var(--purple-50);
-  color: var(--chart-primary);
+  background: var(--teal-50);
+  color: var(--primary);
 }
 
 .chart-toggle.active {
-  background: var(--chart-primary);
+  background: var(--primary);
   color: white;
-  border-color: var(--chart-primary);
+  border-color: var(--primary);
 }
 
-/* Chart specific styles - for bar charts matching the screenshot */
+/* Chart specific styles - for bar charts with purple bars */
 .bar-chart {
   height: 250px;
   position: relative;
@@ -723,7 +731,7 @@
   position: absolute;
   bottom: 40px;
   width: 60px;
-  background: var(--chart-primary);
+  background: var(--chart-primary); /* Purple bars */
   border-radius: 4px 4px 0 0;
   transition: height 0.3s ease;
 }
@@ -768,18 +776,18 @@
 }
 
 .line-chart .line-path {
-  stroke: var(--chart-primary);
+  stroke: var(--chart-primary); /* Purple line */
   stroke-width: 2;
   fill: none;
 }
 
 .line-chart .line-area {
-  fill: var(--purple-200);
+  fill: var(--purple-200); /* Purple area */
   opacity: 0.3;
 }
 
 .line-chart .line-point {
-  fill: var(--chart-primary);
+  fill: var(--chart-primary); /* Purple points */
   stroke: white;
   stroke-width: 2;
 }
@@ -801,10 +809,10 @@
   clip-path: polygon(50% 50%, 50% 0%, 100% 0%, 100% 50%);
 }
 
-.pie-chart .pie-slice:nth-child(1) { background: var(--chart-primary); }
-.pie-chart .pie-slice:nth-child(2) { background: var(--chart-primary); transform: rotate(90deg); }
-.pie-chart .pie-slice:nth-child(3) { background: var(--chart-primary); transform: rotate(180deg); }
-.pie-chart .pie-slice:nth-child(4) { background: var(--chart-primary); transform: rotate(270deg); }
+.pie-chart .pie-slice:nth-child(1) { background: var(--chart-primary); } /* Purple */
+.pie-chart .pie-slice:nth-child(2) { background: var(--chart-primary); transform: rotate(90deg); } /* Purple */
+.pie-chart .pie-slice:nth-child(3) { background: var(--chart-primary); transform: rotate(180deg); } /* Purple */
+.pie-chart .pie-slice:nth-child(4) { background: var(--chart-primary); transform: rotate(270deg); } /* Purple */
 
 .pie-chart .pie-center {
   position: absolute;
@@ -819,119 +827,396 @@
   color: var(--text-primary);
 }
 
-/* Insights */
+/* Performance Insights Section - Modern Design */
+.performance-insights-section {
+    margin-bottom: 40px;
+    animation: fadeInUp 0.6s ease-out;
+}
+
+.section-header {
+    margin-bottom: 32px;
+    text-align: center;
+}
+
+.section-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 8px;
+    background: linear-gradient(135deg, var(--teal-600), var(--teal-500));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.section-subtitle {
+    font-size: 16px;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.insights-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 24px;
+    margin-bottom: 32px;
+}
+
+/* Insight Cards */
+.insight-card {
+    background: var(--bg-secondary);
+    border-radius: 16px;
+    padding: 28px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid var(--border-light);
+    position: relative;
+    overflow: hidden;
+}
+
+.insight-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--teal-500), var(--teal-400));
+    transition: height 0.3s ease;
+}
+
+.insight-card.strength-card::before {
+    background: linear-gradient(90deg, var(--success), #10b981);
+}
+
+.insight-card.improvement-card::before {
+    background: linear-gradient(90deg, var(--warning), #f59e0b);
+}
+
+.insight-card.sentiment-card::before {
+    background: linear-gradient(90deg, var(--info), #06b6d4);
+}
+
+.insight-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.insight-card:hover::before {
+    height: 6px;
+}
+
+.insight-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+}
+
+.insight-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--teal-50), var(--teal-100));
+    color: var(--teal-600);
+    transition: transform 0.3s ease;
+}
+
+.insight-card:hover .insight-icon {
+    transform: scale(1.05);
+}
+
+.insight-badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.strength-card .insight-badge {
+    background: rgba(5, 150, 105, 0.1);
+    color: var(--success);
+}
+
+.improvement-card .insight-badge {
+    background: rgba(217, 119, 6, 0.1);
+    color: var(--warning);
+}
+
+.sentiment-card .insight-badge {
+    background: rgba(8, 145, 178, 0.1);
+    color: var(--info);
+}
+
+.insight-content {
+    text-align: center;
+}
+
+.insight-chart {
+    margin-bottom: 24px;
+    display: flex;
+    justify-content: center;
+}
+
+/* Donut Chart */
+.donut-chart {
+    position: relative;
+    width: 140px;
+    height: 140px;
+}
+
+.donut-svg {
+    transform: rotate(-90deg);
+}
+
+.donut-hole {
+    fill: var(--bg-secondary);
+}
+
+.donut-segment {
+    transition: stroke-dasharray 0.8s ease-in-out;
+    animation: donutFill 1.5s ease-out;
+}
+
+.donut-value {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.donut-value span {
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--text-secondary);
+}
+
+/* Sentiment Gauge */
+.sentiment-gauge {
+    position: relative;
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    background: conic-gradient(
+        from 180deg,
+        var(--success) 0deg,
+        var(--success) 90deg,
+        var(--warning) 90deg,
+        var(--warning) 180deg,
+        var(--danger) 180deg,
+        var(--danger) 270deg,
+        var(--neutral) 270deg,
+        var(--neutral) 360deg
+    );
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.sentiment-gauge::before {
+    content: '';
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    background: var(--bg-secondary);
+    border-radius: 50%;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.gauge-value {
+    position: relative;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text-primary);
+    z-index: 1;
+}
+
+.gauge-label {
+    position: absolute;
+    bottom: 30px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    z-index: 1;
+}
+
+/* Insight Details */
+.insight-details {
+    text-align: center;
+}
+
+.insight-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+}
+
+.insight-description {
+    font-size: 14px;
+    color: var(--text-secondary);
+    font-style: italic;
+    margin-bottom: 16px;
+    line-height: 1.5;
+}
+
+.insight-metrics {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+}
+
+.metric-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.metric-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.metric-value {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+/* Recommendation Breakdown */
+.recommendation-breakdown {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.recommend-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: relative;
+}
+
+.recommend-item span {
+    font-size: 13px;
+    font-weight: 500;
+    min-width: 60px;
+    text-align: right;
+}
+
+.recommend-bar {
+    height: 8px;
+    border-radius: 4px;
+    transition: width 0.8s ease-out;
+}
+
+.recommend-item.yes .recommend-bar {
+    background: linear-gradient(90deg, var(--success), #10b981);
+}
+
+.recommend-item.no .recommend-bar {
+    background: linear-gradient(90deg, var(--danger), #ef4444);
+}
+
+/* Animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes donutFill {
+    from {
+        stroke-dasharray: 0 100;
+    }
+}
+
+/* Insights - Updated with teal color scheme */
 .insights-section {
   margin-bottom: 32px;
 }
 
-.section-header {
-  margin-bottom: 16px;
-}
-
-.section-title {
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--text-primary);
-  margin: 0;
-}
-
-.insights-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 20px;
-}
-
-.insight-card {
+.insights-summary {
   background: var(--bg-secondary);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow);
-  overflow: hidden;
-  transition: var(--transition);
   border: 1px solid var(--border);
-}
-
-.insight-card:hover {
-  box-shadow: var(--shadow);
-  transform: translateY(-2px);
-}
-
-.insight-header {
-  padding: 16px;
+  padding: 20px;
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid var(--border-light);
 }
 
-.insight-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: var(--radius);
+.insights-summary-text {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.insights-summary-stats {
+  display: flex;
+  gap: 24px;
+}
+
+.insight-stat {
+  text-align: center;
+  flex: 1;
+}
+
+.insight-stat .stat-value {
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.insight-stat .stat-label {
+  font-size: 12px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.insight-stat .stat-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
-  margin-right: 12px;
-  color: white;
-}
-
-.insight-icon.strength {
-  background: var(--success);
-}
-
-.insight-icon.improvement {
-  background: var(--warning);
-}
-
-.insight-icon.sentiment {
-  background: var(--info);
-}
-
-.insight-title {
   font-size: 14px;
-  font-weight: 600;
-  color: var(--text-primary);
+  color: white;
+  margin: 0 auto 8px;
 }
 
-.insight-content {
-  padding: 16px;
-}
-
-.insight-value {
-  font-size: 20px;
-  font-weight: 600;
-  color: var(--text-primary);
-  margin-bottom: 6px;
-}
-
-.insight-description {
-  font-size: 13px;
-  color: var(--text-secondary);
-  margin-bottom: 12px;
-  line-height: 1.5;
-}
-
-.insight-progress {
-  height: 4px;
-  background: var(--border);
-  border-radius: 2px;
-  overflow: hidden;
-}
-
-.insight-progress-bar {
-  height: 100%;
-  border-radius: 2px;
-  transition: width 0.3s ease;
-}
-
-.insight-progress-bar.strength {
+.insight-stat.strength .stat-icon {
   background: var(--success);
 }
 
-.insight-progress-bar.improvement {
+.insight-stat.improvement .stat-icon {
   background: var(--warning);
 }
 
-.insight-progress-bar.sentiment {
+.insight-stat.sentiment .stat-icon {
   background: var(--info);
 }
 
@@ -1144,7 +1429,7 @@
 }
 
 .pagination-btn:hover:not(:disabled) {
-  background: var(--purple-50);
+  background: var(--teal-50);
   border-color: var(--button-primary);
 }
 
@@ -1180,7 +1465,7 @@
   to { transform: rotate(360deg); }
 }
 
-/* Dark Mode - Updated with consistent purple for charts and buttons */
+/* Dark Mode - Updated with teal color scheme but purple charts */
 .admin-container.dark-mode {
   background: #1a202c;
   color: #e2e8f0;
@@ -1189,12 +1474,13 @@
 .admin-container.dark-mode .header-content,
 .admin-container.dark-mode .metric-card,
 .admin-container.dark-mode .chart-container,
-.admin-container.dark-mode .insight-card,
+.admin-container.dark-mode .insights-summary,
 .admin-container.dark-mode .table-header,
 .admin-container.dark-mode .table-container,
 .admin-container.dark-mode .pagination,
 .admin-container.dark-mode .date-picker-dropdown,
-.admin-container.dark-mode .export-tooltip {
+.admin-container.dark-mode .export-tooltip,
+.admin-container.dark-mode .insight-card {
   background: #334155;
   border-color: #475569;
 }
@@ -1211,6 +1497,7 @@
 
 .admin-container.dark-mode .dashboard-subtitle,
 .admin-container.dark-mode .metric-label,
+.admin-container.dark-mode .insight-title,
 .admin-container.dark-mode .insight-description,
 .admin-container.dark-mode .table-info {
   color: #d1d5db;
@@ -1311,11 +1598,11 @@
 }
 
 .admin-container.dark-mode .theme-toggle-button {
-  background: var(--purple-200);
+  background: var(--teal-200);
 }
 
 .admin-container.dark-mode .theme-icon {
-  color: var(--purple-400);
+  color: var(--teal-400);
 }
 
 .admin-container.dark-mode .theme-toggle-button.active {
@@ -1323,8 +1610,8 @@
 }
 
 .admin-container.dark-mode .chart-toggle.active {
-  background: var(--chart-primary);
-  border-color: var(--chart-primary);
+  background: var(--primary);
+  border-color: var(--primary);
 }
 
 .admin-container.dark-mode .notification-success {
@@ -1351,25 +1638,35 @@
   border-color: #075985;
 }
 
-/* Dark mode chart colors */
-.admin-container.dark-mode .bar-chart .bar {
-  background: var(--chart-primary);
+/* Dark mode insights section */
+.admin-container.dark-mode .insights-summary {
+  background: #334155;
+  border-color: #475569;
 }
 
-.admin-container.dark-mode .line-chart .line-path {
-  stroke: var(--chart-primary);
+.admin-container.dark-mode .insights-summary-text {
+  color: #d1d5db;
 }
 
-.admin-container.dark-mode .line-chart .line-area {
-  fill: var(--purple-200);
-  opacity: 0.3;
+.admin-container.dark-mode .insight-stat .stat-value {
+  color: #f1f5f9;
 }
 
-.admin-container.dark-mode .line-chart .line-point {
-  fill: var(--chart-primary);
+.admin-container.dark-mode .insight-stat .stat-label {
+  color: #d1d5db;
 }
 
-.admin-container.dark-mode .pie-chart .pie-center {
+/* Dark mode header title */
+.admin-container.dark-mode .dashboard-title {
+  color: var(--primary);
+}
+
+/* Dark mode performance insights */
+.admin-container.dark-mode .donut-hole {
+  fill: #334155;
+}
+
+.admin-container.dark-mode .sentiment-gauge::before {
   background: #334155;
 }
 
@@ -1404,8 +1701,8 @@
 }
 
 @media (max-width: 768px) {
-  .insights-grid {
-    grid-template-columns: 1fr;
+  .insights-summary {
+    flex-direction: column;
   }
   
   .charts-section {
@@ -1431,4 +1728,53 @@
     width: 260px;
     right: -10px;
   }
+  
+  .insights-summary {
+    flex-direction: column;
+  }
+  
+  /* Performance insights responsive */
+  .insights-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .section-title {
+    font-size: 24px;
+  }
+  
+  .insight-card {
+    padding: 24px;
+  }
+  
+  .donut-chart,
+  .sentiment-gauge {
+    width: 120px;
+    height: 120px;
+  }
+  
+  .donut-value,
+  .gauge-value {
+    font-size: 20px;
+  }
 }
+
+@media (max-width: 480px) {
+  .insight-card {
+    padding: 20px;
+  }
+  
+  .insight-header {
+    margin-bottom: 20px;
+  }
+  
+  .insight-icon {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .insight-metrics {
+    gap: 16px;
+  }
+}
+*/

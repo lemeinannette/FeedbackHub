@@ -1,0 +1,67 @@
+.notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  min-width: 300px;
+  max-width: 400px;
+  padding: 16px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  animation: slideIn 0.3s ease-out;
+}
+
+.notification-success {
+  background-color: #10b981;
+  color: white;
+}
+
+.notification-error {
+  background-color: #ef4444;
+  color: white;
+}
+
+.notification-warning {
+  background-color: #f59e0b;
+  color: white;
+}
+
+.notification-info {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.notification-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.notification-content i {
+  font-size: 20px;
+}
+
+.notification-close {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  font-size: 20px;
+  padding: 0;
+}
+
+.notification-close:hover {
+  opacity: 0.8;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}

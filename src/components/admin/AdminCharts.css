@@ -1,0 +1,146 @@
+.charts-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  padding: 32px;
+  background: white;
+}
+
+.admin-container.dark-mode .charts-section {
+  background: #1e293b;
+}
+
+.chart-container {
+  background: white;
+  border-radius: 16px;
+  padding: 28px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.admin-container.dark-mode .chart-container {
+  background: #0f172a;
+}
+
+.chart-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, #14b8a6 0%, #0d9488 100%);
+}
+
+.chart-container:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+
+.chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.chart-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+  letter-spacing: -0.3px;
+}
+
+.admin-container.dark-mode .chart-title {
+  color: #f1f5f9;
+}
+
+.chart-badge {
+  font-size: 13px;
+  color: #64748b;
+  background: #f1f5f9;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-weight: 500;
+}
+
+.admin-container.dark-mode .chart-badge {
+  background: #334155;
+  color: #94a3b8;
+}
+
+/* Custom Tooltip Styles */
+.custom-tooltip {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.admin-container.dark-mode .custom-tooltip {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+.tooltip-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #0f172a;
+  margin: 0 0 4px 0;
+}
+
+.admin-container.dark-mode .tooltip-label {
+  color: #f1f5f9;
+}
+
+.tooltip-value {
+  font-size: 13px;
+  color: #64748b;
+  margin: 0;
+}
+
+.admin-container.dark-mode .tooltip-value {
+  color: #94a3b8;
+}
+
+.tooltip-percentage {
+  font-size: 12px;
+  color: #14b8a6;
+  font-weight: 600;
+  margin: 4px 0 0 0;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .charts-section {
+    grid-template-columns: 1fr;
+    gap: 24px;
+    padding: 24px;
+  }
+  
+  .chart-container {
+    padding: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .charts-section {
+    padding: 20px;
+  }
+  
+  .chart-container {
+    padding: 16px;
+  }
+  
+  .chart-title {
+    font-size: 18px;
+  }
+  
+  .chart-header {
+    margin-bottom: 16px;
+  }
+}

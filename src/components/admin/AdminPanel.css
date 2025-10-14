@@ -1,0 +1,162 @@
+/* Admin Container - Additional Styles */
+.admin-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f0fdfa 0%, #e6fffa 100%);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: #0f172a;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.admin-container::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: 
+    radial-gradient(circle at 20% 80%, rgba(20, 184, 166, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(6, 182, 212, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 40% 40%, rgba(13, 148, 136, 0.05) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Dark Mode Styles */
+.admin-container.dark-mode {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  color: #f1f5f9;
+}
+
+.admin-container.dark-mode::before {
+  background: 
+    radial-gradient(circle at 20% 80%, rgba(20, 184, 166, 0.05) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(6, 182, 212, 0.05) 0%, transparent 50%),
+    radial-gradient(circle at 40% 40%, rgba(13, 148, 136, 0.03) 0%, transparent 50%);
+}
+
+/* Loading State */
+.admin-container.loading {
+  pointer-events: none;
+}
+
+.admin-container.loading::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.8);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.admin-container.dark-mode.loading::after {
+  background: rgba(15, 23, 42, 0.8);
+}
+
+/* Smooth Scroll */
+.admin-container {
+  scroll-behavior: smooth;
+}
+
+/* Custom Scrollbar */
+.admin-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.admin-container::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+.admin-container::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  border-radius: 4px;
+}
+
+.admin-container::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%);
+}
+
+.admin-container.dark-mode::-webkit-scrollbar-track {
+  background: #1e293b;
+}
+
+/* Focus Styles */
+.admin-container *:focus-visible {
+  outline: 2px solid #14b8a6;
+  outline-offset: 2px;
+}
+
+/* Selection Styles */
+.admin-container ::selection {
+  background: rgba(20, 184, 166, 0.2);
+  color: #0f172a;
+}
+
+.admin-container.dark-mode ::selection {
+  background: rgba(20, 184, 166, 0.3);
+  color: #f1f5f9;
+}
+
+/* Animation Classes */
+.fade-in {
+  animation: fadeIn 0.5s ease-out;
+}
+
+.slide-up {
+  animation: slideUp 0.5s ease-out;
+}
+
+.scale-in {
+  animation: scaleIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Print Styles */
+@media print {
+  .admin-container {
+    background: white;
+    color: black;
+  }
+  
+  .admin-container .btn,
+  .admin-container .action-btn,
+  .admin-container .pagination-btn {
+    display: none;
+  }
+}
