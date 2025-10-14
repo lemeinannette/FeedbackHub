@@ -123,10 +123,10 @@ export default function App() {
           <div className="nav-brand">
             <div className="nav-logo-container">
               <div className="nav-logo">
-                <span className="logo-text">FH</span>
+                <img src="/logo" alt="logo" width={45} height={45} />
               </div>
             </div>
-            <span>Feedback Hub</span>
+           
           </div>
           
           <div className="nav-links">
