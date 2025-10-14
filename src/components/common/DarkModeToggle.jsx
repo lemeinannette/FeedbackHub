@@ -1,28 +1,34 @@
-import React, { useEffect, useState } from "react";
+import React from 'react';
+import './DarkModeToggle.css';
 
-export default function DarkModeToggle() {
-  const [darkMode, setDarkMode] = useState(
-    localStorage.getItem("theme") === "dark"
-  );
-
-  useEffect(() => {
-    if (darkMode) {
-      document.body.classList.add("dark");
-      document.body.classList.remove("light");
-      localStorage.setItem("theme", "dark");
-    } else {
-      document.body.classList.add("light");
-      document.body.classList.remove("dark");
-      localStorage.setItem("theme", "light");
-    }
-  }, [darkMode]);
-
+const DarkModeToggle = ({ 
+  isDarkMode, 
+  onToggle,
+  size = 'medium',
+  showLabel = false,
+  label = 'Dark Mode'
+}) => {
   return (
-    <button
-      onClick={() => setDarkMode((prev) => !prev)}
-      className="theme-toggle-btn"
-    >
-      <i className={darkMode ? "bx bxs-moon" : "bx bxs-sun"}></i>
-    </button>
+    <div className={`dark-mode-toggle dark-mode-toggle--${size}`}>
+      <button
+        className={`toggle-switch ${isDarkMode ? 'toggle-switch--active' : ''}`}
+        onClick={onToggle}
+        aria-label={`Toggle ${label}`}
+        aria-pressed={isDarkMode}
+      >
+        <div className="toggle-slider">
+          <div className="toggle-thumb">
+            <i className={`bx ${isDarkMode ? 'bx-moon' : 'bx-sun'} toggle-icon`}></i>
+          </div>
+        </div>
+      </button>
+      {showLabel && (
+        <span className="toggle-label">
+          {label}
+        </span>
+      )}
+    </div>
   );
-}
+};
+
+export default DarkModeToggle;

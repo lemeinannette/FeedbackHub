@@ -1,406 +1,221 @@
-// src/components/FeedbackForm.js
+// src/components/feedback/FeedbackForm.jsx
 
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import StarRating from "./StarRating";
-import EventDropdown from "./EventDropDown";
-import Toggle from "./Toggle";
-import "./FeedbackForm.css";
+import StarRating from "../common/StarRating";  // Updated path
+import EventDropDown from "../common/EventDropDown";  // Updated path
+import Toggle from "../common/Toggle";  // Updated path
+import './FeedbackForm.css';
 
-export default function FeedbackForm({ clientDarkMode, toggleClientTheme, previousRoute, setPreviousRoute }) {
-  const [feedbackType, setFeedbackType] = useState("");
+const FeedbackForm = ({ 
+  previousRoute, 
+  setPreviousRoute,
+  clientDarkMode,
+  toggleClientTheme
+}) => {
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    contact: "",
-    group: "",
-    groupEmail: "",
-    groupContact: "",
-    comments: "",
-    foodRating: 0,
-    serviceRating: 0,
-    ambienceRating: 0,
-    overallRating: 0,
-    event: "",
-    otherEvent: "",
-    recommend: "",
-    isAnonymous: false,
+    name: '',
+    email: '',
+    event: '',
+    food: 5,
+    ambience: 5,
+    service: 5,
+    overall: 5,
+    recommend: 'Yes',
+    comments: '',
+    date: new Date().toISOString().split('T')[0]
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [formErrors, setFormErrors] = useState({});
-  const navigate = useNavigate();
+  const [submitMessage, setSubmitMessage] = useState('');
 
-  const validateForm = () => {
-    const errors = {};
-    
-    if (!formData.isAnonymous && !feedbackType) {
-      errors.feedbackType = "Please select a feedback type";
-    }
-    
-    if (!formData.isAnonymous && feedbackType === "individual" && !formData.name) {
-      errors.name = "Name is required";
-    }
-    
-    if (!formData.isAnonymous && feedbackType === "individual" && !formData.email) {
-      errors.email = "Email is required";
-    }
-    
-    if (!formData.isAnonymous && feedbackType === "group" && !formData.group) {
-      errors.group = "Group name is required";
-    }
-    
-    if (!formData.event) {
-      errors.event = "Please select an event";
-    }
-    
-    if (formData.event === "Other" && !formData.otherEvent) {
-      errors.otherEvent = "Please specify the event";
-    }
-    
-    if (formData.foodRating === 0) {
-      errors.foodRating = "Please rate the food";
-    }
-    
-    if (formData.serviceRating === 0) {
-      errors.serviceRating = "Please rate the service";
-    }
-    
-    if (formData.ambienceRating === 0) {
-      errors.ambienceRating = "Please rate the ambience";
-    }
-    
-    if (formData.overallRating === 0) {
-      errors.overallRating = "Please rate the overall experience";
-    }
-    
-    if (!formData.recommend) {
-      errors.recommend = "Please indicate if you would recommend us";
-    }
-    
-    setFormErrors(errors);
-    return Object.keys(errors).length === 0;
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Submit button clicked");
-    
-    if (!validateForm()) {
-      console.log("Form validation failed");
-      return;
-    }
-    
     setIsSubmitting(true);
-    console.log("Submitting form...");
-    
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    const finalData = {
-      ...formData,
-      food: formData.foodRating,
-      service: formData.serviceRating,
-      ambience: formData.ambienceRating,
-      overall: formData.overallRating,
-      event: formData.event === "Other" ? `Other: ${formData.otherEvent}` : formData.event,
-      name: formData.isAnonymous ? "Anonymous" : feedbackType === "group" ? formData.group : formData.name,
-      email: formData.isAnonymous ? "" : feedbackType === "group" ? formData.groupEmail : formData.email,
-      contact: formData.isAnonymous ? "" : feedbackType === "group" ? formData.groupContact : formData.contact,
-      type: formData.isAnonymous ? "Anonymous" : feedbackType === "group" ? "Group" : "Individual",
-      date: new Date().toLocaleString(),
-    };
 
-    const existing = JSON.parse(localStorage.getItem("feedbacks")) || [];
-    existing.push(finalData);
-    localStorage.setItem("feedbacks", JSON.stringify(existing));
-
-    console.log("Form submitted:", finalData);
-
-    setIsSubmitting(false);
-    
-    navigate('/thank-you');
+    try {
+      // Get existing feedbacks
+      const existingFeedbacks = JSON.parse(localStorage.getItem("feedbacks")) || [];
+      
+      // Add new feedback
+      const updatedFeedbacks = [...existingFeedbacks, formData];
+      
+      // Save to localStorage
+      localStorage.setItem("feedbacks", JSON.stringify(updatedFeedbacks));
+      
+      // Dispatch custom event to trigger real-time update
+      window.dispatchEvent(new Event('feedbackUpdated'));
+      
+      // Reset form
+      setFormData({
+        name: '',
+        email: '',
+        event: '',
+        food: 5,
+        ambience: 5,
+        service: 5,
+        overall: 5,
+        recommend: 'Yes',
+        comments: '',
+        date: new Date().toISOString().split('T')[0]
+      });
+      
+      setSubmitMessage('Thank you for your feedback!');
+      setTimeout(() => setSubmitMessage(''), 5000);
+    } catch (error) {
+      console.error("Error submitting feedback:", error);
+      setSubmitMessage('Error submitting feedback. Please try again.');
+      setTimeout(() => setSubmitMessage(''), 5000);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
-    <div className={`feedback-form-container ${clientDarkMode ? 'dark-mode' : ''}`}>
-      <form className="feedback-form" onSubmit={handleSubmit}>
-        <div className="form-header">
-            <h1>Feedback Form</h1>
-            <button 
-                className={`theme-toggle-button ${clientDarkMode ? 'active' : ''}`}
-                onClick={toggleClientTheme}
-                aria-label="Toggle dark mode"
-                title="Toggle theme"
-            >
-                <span className="toggle-slider"></span>
-                <i className={`bx ${clientDarkMode ? 'bx-sun' : 'bx-moon'} theme-icon`}></i>
-            </button>
+    <div className="feedback-form-container">
+      <h2>Share Your Feedback</h2>
+      {submitMessage && (
+        <div className="submit-message">
+          {submitMessage}
         </div>
-        <p className="form-description">
-          We value your feedback! Please share your experience with us.
-        </p>
-
-        <div className="form-group anonymous-option">
-          <label className="checkbox-label">
+      )}
+      <form onSubmit={handleSubmit} className="feedback-form">
+        <div className="form-row">
+          <div className="form-group">
+            <label htmlFor="name">Name</label>
             <input
-              type="checkbox"
-              checked={formData.isAnonymous}
-              onChange={(e) =>
-                setFormData({ ...formData, isAnonymous: e.target.checked })
-              }
+              type="text"
+              id="name"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              required
             />
-            <span className="checkmark"></span>
-            Submit as Anonymous
-          </label>
-        </div>
-
-        {!formData.isAnonymous && (
+          </div>
           <div className="form-group">
-            <label>
-              <strong>Are you giving feedback as:</strong>
-            </label>
-            <div className="radio-group">
-              <label className="radio-label">
-                <input
-                  type="radio"
-                  name="feedbackType"
-                  value="individual"
-                  checked={feedbackType === "individual"}
-                  onChange={(e) => setFeedbackType(e.target.value)}
-                />
-                <span className="radio-custom"></span>
-                Individual
-              </label>
-              <label className="radio-label">
-                <input
-                  type="radio"
-                  name="feedbackType"
-                  value="group"
-                  checked={feedbackType === "group"}
-                  onChange={(e) => setFeedbackType(e.target.value)}
-                />
-                <span className="radio-custom"></span>
-                Group / Organization / Association
-              </label>
-            </div>
-            {formErrors.feedbackType && (
-              <span className="error-message">{formErrors.feedbackType}</span>
-            )}
+            <label htmlFor="email">Email</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              required
+            />
           </div>
-        )}
-
-        {!formData.isAnonymous && feedbackType === "individual" && (
-          <div className="form-section">
-            <h3>Individual Information</h3>
-            <div className="form-group">
-              <label>Name:</label>
-              <input
-                type="text"
-                value={formData.name}
-                onChange={(e) =>
-                  setFormData({ ...formData, name: e.target.value })
-                }
-                className={formErrors.name ? "error" : ""}
-              />
-              {formErrors.name && (
-                <span className="error-message">{formErrors.name}</span>
-              )}
-            </div>
-            <div className="form-group">
-              <label>Email:</label>
-              <input
-                type="email"
-                value={formData.email}
-                onChange={(e) =>
-                  setFormData({ ...formData, email: e.target.value })
-                }
-                className={formErrors.email ? "error" : ""}
-              />
-              {formErrors.email && (
-                <span className="error-message">{formErrors.email}</span>
-              )}
-            </div>
-            <div className="form-group">
-              <label>Contact:</label>
-              <input
-                type="tel"
-                value={formData.contact}
-                onChange={(e) =>
-                  setFormData({ ...formData, contact: e.target.value })
-                }
-              />
-            </div>
-          </div>
-        )}
-
-        {!formData.isAnonymous && feedbackType === "group" && (
-          <div className="form-section">
-            <h3>Group / Organization Information</h3>
-            <div className="form-group">
-              <label>Group / Organization Name:</label>
-              <input
-                type="text"
-                value={formData.group}
-                onChange={(e) =>
-                  setFormData({ ...formData, group: e.target.value })
-                }
-                className={formErrors.group ? "error" : ""}
-              />
-              {formErrors.group && (
-                <span className="error-message">{formErrors.group}</span>
-              )}
-            </div>
-            <div className="form-group">
-              <label>Group Email:</label>
-              <input
-                type="email"
-                value={formData.groupEmail}
-                onChange={(e) =>
-                  setFormData({ ...formData, groupEmail: e.target.value })
-                }
-              />
-            </div>
-            <div className="form-group">
-              <label>Group Contact:</label>
-              <input
-                type="tel"
-                value={formData.groupContact}
-                onChange={(e) =>
-                  setFormData({ ...formData, groupContact: e.target.value })
-                }
-              />
-            </div>
-          </div>
-        )}
-
-        <div className="form-section">
-          <h3>Event Information</h3>
-          <EventDropdown
-            value={formData.event}
-            otherEvent={formData.otherEvent}
-            onChange={(data) => setFormData({ ...formData, ...data })}
+        </div>
+        
+        <div className="form-group">
+          <label htmlFor="event">Event</label>
+          <EventDropDown
+            events={['Birthday Party', 'Corporate Event', 'Wedding', 'Conference', 'Other']}
+            selectedEvent={formData.event}
+            onEventChange={(event) => setFormData(prev => ({ ...prev, event }))}
+            placeholder="Select an event"
+            allowCustom={true}
           />
-          {formErrors.event && (
-            <span className="error-message">{formErrors.event}</span>
-          )}
-          {formErrors.otherEvent && (
-            <span className="error-message">{formErrors.otherEvent}</span>
-          )}
         </div>
-
-        <div className="form-section">
-          <h3>Your Ratings</h3>
-          <div className="ratings-container">
-            <StarRating
-              label="Food"
-              value={formData.foodRating}
-              onChange={(val) => setFormData({ ...formData, foodRating: val })}
-              error={formErrors.foodRating}
+        
+        <div className="ratings-container">
+          <div className="rating-group">
+            <label>Food Quality</label>
+            <StarRating 
+              rating={formData.food}
+              onRatingChange={(rating) => setFormData(prev => ({ ...prev, food: rating }))}
+              size="large"
             />
-            <StarRating
-              label="Ambience"
-              value={formData.ambienceRating}
-              onChange={(val) =>
-                setFormData({ ...formData, ambienceRating: val })
-              }
-              error={formErrors.ambienceRating}
+          </div>
+          
+          <div className="rating-group">
+            <label>Ambience</label>
+            <StarRating 
+              rating={formData.ambience}
+              onRatingChange={(rating) => setFormData(prev => ({ ...prev, ambience: rating }))}
+              size="large"
             />
-            <StarRating
-              label="Service"
-              value={formData.serviceRating}
-              onChange={(val) => setFormData({ ...formData, serviceRating: val })}
-              error={formErrors.serviceRating}
+          </div>
+          
+          <div className="rating-group">
+            <label>Service</label>
+            <StarRating 
+              rating={formData.service}
+              onRatingChange={(rating) => setFormData(prev => ({ ...prev, service: rating }))}
+              size="large"
             />
-            <StarRating
-              label="Overall Experience"
-              value={formData.overallRating}
-              onChange={(val) =>
-                setFormData({ ...formData, overallRating: val })
-              }
-              error={formErrors.overallRating}
+          </div>
+          
+          <div className="rating-group">
+            <label>Overall Experience</label>
+            <StarRating 
+              rating={formData.overall}
+              onRatingChange={(rating) => setFormData(prev => ({ ...prev, overall: rating }))}
+              size="large"
             />
           </div>
         </div>
-
-        <div className="form-section">
-          <h3>Recommendation</h3>
-          <div className="form-group">
-            <label>
-              <strong>Would you recommend us?</strong>
+        
+        <div className="form-group">
+          <label>Would you recommend us?</label>
+          <div className="radio-group">
+            <label className="radio-label">
+              <input
+                type="radio"
+                name="recommend"
+                value="Yes"
+                checked={formData.recommend === 'Yes'}
+                onChange={handleChange}
+              />
+              <span>Yes</span>
             </label>
-            <div className="recommendation-options">
-              <label className="recommendation-label">
-                <input
-                  type="radio"
-                  name="recommend"
-                  value="Yes"
-                  checked={formData.recommend === "Yes"}
-                  onChange={(e) =>
-                    setFormData({ ...formData, recommend: e.target.value })
-                  }
-                />
-                <span className="recommendation-custom yes">
-                  <i className="bx bx-smile"></i>
-                  Yes
-                </span>
-              </label>
-              <label className="recommendation-label">
-                <input
-                  type="radio"
-                  name="recommend"
-                  value="No"
-                  checked={formData.recommend === "No"}
-                  onChange={(e) =>
-                    setFormData({ ...formData, recommend: e.target.value })
-                  }
-                />
-                <span className="recommendation-custom no">
-                  <i className="bx bx-sad"></i>
-                  No
-                </span>
-              </label>
-            </div>
-            {formErrors.recommend && (
-              <span className="error-message">{formErrors.recommend}</span>
-            )}
+            <label className="radio-label">
+              <input
+                type="radio"
+                name="recommend"
+                value="No"
+                checked={formData.recommend === 'No'}
+                onChange={handleChange}
+              />
+              <span>No</span>
+            </label>
           </div>
         </div>
-
-        <div className="form-section">
-          <h3>Additional Comments</h3>
-          <div className="form-group">
-            <label>Comments:</label>
-            <textarea
-              value={formData.comments}
-              onChange={(e) =>
-                setFormData({ ...formData, comments: e.target.value })
-              }
-              placeholder="Please share any additional feedback or suggestions..."
+        
+        <div className="form-group">
+          <label htmlFor="comments">Additional Comments</label>
+          <textarea
+            id="comments"
+            name="comments"
+            value={formData.comments}
+            onChange={handleChange}
+            rows="4"
+          ></textarea>
+        </div>
+        
+        <div className="form-actions">
+          <button type="submit" className="submit-btn" disabled={isSubmitting}>
+            {isSubmitting ? 'Submitting...' : 'Submit Feedback'}
+          </button>
+          
+          <div className="theme-toggle-container">
+            <Toggle
+              isOn={clientDarkMode}
+              onToggle={toggleClientTheme}
+              size="small"
+              label="Dark Mode"
             />
           </div>
-        </div>
-
-        <div className="form-actions">
-          <button 
-            type="submit" 
-            className="submit-btn"
-            disabled={isSubmitting}
-            style={{ cursor: isSubmitting ? 'not-allowed' : 'pointer' }}
-          >
-            {isSubmitting ? (
-              <>
-                <i className="bx bx-loader-alt bx-spin"></i>
-                Submitting...
-              </>
-            ) : (
-              <>
-                <i className="bx bx-send"></i>
-                Submit Feedback
-              </>
-            )}
-          </button>
         </div>
       </form>
     </div>
   );
-}
+};
+
+export default FeedbackForm;

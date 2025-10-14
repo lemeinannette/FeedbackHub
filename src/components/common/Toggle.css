@@ -1,0 +1,226 @@
+/* Toggle Component */
+.toggle-container {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.toggle-container--left {
+  flex-direction: row-reverse;
+}
+
+.toggle-container--right {
+  flex-direction: row;
+}
+
+.toggle-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+  cursor: pointer;
+  user-select: none;
+  transition: color 0.3s ease;
+}
+
+.toggle-label:hover {
+  color: #14b8a6;
+}
+
+/* Toggle Button */
+.toggle {
+  position: relative;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.toggle:focus-visible {
+  outline: 2px solid #14b8a6;
+  outline-offset: 2px;
+  border-radius: 9999px;
+}
+
+/* Size Variants */
+.toggle--small {
+  width: 40px;
+  height: 24px;
+}
+
+.toggle--medium {
+  width: 48px;
+  height: 28px;
+}
+
+.toggle--large {
+  width: 56px;
+  height: 32px;
+}
+
+/* Toggle Slider */
+.toggle-slider {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: #d1d5db;
+  border-radius: 9999px;
+  transition: all 0.3s ease;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.toggle--on .toggle-slider {
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  box-shadow: 0 2px 8px rgba(20, 184, 166, 0.3);
+}
+
+.toggle--off .toggle-slider {
+  background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+}
+
+.toggle--disabled .toggle-slider {
+  background: #e5e7eb;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Toggle Thumb */
+.toggle-thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  background: white;
+  border-radius: 50%;
+  transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+/* Thumb Sizes */
+.toggle--small .toggle-thumb {
+  width: 20px;
+  height: 20px;
+}
+
+.toggle--medium .toggle-thumb {
+  width: 24px;
+  height: 24px;
+}
+
+.toggle--large .toggle-thumb {
+  width: 28px;
+  height: 28px;
+}
+
+/* Thumb Position */
+.toggle--on .toggle-thumb {
+  transform: translateX(var(--thumb-translate));
+}
+
+.toggle--small .toggle--on .toggle-thumb {
+  --thumb-translate: 16px;
+}
+
+.toggle--medium .toggle--on .toggle-thumb {
+  --thumb-translate: 20px;
+}
+
+.toggle--large .toggle--on .toggle-thumb {
+  --thumb-translate: 24px;
+}
+
+/* Toggle Indicators */
+.toggle-indicator {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 10px;
+  color: white;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.toggle-indicator--on {
+  left: 6px;
+}
+
+.toggle-indicator--off {
+  right: 6px;
+}
+
+.toggle--on .toggle-indicator--on,
+.toggle--off .toggle-indicator--off {
+  opacity: 1;
+}
+
+/* Indicator Sizes */
+.toggle--small .toggle-indicator {
+  font-size: 8px;
+}
+
+.toggle--medium .toggle-indicator {
+  font-size: 10px;
+}
+
+.toggle--large .toggle-indicator {
+  font-size: 12px;
+}
+
+/* Hover Effects */
+.toggle:not(.toggle--disabled):hover .toggle-slider {
+  box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.1);
+}
+
+.toggle--on:not(.toggle--disabled):hover .toggle-slider {
+  box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.2);
+}
+
+.toggle--off:not(.toggle--disabled):hover .toggle-slider {
+  box-shadow: 0 0 0 3px rgba(107, 114, 128, 0.2);
+}
+
+/* Dark Mode */
+.admin-container.dark-mode .toggle-label {
+  color: #e5e7eb;
+}
+
+.admin-container.dark-mode .toggle--off .toggle-slider {
+  background: linear-gradient(135deg, #4b5563 0%, #374151 100%);
+}
+
+.admin-container.dark-mode .toggle--disabled .toggle-slider {
+  background: #374151;
+}
+
+/* Animation */
+.toggle {
+  animation: toggleFadeIn 0.3s ease-out;
+}
+
+@keyframes toggleFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .toggle,
+  .toggle-slider,
+  .toggle-thumb,
+  .toggle-indicator {
+    transition: none;
+  }
+  
+  .toggle-thumb {
+    transition: transform 0.2s ease;
+  }
+}
